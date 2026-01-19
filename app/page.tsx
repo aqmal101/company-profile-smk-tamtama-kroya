@@ -1,9 +1,142 @@
-export default function Beranda() {
+"use client";
+
+import { HeroSection } from "@/components/LandingPage/HeroSection";
+import { VacationTotal } from "@/components/LandingPage/VacationTotal";
+import { WhyChooseUs } from "@/components/LandingPage/WhyChooseUs";
+import { SchoolLocation } from "./components/LandingPage/SchoolLocation";
+import { RegistrationPathSection } from "@/components/LandingPage/RegistrationPathSection";
+import { RegistrationRequirementsSection } from "@/components/LandingPage/RegistrationRequirementsSection";
+
+export default function LandingPage() {
+  // Data untuk Registration Path Section
+  const registrationPathTabs = [
+    {
+      id: "prestasi",
+      label: "Jalur Prestasi",
+      image: "/ppdb/jalur-prestasi.jpg",
+      items: [
+        {
+          grade: "Peringkat 1 Kelas (Gratis SPP 9 Bulan)",
+          description: "Untuk siswa dengan prestasi akademik terbaik",
+          icon: "🏆",
+        },
+        {
+          grade: "Peringkat 2 Kelas (Gratis SPP 6 Bulan)",
+          description: "Untuk siswa dengan prestasi akademik sangat baik",
+          icon: "🥈",
+        },
+        {
+          grade: "Peringkat 3 Kelas (Gratis SPP 3 Bulan)",
+          description: "Untuk siswa dengan prestasi akademik baik",
+          icon: "🥉",
+        },
+      ],
+    },
+    {
+      id: "non-akademik",
+      label: "Jalur Non-Akademik",
+      image: "/ppdb/jalur-non-akademik.jpg",
+      items: [
+        {
+          grade: "Peringkat 1 Kelas (Gratis SPP 9 Bulan)",
+          description: "Untuk siswa dengan prestasi non-akademik terbaik",
+          icon: "🏆",
+        },
+        {
+          grade: "Peringkat 2 Kelas (Gratis SPP 6 Bulan)",
+          description: "Untuk siswa dengan prestasi non-akademik sangat baik",
+          icon: "🥈",
+        },
+        {
+          grade: "Peringkat 3 Kelas (Gratis SPP 3 Bulan)",
+          description: "Untuk siswa dengan prestasi non-akademik baik",
+          icon: "🥉",
+        },
+      ],
+    },
+  ];
+
+  // Data untuk Registration Requirements Section
+  const requirements = [
+    {
+      id: 1,
+      text: "Mengisi formulir pendaftaran",
+    },
+    {
+      id: 2,
+      text: "Foto Copy (Ijazah)",
+    },
+    {
+      id: 3,
+      text: "Foto Copy KK dan Akta Kelahiran",
+    },
+    {
+      id: 4,
+      text: "Foto Copy KTP/Kartu Pelajar",
+    },
+    {
+      id: 5,
+      text: "Pas foto 3x4 (2 lembar)",
+    },
+    {
+      id: 6,
+      text: "Sertifikat TKA (Tes Kemampuan Akademik)",
+    },
+    {
+      id: 7,
+      text: "Foto Copy Kartu PKH (Jika Ada)",
+    },
+  ];
+
+  const registrationPeriods = [
+    {
+      id: 1,
+      period: "1",
+      startMonth: "November",
+      endMonth: "Februari",
+      status: "BUKA",
+      icon: "01",
+    },
+    {
+      id: 2,
+      period: "2",
+      startMonth: "Maret",
+      endMonth: "Mei",
+      status: "Tutup",
+      icon: "02",
+    },
+    {
+      id: 3,
+      period: "3",
+      startMonth: "Juni",
+      endMonth: "Juli",
+      status: "Tutup",
+      icon: "03",
+    },
+  ];
+
   return (
-    <main className="flex h-screen w-full flex-col items-center justify-center">
-      <div className="w-full h-full flex justify-center items-center">
-        <h1 className="text-3xl">Beranda</h1>
-      </div>
+    <main className="min-h-screen bg-linear-to-b from-white to-gray-50">
+      {/* Hero Section */}
+      <HeroSection />
+
+      {/* Mengapa harus SMK Tamtama Kroya? */}
+      <WhyChooseUs />
+
+      {/* Jumlah Pendaftar per Jurusan */}
+      <VacationTotal />
+
+      {/* Jalur Pendaftaran */}
+      <RegistrationPathSection tabs={registrationPathTabs} />
+
+      {/* Syarat & Periode Pendaftaran */}
+      <RegistrationRequirementsSection
+        requirements={requirements}
+        periods={registrationPeriods}
+      />
+
+      {/* Lokasi Sekolah */}
+      <SchoolLocation />
     </main>
   );
 }

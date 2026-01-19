@@ -12,7 +12,7 @@ export const WhyChooseUs: React.FC = () => {
 
       <div className="w-full h-[70vh] border border-gray-100 flex flex-row px-32">
         <div className="w-4/10 h-full border  border-purple-500">
-          <div className="w-full h-full bg-gray-700 rounded-2xl"></div>
+          <div className="w-full h-full bg-gray-300 rounded-2xl"></div>
         </div>
         <div className="w-6/10 h-full border border-purple-500 py-20 px-12">
           <div className="w-full h-full flex justify-center items-center border">

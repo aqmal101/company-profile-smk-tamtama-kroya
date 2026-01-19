@@ -1,5 +1,6 @@
 import { SectionTitle } from "@/components/SectionTitle";
 import { FaCheck } from "react-icons/fa6";
+import { Tabs } from "../Tabs";
 
 export const RegistrationPath: React.FC = () => {
   return (
@@ -10,7 +11,7 @@ export const RegistrationPath: React.FC = () => {
         align="center"
       />
 
-      <div className="w-full h-[70vh] border border-gray-100 flex flex-row px-32">
+      <div className="w-full h-[70vh] border border-gray-500 flex flex-row px-32">
         <div className="w-4/10 h-full border  border-purple-500">
           <div className="w-full h-full bg-gray-700 rounded-2xl"></div>
         </div>

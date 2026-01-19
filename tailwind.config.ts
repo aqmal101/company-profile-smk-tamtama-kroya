@@ -13,10 +13,6 @@ module.exports = {
       colors: {
         primary: '#014921',
         secondary: "#56B680",
-        'jurusan-tkr': '#ec4899',
-        'jurusan-dkv': '#3b82f6',
-        'jurusan-mesin': '#06b6d4',
-        'jurusan-titl': '#a855f7',
       },
     },
   },
