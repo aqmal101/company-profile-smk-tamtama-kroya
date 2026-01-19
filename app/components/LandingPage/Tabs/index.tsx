@@ -1,4 +1,4 @@
-export const Tabs() {
+export const Tabs: unknown = () => {
   return (
     <>
       <div className="mb-4 border-b border-default">
