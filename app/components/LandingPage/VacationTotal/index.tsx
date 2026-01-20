@@ -42,7 +42,7 @@ export const VacationTotal: React.FC = () => {
     },
   ];
   return (
-    <section className="w-full border border-red-500 mb-12 px-24 py-10 h-fit space-y-12">
+    <section className="w-full mb-12 px-24 py-10 h-fit space-y-12">
       <SectionTitle
         title="Jumlah Pendaftar per Jurusan"
         subtitle="Daftar pendaftar diperbarui secara berkala selama masa PPDB  berlangsung"

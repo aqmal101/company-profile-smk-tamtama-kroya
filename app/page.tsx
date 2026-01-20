@@ -18,7 +18,7 @@ export default function LandingPage() {
         {
           grade: "Peringkat 1 Kelas (Gratis SPP 9 Bulan)",
           description: "Untuk siswa dengan prestasi akademik terbaik",
-          icon: "🏆",
+          icon: "🥇",
         },
         {
           grade: "Peringkat 2 Kelas (Gratis SPP 6 Bulan)",
@@ -38,19 +38,19 @@ export default function LandingPage() {
       image: "/ppdb/jalur-non-akademik.jpg",
       items: [
         {
-          grade: "Peringkat 1 Kelas (Gratis SPP 9 Bulan)",
+          grade: "Juara Nasional (Gratis SPP 1 Tahun)",
           description: "Untuk siswa dengan prestasi non-akademik terbaik",
           icon: "🏆",
         },
         {
-          grade: "Peringkat 2 Kelas (Gratis SPP 6 Bulan)",
+          grade: "Juara Provinsi (Gratis SPP 9 Bulan)",
           description: "Untuk siswa dengan prestasi non-akademik sangat baik",
-          icon: "🥈",
+          icon: "🏆",
         },
         {
-          grade: "Peringkat 3 Kelas (Gratis SPP 3 Bulan)",
+          grade: "Juara Kabupaten (Gratis SPP 6 Bulan)",
           description: "Untuk siswa dengan prestasi non-akademik baik",
-          icon: "🥉",
+          icon: "🏆",
         },
       ],
     },
@@ -64,7 +64,7 @@ export default function LandingPage() {
     },
     {
       id: 2,
-      text: "Foto Copy (Ijazah)",
+      text: "Foto Copy Ijazah",
     },
     {
       id: 3,
@@ -72,11 +72,11 @@ export default function LandingPage() {
     },
     {
       id: 4,
-      text: "Foto Copy KTP/Kartu Pelajar",
+      text: "Foto Copy KTP Orang Tua",
     },
     {
       id: 5,
-      text: "Pas foto 3x4 (2 lembar)",
+      text: "Pas foto 3x4 Berwarna (3 lembar)",
     },
     {
       id: 6,
@@ -84,7 +84,7 @@ export default function LandingPage() {
     },
     {
       id: 7,
-      text: "Foto Copy Kartu PKH (Jika Ada)",
+      text: "Foto Copy Kartu PIP (Jika Ada)",
     },
   ];
 
@@ -116,7 +116,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-linear-to-b from-white to-gray-50">
+    <main className="h-fit bg-linear-to-b from-[#fafafa] to-gray-50">
       {/* Hero Section */}
       <HeroSection />
 

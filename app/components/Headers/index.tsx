@@ -9,14 +9,14 @@ const currentYear = new Date().getFullYear();
 export const Header: React.FC = () => {
   const pathname = usePathname();
 
-  const ppdbRoutes = ["/ppdb"];
+  const ppdbRoutes = ["/ppdb", "/"];
 
   const isPPDBRoute = ppdbRoutes.some((route) => pathname.startsWith(route));
 
   return (
     <header className="fixed bg-white text-[#2D2D2D] shadow-lg w-full px-10 py-4 z-100">
-      <div className="w-full flex flex-row border justify-between">
-        <div className="w-[40%] flex flex-row items-center justify-start border">
+      <div className="w-full flex flex-row justify-between">
+        <div className="w-[40%] flex flex-row items-center justify-start">
           <Image
             src="/header/logo.png"
             alt="PPDB Logo"
@@ -32,8 +32,8 @@ export const Header: React.FC = () => {
             </div>
           )}
         </div>
-        <div className="w-[60%] flex flex-row items-center justify-end border">
-          <div className="w-full border flex flex-row space-x-8">
+        <div className="w-[60%] flex flex-row items-center justify-end">
+          <div className="w-full flex flex-row space-x-8">
             {NavItems.map((item) => (
               <div key={item.label} className="relative group/nav">
                 <a

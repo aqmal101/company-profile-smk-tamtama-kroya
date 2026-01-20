@@ -3,20 +3,20 @@ import { SectionTitle } from "../../SectionTitle";
 
 export const WhyChooseUs: React.FC = () => {
   return (
-    <section className="w-full border border-red-500 mb-12 px-24 py-10 h-fit space-y-12">
+    <section className="w-full mb-12 px-24 py-10 h-fit space-y-12">
       <SectionTitle
-        title="Mengapa harus SMK Tamtama Kroya?"
+        title="Mengapa Harus SMK Tamtama Kroya?"
         subtitle="Pilihan tepat untuk membangun masa depan melalui pendidikan vokasi berkualitas"
         align="center"
       />
 
       <div className="w-full h-[70vh] border border-gray-100 flex flex-row px-32">
-        <div className="w-4/10 h-full border  border-purple-500">
+        <div className="w-4/10 h-full ">
           <div className="w-full h-full bg-gray-300 rounded-2xl"></div>
         </div>
-        <div className="w-6/10 h-full border border-purple-500 py-20 px-12">
-          <div className="w-full h-full flex justify-center items-center border">
-            <ol className="w-full space-y-12 border">
+        <div className="w-6/10 h-full py-20 px-12">
+          <div className="w-full h-full flex justify-center items-center">
+            <ol className="w-full space-y-12">
               {[
                 "Kurikulum Nasional & Penguatan Karakter",
                 "Guru Professional & Pengalaman",
