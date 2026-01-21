@@ -7,6 +7,8 @@ import { SchoolLocation } from "./components/LandingPage/SchoolLocation";
 import { RegistrationPathSection } from "@/components/LandingPage/RegistrationPathSection";
 import { RegistrationRequirementsSection } from "@/components/LandingPage/RegistrationRequirementsSection";
 import { BrochureSection } from "./components/LandingPage/BrochureSection";
+import { ContactAndSocial } from "./components/LandingPage/ContactAndSocial";
+import { SchoolFacility } from "./components/LandingPage/SchoolFacility";
 
 export default function LandingPage() {
   // Data untuk Registration Path Section
@@ -122,13 +124,16 @@ export default function LandingPage() {
       <HeroSection />
 
       {/* Mengapa harus SMK Tamtama Kroya? */}
-      <WhyChooseUs />
+      <WhyChooseUs id="mengapa-pilih-tamtama" />
 
       {/* Jumlah Pendaftar per Jurusan */}
       <VacationTotal />
 
       {/* Jalur Pendaftaran */}
-      <RegistrationPathSection tabs={registrationPathTabs} />
+      <RegistrationPathSection
+        id="jalur-pendaftaran"
+        tabs={registrationPathTabs}
+      />
 
       {/* Syarat & Periode Pendaftaran */}
       <RegistrationRequirementsSection
@@ -136,11 +141,17 @@ export default function LandingPage() {
         periods={registrationPeriods}
       />
 
+      {/* Fasilitas Sekolah */}
+      <SchoolFacility id="fasilitas-sekolah" />
+
       {/* Lokasi Sekolah */}
-      <SchoolLocation />
+      <SchoolLocation id="lokasi-sekolah" />
+
+      {/* Kontak & Sosial Media */}
+      <ContactAndSocial id="kontak-sosial-media" />
 
       {/* Info Brosur */}
-      <BrochureSection />
+      <BrochureSection id="info-brosur" />
     </main>
   );
 }

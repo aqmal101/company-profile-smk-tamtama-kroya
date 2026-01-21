@@ -19,14 +19,17 @@ interface RegistrationPathSectionProps {
 }
 
 export const RegistrationPathSection: React.FC<
-  RegistrationPathSectionProps
-> = ({ tabs }) => {
+  RegistrationPathSectionProps & { id?: string }
+> = ({ tabs, id }) => {
   const [activeTab, setActiveTab] = useState(tabs[0]?.id || "");
 
   const activeTabData = tabs.find((tab) => tab.id === activeTab);
 
   return (
-    <section className="w-full h-fit px-4 sm:px-12 lg:px-56 space-y-12 ">
+    <section
+      id={id || "jalur-pendaftaran"}
+      className="w-full h-fit px-4 sm:px-12 lg:px-56 space-y-12 "
+    >
       <SectionTitle
         title="Jalur Pendaftaran"
         subtitle="Tersedia beberapa jalur pendaftaran yang dapat disesuaikan dengan prestasi dan kemampuan calon peserta didik."
@@ -75,20 +78,27 @@ export const RegistrationPathSection: React.FC<
               </div>
 
               {/* Content Section */}
-              <div className="flex w-1/2 h-full flex-col justify-center space-y-10 p-10">
-                {activeTabData.items.map((item, index) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className="text-3xl shrink-0">{item.icon}</div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-800">
-                        {item.grade}
-                      </h4>
-                      <p className="text-gray-600 text-sm mt-1">
-                        {item.description}
-                      </p>
+              <div className="flex w-1/2 h-full flex-col items-center justify-center p-10">
+                <div className="w-full h-fit space-y-5">
+                  {activeTabData.items.map((item, index) => (
+                    <div key={index} className="flex items-start gap-4">
+                      <div className="text-3xl shrink-0">{item.icon}</div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-800">
+                          {item.grade}
+                        </h4>
+                        <p className="text-gray-600 text-sm mt-1">
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <span
+                  className={`w-full mt-6 flex justify-end ${activeTabData.id === "non-akademik" ? "block" : "hidden"} text-red-500 text-sm`}
+                >
+                  *Syarat dan Ketentuan Berlaku
+                </span>
               </div>
             </div>
           </div>

@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { HeaderWrapper } from "./components/Headers/HeaderWrapper";
 import { BsWhatsapp } from "react-icons/bs";
+import { Footer } from "./components/Footer";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -40,6 +41,7 @@ export default function RootLayout({
         >
           <BsWhatsapp size={30} color="white" />
         </a>
+        <Footer />
       </body>
     </html>
   );

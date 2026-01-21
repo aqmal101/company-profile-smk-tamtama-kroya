@@ -1,9 +1,12 @@
 import { FaCheck } from "react-icons/fa6";
 import { SectionTitle } from "../../SectionTitle";
 
-export const WhyChooseUs: React.FC = () => {
+export const WhyChooseUs: React.FC<{ id?: string }> = ({ id }) => {
   return (
-    <section className="w-full mb-12 px-24 py-10 h-fit space-y-12">
+    <section
+      id={id || "mengapa-pilih-tamtama"}
+      className="w-full mb-12 px-24 py-10 h-fit space-y-12"
+    >
       <SectionTitle
         title="Mengapa Harus SMK Tamtama Kroya?"
         subtitle="Pilihan tepat untuk membangun masa depan melalui pendidikan vokasi berkualitas"

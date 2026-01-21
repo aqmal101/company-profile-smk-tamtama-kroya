@@ -1,11 +1,11 @@
-import { BsFire, BsLightningCharge } from "react-icons/bs";
+import { BsLightningCharge } from "react-icons/bs";
 import { FaGears } from "react-icons/fa6";
 import { LiaCarSideSolid } from "react-icons/lia";
 import { MdOutlineColorLens } from "react-icons/md";
 import { SectionTitle } from "@/components/SectionTitle";
 import VacationCard from "@/components/Card/VacationCard";
 
-export const VacationTotal: React.FC = () => {
+export const VacationTotal: React.FC<{ id?: string }> = ({ id }) => {
   const vacationList = [
     {
       name: "TKR",
@@ -42,7 +42,10 @@ export const VacationTotal: React.FC = () => {
     },
   ];
   return (
-    <section className="w-full mb-12 px-24 py-10 h-fit space-y-12">
+    <section
+      id={id || "jumlah-peminat"}
+      className="w-full mb-12 px-24 py-10 h-fit space-y-12"
+    >
       <SectionTitle
         title="Jumlah Pendaftar per Jurusan"
         subtitle="Daftar pendaftar diperbarui secara berkala selama masa PPDB  berlangsung"

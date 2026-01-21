@@ -33,7 +33,7 @@ export const PathCard = ({
   isLocked: boolean;
 }) => {
   return (
-    <div className="flex flex-col justify-between p-2 border border-gray-300 h-28 rounded-lg">
+    <div className="flex flex-col justify-between p-2 border border-gray-300 min-h-28 h-fit rounded-lg">
       <p className="text-lg font-bold text-[#014921]">{grade}</p>
       <p>{description}</p>
       {isLocked ? (
@@ -61,9 +61,12 @@ export const PathCard = ({
 
 export const RegistrationRequirementsSection: React.FC<
   RegistrationRequirementsSectionProps
-> = ({ requirements, periods }) => {
+> = ({ requirements }) => {
   return (
-    <section className="w-full h-fit px-4 sm:px-12 lg:px-56 py-10">
+    <section
+      id="syarat-periode-daftar"
+      className="w-full h-fit px-4 sm:px-12 lg:px-56 py-10"
+    >
       <SectionTitle
         title="Syarat & Periode Pendaftaran"
         subtitle="Perhatikan ketentuan menerima pendaftaran dan mendaftar sesuai jadwal yang telah ditentukan."
@@ -71,19 +74,19 @@ export const RegistrationRequirementsSection: React.FC<
       />
 
       {/* Tabs Container */}
-      <div className=" h-fit border border-gray-300 rounded-md grid grid-cols-1 lg:grid-cols-2">
+      <div className=" h-140 border border-gray-300 rounded-md grid grid-cols-1 lg:grid-cols-2">
         {/* Persyaratan Tab */}
-        <div className="w-full h-fit bg-white rounded-lg rounded-r-none overflow-hidden">
+        <div className="w-full h-full bg-white rounded-lg rounded-r-none overflow-hidden pb-12">
           <div className="bg-[#1B5E20] px-6 py-6">
             <h3 className="text-xl font-bold text-white text-center">
               Syarat Pendaftaran
             </h3>
           </div>
-          <div className="w-full h-full px-8 my-10 flex flex-col justify-center items-start space-y-6 border-r-2 border-gray-200">
+          <div className="w-full h-full flex flex-col justify-center items-start p-10 border-gray-200">
             {requirements.map((requirement) => (
               <div
                 key={requirement.id}
-                className="flex h-full items-start gap-4"
+                className="flex h-full items-start gap-3"
               >
                 <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0 mt-1">
                   <FaCheck className="text-green-600" size={20} />
@@ -97,13 +100,13 @@ export const RegistrationRequirementsSection: React.FC<
         </div>
 
         {/* Periode Pendaftaran Tab */}
-        <div className="w-full h-fit bg-white rounded-lg rounded-l-none overflow-hidden">
+        <div className="w-full h-full bg-white rounded-lg rounded-l-none overflow-hidden">
           <div className="bg-[#1B5E20] px-6 py-6">
             <h3 className="text-xl font-bold text-white text-center">
               Periode Pendaftaran
             </h3>
           </div>
-          <div className="w-full h-full px-8 my-10 flex flex-col justify-center items-start space-y-6 border-gray-200">
+          <div className="w-full h-full flex flex-col justify-center items-start border p-10 border-gray-200">
             <div className="w-full h-full flex flex-row justify-between">
               <div className="w-[43%] h-100 flex flex-col justify-between">
                 <PathCard

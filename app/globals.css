@@ -4,4 +4,17 @@
     button {
         @apply cursor-pointer;
     }
+
+    h1 {
+        @apply font-bold;
+    }
+}
+
+/* Smooth scroll behavior dengan offset untuk section links */
+html {
+    scroll-behavior: smooth;
+}
+
+section[id] {
+    scroll-margin-top: 10vh;
 }

@@ -30,8 +30,14 @@ export default function VacationCard({
         </div>
       )}
       <div className="flex flex-row justify-start items-center space-x-6">
-        <div className="w-20 h-20 border-2 border-gray-400 rounded-md flex justify-center items-center">
-          {item.icon}
+        <div
+          className="w-20 h-20 rounded-md flex justify-center items-center flex-shrink-0"
+          style={{
+            backgroundColor: item.color,
+            opacity: 0.1,
+          }}
+        >
+          <div className="text-4xl text-gray-700">{item.icon}</div>
         </div>
         <div className="flex flex-col">
           <h3
