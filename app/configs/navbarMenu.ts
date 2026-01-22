@@ -3,7 +3,6 @@ export const NavItems = [
   { label: "Beranda", href: "/" },
   {
     label: "Tentang Sekolah",
-    href: "/tentang-sekolah",
     children: [
       { label: "Kegiatan Sekolah", href: "/tentang-sekolah/kegiatan" },
       { label: "Fasilitas", href: "/tentang-sekolah/fasilitas" },
@@ -16,14 +15,14 @@ export const NavItems = [
     href: "/program-keahlian",
    
   },
-  { label: "PPDB", href: "/ppdb",
+  { label: "PPDB",
     children: [
       { label: "Jadwal & Alur Pendaftaran ", href: "/#syarat-periode-daftar" },
       { label: "Jalur Pendaftaran", href: "/#jalur-pendaftaran" },
       { label: "Syarat Pendaftaran", href: "/#syarat-periode-daftar" },
       { label: "Statistik Pendaftar", href: "/#jumlah-peminat" },
     ] },
-  { label: "Informasi", href: "/informasi", children: [
+  { label: "Informasi", children: [
       { label: "Lokasi Sekolah", href: "/#lokasi-sekolah" },
       { label: "Kontak", href: "/#kontak-sosial-media" },
   ] },

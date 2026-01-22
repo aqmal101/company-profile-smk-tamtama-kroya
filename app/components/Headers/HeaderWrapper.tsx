@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Header from "./index";
+import RegistrationHeader from "./RegistrationHeader";
 
 export const HeaderWrapper = () => {
   const pathname = usePathname();
@@ -15,11 +16,17 @@ export const HeaderWrapper = () => {
     "/not-found",
   ];
 
+  const registrationHeaderRoutes = ["/pendaftaran"];
+
   // Cek apakah pathname dimulai dengan path tanpa header
   const isNoHeader = noHeader.some((route) => pathname.startsWith(route));
+  const isRegistrationHeader = registrationHeaderRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
 
-  // Return header sesuai kondisi (null jika tidak ada header)
-  if (isNoHeader) return null;
-
-  return <Header />;
+  return isRegistrationHeader && !isNoHeader ? (
+    <RegistrationHeader />
+  ) : (
+    <Header />
+  );
 };

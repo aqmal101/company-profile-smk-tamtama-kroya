@@ -1,5 +1,6 @@
 "use client";
 
+import { ScrollAnimationWrapper } from "@/components/ScrollAnimationWrapper";
 import { SectionTitle } from "@/components/SectionTitle";
 import { FaCheck } from "react-icons/fa6";
 import { MdLockOpen, MdLockOutline } from "react-icons/md";
@@ -34,11 +35,11 @@ export const PathCard = ({
 }) => {
   return (
     <div className="flex flex-col justify-between p-2 border border-gray-300 min-h-28 h-fit rounded-lg">
-      <p className="text-lg font-bold text-primary">{grade}</p>
-      <p>{description}</p>
+      <p className="text-lg max-sm:text-sm font-bold text-primary">{grade}</p>
+      <p className="text-base max-sm:text-xs">{description}</p>
       {isLocked ? (
         <div className="w-full h-fit flex justify-between items-center">
-          <p className="text-sm">
+          <p className="text-sm max-sm:text-xs">
             Status : <span className="text-red-500 font-semibold">TUTUP</span>
           </p>
           <div className="w-8 h-8 flex justify-center items-center rounded-md bg-gray-100">
@@ -47,7 +48,7 @@ export const PathCard = ({
         </div>
       ) : (
         <div className="w-full h-fit flex justify-between items-center">
-          <p className="text-sm">
+          <p className="text-sm max-sm:text-xs">
             Status : <span className="text-primary font-semibold">BUKA</span>
           </p>
           <div className="w-8 h-8 flex justify-center items-center rounded-md bg-gray-100">
@@ -65,7 +66,7 @@ export const RegistrationRequirementsSection: React.FC<
   return (
     <section
       id="syarat-periode-daftar"
-      className="w-full h-fit px-4 sm:px-12 lg:px-56 py-10"
+      className="w-full h-fit px-6 max-sm:px-8 max-md:px-16 max-lg:px-10 max-xl:px-56 py-10"
     >
       <SectionTitle
         title="Syarat & Periode Pendaftaran"
@@ -74,72 +75,78 @@ export const RegistrationRequirementsSection: React.FC<
       />
 
       {/* Tabs Container */}
-      <div className=" h-140 border border-gray-300 rounded-md grid grid-cols-1 lg:grid-cols-2">
+      <div className="h-140 max-lg:h-fit border border-gray-300 rounded-md grid grid-cols-2 max-sm:grid-cols-1 max-md:grid-cols-1 max-lg:grid-cols-1">
         {/* Persyaratan Tab */}
-        <div className="w-full h-full bg-white rounded-lg rounded-r-none overflow-hidden pb-12">
-          <div className="bg-[#1B5E20] px-6 py-6">
-            <h3 className="text-xl font-bold text-white text-center">
+        <div className="w-full h-full bg-white rounded-lg lg:rounded-r-none overflow-hidden pb-12">
+          <div className="bg-[#1B5E20] px-6 py-6 max-sm:py-3 max-sm:px-3">
+            <h3 className="text-xl max-sm:text-lg font-bold text-white text-center">
               Syarat Pendaftaran
             </h3>
           </div>
-          <div className="w-full h-full flex flex-col justify-center items-start p-10 border-gray-200">
+          <div className="w-full h-full flex flex-col justify-center items-start p-10 max-sm:p-7 border-gray-200">
             {requirements.map((requirement) => (
-              <div
+              <ScrollAnimationWrapper
                 key={requirement.id}
                 className="flex h-full items-start gap-3"
               >
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0 mt-1">
-                  <FaCheck className="text-green-600" size={20} />
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                  <FaCheck className="text-green-600 text-base max-sm:text-sm" />
                 </div>
-                <p className="text-gray-700 leading-relaxed">
+                <p className="text-gray-700 leading-relaxed max-sm:text-xs">
                   {requirement.text}
                 </p>
-              </div>
+              </ScrollAnimationWrapper>
             ))}
           </div>
         </div>
 
         {/* Periode Pendaftaran Tab */}
-        <div className="w-full h-full bg-white rounded-lg rounded-l-none overflow-hidden">
-          <div className="bg-[#1B5E20] px-6 py-6">
-            <h3 className="text-xl font-bold text-white text-center">
+        <div className="w-full h-full max-lg:h-fit bg-white rounded-lg lg:rounded-l-none overflow-hidden">
+          <div className="bg-[#1B5E20] px-6 py-6 max-sm:py-3 max-sm:px-3">
+            <h3 className="text-xl max-sm:text-lg font-bold text-white text-center">
               Periode Pendaftaran
             </h3>
           </div>
-          <div className="w-full h-full flex flex-col justify-center items-start border p-10 border-gray-200">
+          <div className="w-full h-full flex flex-col justify-center items-start border p-10 max-sm:border max-sm:p-4 border-gray-200">
             <div className="w-full h-full flex flex-row justify-between">
-              <div className="w-[43%] h-100 flex flex-col justify-between">
-                <PathCard
-                  grade={"Gelombang 1"}
-                  description={"November - Februari"}
-                  isLocked={false}
-                />
-                <PathCard
-                  grade={"Gelombang 3"}
-                  description={"Juni - Juli"}
-                  isLocked={false}
-                />
+              <div className="w-[43%] max-sm:w-[9/10] h-100 flex flex-col justify-between">
+                <ScrollAnimationWrapper>
+                  <PathCard
+                    grade={"Gelombang 1"}
+                    description={"November - Februari"}
+                    isLocked={false}
+                  />
+                </ScrollAnimationWrapper>
+                <ScrollAnimationWrapper>
+                  <PathCard
+                    grade={"Gelombang 3"}
+                    description={"Juni - Juli"}
+                    isLocked={false}
+                  />
+                </ScrollAnimationWrapper>
               </div>
               <div className="w-1/10 h-100 relative">
                 <div className="absolute w-full h-full flex items-center justify-around flex-col space-y-6 z-10">
-                  <div className="w-10 h-10 text-white rounded-full flex justify-center items-center text-xl font-bold text-primary">
+                  <div className="w-10 h-10 max-sm:w-8 max-sm:h-8 max-sm:text-sm text-white rounded-full flex justify-center items-center text-xl font-bold bg-primary">
                     01
                   </div>
-                  <div className="w-10 h-10 text-white rounded-full flex justify-center items-center text-xl font-bold bg-[#56B680]">
+                  <div className="w-10 h-10 max-sm:w-8 max-sm:h-8 max-sm:text-sm text-white rounded-full flex justify-center items-center text-xl font-bold bg-secondary">
                     02
                   </div>
-                  <div className="w-10 h-10 text-white rounded-full flex justify-center items-center text-xl font-bold bg-[#BFEC43]">
+                  <div className="w-10 h-10 max-sm:w-8 max-sm:h-8 max-sm:text-sm text-white rounded-full flex justify-center items-center text-xl font-bold bg-[#BFEC43]">
                     03
                   </div>
                 </div>
                 <div className="w-0.5 h-full absolute top-0 inset-1/2 bg-gray-200"></div>
               </div>
-              <div className="w-[43%] h-100 flex flex-col justify-center">
-                <PathCard
-                  grade={"Gelombang 2"}
-                  description={"Maret - Mei"}
-                  isLocked={true}
-                />
+              <div className="w-[43%] max-sm:w-[9/10] h-100 flex flex-col justify-center">
+                <ScrollAnimationWrapper>
+                  <PathCard
+                    grade={"Gelombang 2"}
+                    description={"Maret - Mei"}
+                    isLocked={true}
+                  />
+                </ScrollAnimationWrapper>
               </div>
             </div>
           </div>

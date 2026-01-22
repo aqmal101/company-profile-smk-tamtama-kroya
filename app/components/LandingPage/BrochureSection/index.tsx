@@ -5,17 +5,18 @@ import { ImageZoomModal } from "@/components/Modal/ImageZoomModal";
 import Image from "next/image";
 import { useState } from "react";
 import { PiMagnifyingGlassBold } from "react-icons/pi";
+import { ScrollAnimationWrapper } from "@/components/ScrollAnimationWrapper";
 
-const brochureList = [
-  { image: "/brochure/brosur-depan.png", alt: "Brosur Depan" },
-  { image: "/brochure/brosur-belakang.png", alt: "Brosur Belakang" },
-];
+interface Brochure {
+  image: string;
+  alt: string;
+}
 
-export const BrochureSection: React.FC<{ id?: string }> = ({ id }) => {
-  const [selectedImage, setSelectedImage] = useState<{
-    image: string;
-    alt: string;
-  } | null>(null);
+export const BrochureSection: React.FC<{
+  id?: string;
+  brochureList: Brochure[];
+}> = ({ id, brochureList }) => {
+  const [selectedImage, setSelectedImage] = useState<Brochure | null>(null);
 
   const handleCloseModal = () => {
     setSelectedImage(null);
@@ -25,7 +26,7 @@ export const BrochureSection: React.FC<{ id?: string }> = ({ id }) => {
     <>
       <section
         id={id || "info-brosur"}
-        className="w-full mb-12 py-10 h-fit space-y-12"
+        className="w-full mb-12 py-8 sm:py-10 px-4 sm:px-8 h-fit space-y-12"
       >
         <SectionTitle
           title="Info Brosur"
@@ -33,12 +34,17 @@ export const BrochureSection: React.FC<{ id?: string }> = ({ id }) => {
           align="center"
         />
 
-        <div className="w-full h-[80vh] border rounded-2xl overflow-hidden border-gray-300 bg-gray-200 flex flex-row px-20 py-10 gap-5 justify-between">
+        <div className="w-full h-auto lg:h-[80vh] border rounded-2xl overflow-hidden border-gray-300 bg-gray-200 flex flex-col lg:flex-row px-4 sm:px-8 lg:px-20 py-6 sm:py-10 gap-3 sm:gap-5 justify-between">
           {brochureList.map((item, index) => (
-            <div key={index} className="h-full w-full flex flex-col">
-              <div className="h-9/10 bg-white p-2 rounded-lg">
+            <ScrollAnimationWrapper
+              key={index}
+              direction="up"
+              delay={index * 0.1}
+              className="h-auto lg:h-full w-full flex flex-col"
+            >
+              <div className="h-64 sm:h-80 lg:h-9/10 bg-white p-2 rounded-lg">
                 <Image
-                  className="w-full h-full cursor-zoom-in hover:opacity-80 transition-opacity"
+                  className="w-full h-full cursor-zoom-in hover:opacity-80 transition-opacity object-cover"
                   src={item?.image}
                   alt={item?.alt}
                   width={500}
@@ -46,11 +52,11 @@ export const BrochureSection: React.FC<{ id?: string }> = ({ id }) => {
                   onClick={() => setSelectedImage(item)}
                 />
               </div>
-              <div className="h-1/10  text-center flex justify-center items-center gap-2 text-sm text-gray-600">
-                <PiMagnifyingGlassBold size={24} />{" "}
-                <p className="text-base">Klik untuk zoom</p>
+              <div className="h-12 sm:h-14 lg:h-1/10 text-center flex justify-center items-center gap-2 text-xs sm:text-sm text-gray-600">
+                <PiMagnifyingGlassBold size={20} className="sm:w-6 sm:h-6" />
+                <p className="text-sm sm:text-base">Klik untuk zoom</p>
               </div>
-            </div>
+            </ScrollAnimationWrapper>
           ))}
         </div>
       </section>

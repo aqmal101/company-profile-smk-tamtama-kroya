@@ -117,15 +117,15 @@ export const ImageZoomModal: React.FC<ImageZoomModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-1000"
+      className="fixed inset-0 bg-black/70 flex items-center text-xl max-md:text-base justify-center z-1000"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg shadow-2xl max-w-[70vw] w-[60vw] max-h-[90vh] flex flex-row p-4"
+        className="bg-white rounded-lg shadow-2xl max-w-screen md:w-[70vw] lg:w-[60vw] sm:max-w-screen sm:w-screen md:max-w-screen max-h-[90vh] flex sm:flex-col max-md:flex-col lg:flex-row p-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="hidden justify-between items-center p-4 border-b border-gray-200">
+        {/* <div className="hidden justify-between items-center p-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-800">{imageAlt}</h2>
           <button
             onClick={onClose}
@@ -134,10 +134,10 @@ export const ImageZoomModal: React.FC<ImageZoomModalProps> = ({
           >
             <AiOutlineClose size={24} />
           </button>
-        </div>
+        </div> */}
 
         {/* Image Container */}
-        <div className="flex-1 flex items-center justify-center overflow-auto bg-gray-200 p-4">
+        <div className="flex-1 flex items-center text-xl max-md:text-base justify-center overflow-auto bg-gray-200 p-4">
           <div
             className="relative cursor-grab active:cursor-grabbing"
             style={{
@@ -161,37 +161,37 @@ export const ImageZoomModal: React.FC<ImageZoomModalProps> = ({
         </div>
 
         {/* Controls Footer */}
-        <div className="flex flex-col justify-between items-center gap-4 border-t border-white bg-white pl-4">
+        <div className="flex sm:flex-row md:flex-row lg:flex-col justify-between items-center gap-4 border-t border-white bg-white pl-4 sm:pl-0 md:pl-0 lg:pl-4 pt-4 sm:pt-2 md:pt-2 lg:pt-4">
           <button
             onClick={onClose}
-            className="flex items-center gap-2 p-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+            className="flex items-center text-xl max-md:text-base gap-2 p-2 bg-red-500 hover:bg-red-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
           >
-            <IoClose size={30} />
+            <IoClose />
           </button>
-          <div className="h-full flex flex-col justify-center items-center gap-4">
+          <div className="h-full flex sm:flex-row md:flex-row lg:flex-col justify-center items-center gap-4">
             <button
               onClick={zoomIn}
               disabled={zoom === MAX_ZOOM}
-              className="flex items-center gap-2 p-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+              className="flex items-center text-xl max-md:text-base gap-2 p-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
             >
-              <AiOutlineZoomIn size={30} />
+              <AiOutlineZoomIn />
             </button>
 
-            <div className="flex items-center p-2 gap-2 bg-gray-200 rounded-lg w-fit justify-center">
+            <div className="flex items-center text-xl max-md:text-base p-2 gap-2 bg-gray-200 rounded-lg w-fit justify-center">
               <span className="font-semibold text-gray-700">{zoom}%</span>
             </div>
             <button
               onClick={zoomOut}
               disabled={zoom === MIN_ZOOM}
-              className="flex items-center gap-2 p-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+              className="flex items-center text-xl max-md:text-base gap-2 p-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
             >
-              <AiOutlineZoomOut size={30} />
+              <AiOutlineZoomOut />
             </button>
             <button
               onClick={resetZoom}
               className="p-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg transition-colors"
             >
-              <RiResetLeftLine size={30} />
+              <RiResetLeftLine />
             </button>
           </div>
 
@@ -199,7 +199,7 @@ export const ImageZoomModal: React.FC<ImageZoomModalProps> = ({
             onClick={handleDownload}
             className="p-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
           >
-            <MdOutlineFileDownload size={30} />
+            <MdOutlineFileDownload />
           </button>
         </div>
       </div>

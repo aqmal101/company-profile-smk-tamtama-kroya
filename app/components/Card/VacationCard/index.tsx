@@ -21,7 +21,7 @@ export default function VacationCard({
   return (
     <div
       key={index}
-      className={`relative w-full border border-gray-300 border-l-10 h-60 rounded-xl p-10 flex flex-col justify-between transition-all duration-300 ease-in-out`}
+      className={`relative w-full border border-gray-300 border-l-10 h-60 max-sm:h-fit max-lg:h-fit max-md:h-fit max-sm:p-6 sm:p-4 rounded-xl p-10 flex flex-col justify-between transition-all duration-300 ease-in-out`}
       style={{ borderLeftColor: item.color }}
     >
       {item.isPopular && (
@@ -32,37 +32,37 @@ export default function VacationCard({
       )}
       <div className="flex flex-row justify-start items-center space-x-6">
         <div
-          className="w-20 h-20 rounded-md flex justify-center items-center"
+          className="w-20 h-20 sm:w-16 sm:h-16 rounded-md flex justify-center items-center"
           style={{
             backgroundColor: item.color + "20",
           }}
         >
-          <div className="text-4xl text-gray-700">{item.icon}</div>
+          <div className="text-4xl sm:text-3xl text-gray-700">{item.icon}</div>
         </div>
         <div className="flex flex-col">
           <h3
-            className={`font-semibold text-2xl`}
+            className={`font-semibold text-2xl sm:text-xl`}
             style={{ color: item.color }}
           >
             {item.name}
           </h3>
-          <p className="text-lg">{item.description}</p>
+          <p className="text-lg sm:text-base">{item.description}</p>
         </div>
       </div>
       <div className="w-full mt-4 space-y-3 border-t-2 border-gray-300">
         <div className="flex flex-row space-x-3 justify-start items-center mt-2">
           <div className="flex flex-row space-x-3 justify-start items-center border-r-2 pr-3 border-gray-300">
             <h3
-              className="font-bold text-xl rounded-sm"
+              className="font-bold text-xl max-sm:text-lg rounded-sm"
               style={{ color: item.color }}
             >
               {item.total}
             </h3>
-            <h3>Total Pendaftar</h3>
+            <h3 className="text-base sm:text-sm">Total Pendaftar</h3>
           </div>
-          <div className="flex flex-row space-x-3 justify-start items-center ">
+          <div className="flex flex-row text-base sm:text-sm space-x-3 justify-start items-center ">
             <h3>Kuota:</h3>
-            <h3 className="font-semibold text-lg rounded-sm text-[#FF8E8E]">
+            <h3 className="font-semibold text-lg sm:text-base rounded-sm text-[#FF8E8E]">
               {item.quota} Siswa
             </h3>
           </div>

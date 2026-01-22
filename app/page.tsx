@@ -9,9 +9,14 @@ import { RegistrationRequirementsSection } from "@/components/LandingPage/Regist
 import { BrochureSection } from "./components/LandingPage/BrochureSection";
 import { ContactAndSocial } from "./components/LandingPage/ContactAndSocial";
 import { SchoolFacility } from "./components/LandingPage/SchoolFacility";
+import { HiOutlineAcademicCap } from "react-icons/hi";
+import { LiaIndustrySolid } from "react-icons/lia";
+import { AiOutlineTool } from "react-icons/ai";
+import { HiOutlineComputerDesktop } from "react-icons/hi2";
+import { FaRegMoneyBill1 } from "react-icons/fa6";
+import { FaRegHandshake } from "react-icons/fa";
 
 export default function LandingPage() {
-  // Data untuk Registration Path Section
   const registrationPathTabs = [
     {
       id: "prestasi",
@@ -118,8 +123,52 @@ export default function LandingPage() {
     },
   ];
 
+  const facilityList = [
+    {
+      name: "Fasilitas Sekolah",
+      description:
+        "Program kelas industri bersama Isuzu, Panasonic, Astra, dan mitra industri terpercaya.",
+      icon: <HiOutlineAcademicCap />,
+    },
+    {
+      name: "Kurikulum Siap Kerja",
+      description:
+        "Program kelas industri bersama Isuzu, Panasonic, Astra, dan mitra industri terpercaya.",
+      icon: <LiaIndustrySolid />,
+    },
+    {
+      name: "Bengkel & Alat Praktik Modern",
+      description:
+        "Bengkel nyaman dengan peralatan praktik TITL, TKR, TP, dan DKV berstandar industri.",
+      icon: <AiOutlineTool />,
+    },
+    {
+      name: "Pembelajaran Berbasis Teknologi",
+      description:
+        "Program kelas industri bersama Isuzu, Panasonic, Astra, dan mitra industri terpercaya.",
+      icon: <HiOutlineComputerDesktop />,
+    },
+    {
+      name: "Beasiswa & Biaya Terjangkau",
+      description:
+        "Program kelas industri bersama Isuzu, Panasonic, Astra, dan mitra industri terpercaya.",
+      icon: <FaRegMoneyBill1 />,
+    },
+    {
+      name: "Penyaluran Kerja (BKK)",
+      description:
+        "Bursa Kerja Khusus (BKK) membantu lulusan terserap langsung ke dunia kerja.",
+      icon: <FaRegHandshake />,
+    },
+  ];
+
+  const brochureList = [
+    { image: "/brochure/brosur-depan.png", alt: "Brosur Depan" },
+    { image: "/brochure/brosur-belakang.png", alt: "Brosur Belakang" },
+  ];
+
   return (
-    <main className="h-fit bg-linear-to-b from-[#fafafa] to-gray-50">
+    <main className="h-fit bg-linear-to-b from-[#fafafa] to-gray-50 pt-16 sm:pt-20">
       {/* Hero Section */}
       <HeroSection />
 
@@ -142,16 +191,19 @@ export default function LandingPage() {
       />
 
       {/* Fasilitas Sekolah */}
-      <SchoolFacility id="fasilitas-sekolah" />
+      <SchoolFacility id="fasilitas-sekolah" facilityList={facilityList} />
 
       {/* Lokasi Sekolah */}
-      <SchoolLocation id="lokasi-sekolah" />
+      <SchoolLocation
+        id="lokasi-sekolah"
+        mapSrc="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4918.492276323309!2d109.24708601282072!3d-7.621409676956022!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e65416d4622eb89%3A0x16173980f8b0f4c7!2sSMK%20Tamtama%20Kroya!5e0!3m2!1sen!2sid!4v1768843453168!5m2!1sen!2sid"
+      />
 
       {/* Kontak & Sosial Media */}
       <ContactAndSocial id="kontak-sosial-media" />
 
       {/* Info Brosur */}
-      <BrochureSection id="info-brosur" />
+      <BrochureSection id="info-brosur" brochureList={brochureList} />
     </main>
   );
 }
