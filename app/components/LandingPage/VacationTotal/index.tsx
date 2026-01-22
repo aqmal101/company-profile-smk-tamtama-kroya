@@ -49,14 +49,14 @@ export const VacationTotal: React.FC<{ id?: string }> = ({ id }) => {
   return (
     <section
       id={id || "jumlah-peminat"}
-      className="w-full mb-12 px-4 md:px-12 sm:px-6 lg:px-24 xl:px-32 py-8 sm:py-10 h-fit space-y-12"
+      className="w-full mb-12 px-4 md:px-12 sm:px-6 lg:px-24 xl:px-56 py-8 sm:py-10 h-fit space-y-12"
     >
       <SectionTitle
         title="Jumlah Pendaftar per Jurusan"
         subtitle="Daftar pendaftar diperbarui secara berkala selama masa PPDB  berlangsung"
         align="center"
       />
-      <div className="w-full grid grid-cols-1 max-sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-10 xl:gap-x-24">
+      <div className="w-full grid grid-cols-1 max-sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-10 xl:gap-x-12">
         {vacationList.map((item, index) => (
           <ScrollAnimationWrapper
             key={index}

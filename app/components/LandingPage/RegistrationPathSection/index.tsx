@@ -29,7 +29,7 @@ export const RegistrationPathSection: React.FC<
   return (
     <section
       id={id || "jalur-pendaftaran"}
-      className="w-full h-fit px-4 sm:px-8 lg:px-12 xl:px-24 2xl:px-56 space-y-12 py-8 sm:py-10"
+      className="w-full h-fit px-4 sm:px-8 lg:px-24 xl:px-56 2xl:px-56 space-y-12 py-8 sm:py-10"
     >
       <SectionTitle
         title="Jalur Pendaftaran"
@@ -67,12 +67,8 @@ export const RegistrationPathSection: React.FC<
               {/* Image Section */}
               <div className="w-full lg:w-1/2 h-full max-sm:h-64 lg:h-full flex items-center justify-center">
                 {activeTabData.image ? (
-                  <ScrollAnimationWrapper className="w-full h-full bg-gray-400 rounded-2xl overflow-hidden">
-                    <img
-                      src={activeTabData.image}
-                      alt={activeTabData.label}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
+                  <ScrollAnimationWrapper className="w-full h-full bg-gray-300 rounded-2xl overflow-hidden">
+                    <></>
                   </ScrollAnimationWrapper>
                 ) : (
                   <div className="w-full h-full bg-linear-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center">
@@ -85,7 +81,7 @@ export const RegistrationPathSection: React.FC<
 
               {/* Content Section */}
               <div className="flex w-full lg:w-1/2 h-auto lg:h-full flex-col items-center justify-center sm:p-6 lg:p-10">
-                <div className="w-full h-fit space-y-5 max-sm:space-y-8 lg:space-y-5">
+                <div className="w-full h-fit space-y-8 max-sm:space-y-8 max-lg:space-y-5">
                   {activeTabData.items.map((item, index) => (
                     <ScrollAnimationWrapper
                       key={index}
@@ -95,10 +91,10 @@ export const RegistrationPathSection: React.FC<
                         {item.icon}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-gray-800 text-sm max-sm:text-xs">
+                        <h4 className="font-semibold text-gray-800 text-base max-sm:text-xs">
                           {item.grade}
                         </h4>
-                        <p className="text-gray-600 text-xs max-sm:text-xs mt-1 wrap-break-word">
+                        <p className="text-gray-600 text-sm max-sm:text-xs mt-1 wrap-break-word">
                           {item.description}
                         </p>
                       </div>

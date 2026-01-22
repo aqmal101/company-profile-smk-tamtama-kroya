@@ -66,7 +66,7 @@ export const RegistrationRequirementsSection: React.FC<
   return (
     <section
       id="syarat-periode-daftar"
-      className="w-full h-fit px-6 max-sm:px-8 max-md:px-16 max-lg:px-10 max-xl:px-56 py-10"
+      className="w-full h-fit px-6 sm:px-8 md:px-16 lg:px-10 xl:px-56 py-10"
     >
       <SectionTitle
         title="Syarat & Periode Pendaftaran"

@@ -82,7 +82,7 @@ export const Header: React.FC = () => {
                 </a>
                 {item?.children && (
                   <div
-                    className="absolute left-0 top-full mt-0 w-fit min-w-48 bg-white shadow-lg drop-shadow-gray-300 border border-gray-200 rounded-md p-3 sm:p-4
+                    className="absolute left-0 top-full mt-0 w-fit min-w-48 max-w-92 bg-white shadow-lg drop-shadow-gray-300 border border-gray-200 rounded-md p-3 sm:p-4
                     opacity-0 translate-y-2 pointer-events-none invisible
                     transition-all duration-300 ease-out
                     group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto group-hover/nav:visible
@@ -110,7 +110,7 @@ export const Header: React.FC = () => {
             onClick={routeToRegistration}
             type="primary"
             text="Daftar Sekarang"
-            className="min-w-fit w-fit px-3 h-fit py-2 md:text-sm ml-6"
+            className="min-w-fit w-fit px-3 h-fit py-3 md:text-sm ml-6"
             width="fit"
           />
         </div>

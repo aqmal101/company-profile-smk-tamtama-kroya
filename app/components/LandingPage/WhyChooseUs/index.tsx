@@ -13,7 +13,7 @@ export const WhyChooseUs: React.FC<{ id?: string }> = ({ id }) => {
   return (
     <section
       id={id || "mengapa-pilih-tamtama"}
-      className="w-full mb-12 px-4 sm:px-8 lg:px-12 xl:px-24 py-8 sm:py-10 h-fit space-y-12"
+      className="w-full mb-12 px-4 sm:px-8 lg:px-12 xl:px-36 py-8 sm:py-10 h-fit space-y-12"
     >
       <SectionTitle
         title="Mengapa Harus SMK Tamtama Kroya?"
