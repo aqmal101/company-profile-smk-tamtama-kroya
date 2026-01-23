@@ -1,35 +1,3 @@
-export const NavItems = [
-  { label: "Beranda", href: "/" },
-  {
-    label: "Tentang Sekolah",
-    children: [
-      { label: "Kegiatan Sekolah", href: "/tentang-sekolah/kegiatan" },
-      { label: "Fasilitas", href: "/tentang-sekolah/fasilitas" },
-      { label: "Prestasi", href: "/tentang-sekolah/prestasi" },
-      { label: "Profil Alumni", href: "/tentang-sekolah/alumni" },
-    ],
-  },
-  {
-    label: "Program Keahlian",
-    href: "/program-keahlian",
-  },
-  {
-    label: "PPDB",
-    children: [
-      { label: "Alur & Jadwal Pendaftaran ", href: "/#syarat-periode-daftar" },
-      { label: "Jalur Pendaftaran", href: "/#jalur-pendaftaran" },
-      { label: "Syarat Pendaftaran", href: "/#syarat-periode-daftar" },
-      { label: "Statistik Pendaftar", href: "/#jumlah-peminat" },
-    ],
-  },
-  {
-    label: "Informasi",
-    children: [
-      { label: "Lokasi Sekolah", href: "/#lokasi-sekolah" },
-      { label: "Kontak", href: "/#kontak-sosial-media" },
-    ],
-  },
-];
 
 export const navFooterSection = [
   { label: "Beranda", href: "/#" },

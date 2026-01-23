@@ -1,37 +1,94 @@
-export const DateInput: React.FC<{
+"use client";
+
+import * as React from "react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import dayjs from "dayjs";
+import "dayjs/locale/id";
+import { BiCalendar } from "react-icons/bi";
+
+dayjs.locale("id");
+
+interface DateInputProps {
   label: string;
   name: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
+  value?: string; // format: YYYY-MM-DD
+  onChange: (date: Date | undefined) => void;
   isMandatory?: boolean;
-}> = ({ label, name, value, onChange, placeholder, isMandatory }) => {
+  placeholder?: string;
+  max?: string;
+}
+
+export const DateInput: React.FC<DateInputProps> = ({
+  label,
+  name,
+  value,
+  onChange,
+  isMandatory = false,
+  placeholder,
+  max,
+}) => {
+  const [open, setOpen] = React.useState(false);
+
+  const selectedDate = value ? dayjs(value, "YYYY-MM-DD").toDate() : undefined;
+
   return (
-    <div className="mb-4 max-sm:mb-1">
-      <label className="block text-sm max-sm:text-xs font-semibold text-gray-700 mb-2">
+    <div className="w-full rounded-md">
+      {/* Label */}
+      <label
+        htmlFor={name}
+        className="block text-sm font-semibold text-gray-700 mb-2"
+      >
         {label} {isMandatory && <span className="text-red-500">*</span>}
       </label>
-      <div className="relative">
-        <input
-          type="date"
-          name={name}
-          value={value}
-          onChange={onChange}
-          required={isMandatory}
-          className={`w-full px-4 py-2 border border-gray-300 rounded-sm 
-            focus:outline-none focus:ring-2 focus:ring-primary 
-            focus:border-transparent
-            [&::-webkit-calendar-picker-indicator]:cursor-pointer
-            [&::-webkit-calendar-picker-indicator]:filter
-            ${!value ? "text-transparent" : "text-gray-900"}`}
-          title={placeholder}
-        />
-        {!value && (
-          <span className="absolute left-4 top-2 text-gray-400 text-sm pointer-events-none font-normal">
-            {placeholder || "Masukkan tanggal"}
-          </span>
-        )}
-      </div>
+
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild className="">
+          <button
+            // variant="link"
+            id={name}
+            className="w-full flex flex-row border border-gray-300 justify-start text-left px-4 py-2 rounded-sm font-normal"
+          >
+            <div className="w-full">
+              {" "}
+              {selectedDate
+                ? dayjs(selectedDate)
+                    .locale("id-ID")
+                    .format("dddd, DD MMMM YYYY")
+                : placeholder || "Pilih tanggal"}
+            </div>
+            <BiCalendar className="text-2xl" />
+          </button>
+        </PopoverTrigger>
+
+        <PopoverContent className="w-full p-0" align="start">
+          <Calendar
+            // className="border"
+            mode="single"
+            selected={selectedDate}
+            defaultMonth={selectedDate}
+            captionLayout="dropdown"
+            toDate={max ? dayjs(max).toDate() : undefined}
+            onSelect={(date) => {
+              if (!date) return;
+
+              const fixedDate = new Date(
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate(),
+                12, // jam 12 siang, anti geser
+              );
+
+              onChange(fixedDate);
+              setOpen(false);
+            }}
+          />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };

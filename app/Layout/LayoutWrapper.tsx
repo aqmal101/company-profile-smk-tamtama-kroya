@@ -35,7 +35,8 @@ export default function LayoutWrapper({
   }
 
   const message =
-    "Halo, tolong infokan terkait pendaftaran di SMK Tamtama Kroya ";
+    "Halo! Mohon informasikan pendaftaran murid baru di SMK Tamtama Kroya.";
+
   const encodedMessage = encodeURIComponent(message);
 
   return (

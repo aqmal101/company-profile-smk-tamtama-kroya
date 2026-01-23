@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { SectionTitle } from "@/components/SectionTitle";
 import { ScrollAnimationWrapper } from "@/components/ScrollAnimationWrapper";
+import React from "react";
+import Script from "next/script";
 
 interface PathTabProps {
   id: string;
@@ -62,7 +64,7 @@ export const RegistrationPathSection: React.FC<
         {activeTabData && (
           <div className="w-full h-full overflow-hidden">
             <div
-              className={`w-full h-full flex flex-row gap-6 max-sm:gap-2 lg:gap-0 ${activeTabData.id === "non-akademik" ? "lg:flex-row-reverse" : "lg:flex-row"}`}
+              className={`w-full h-full flex flex-row gap-6 max-sm:gap-2 lg:gap-0 ${activeTabData.id === "non-akademik" ? "flex-row-reverse" : "flex-row"}`}
             >
               {/* Image Section */}
               <div className="w-full lg:w-1/2 h-full max-sm:h-64 lg:h-full flex items-center justify-center">
@@ -112,5 +114,63 @@ export const RegistrationPathSection: React.FC<
         )}
       </ScrollAnimationWrapper>
     </section>
+  );
+};
+
+export const DateInput: React.FC<{
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  isMandatory?: boolean;
+}> = ({ label, name, value, onChange, placeholder, isMandatory }) => {
+  const inputId = `${name}-datepicker`;
+
+  return (
+    <>
+      <Script
+        src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"
+        strategy="afterInteractive"
+      />
+      <div className="mb-4 max-sm:mb-1">
+        <label className="block text-sm max-sm:text-xs font-semibold text-gray-700 mb-2">
+          {label} {isMandatory && <span className="text-red-500">*</span>}
+        </label>
+        <div className="relative max-w-sm">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg
+              className="w-4 h-4 text-body"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 10h16m-8-3V4M7 7V4m10 3V4M5 20h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1Zm3-7h.01v.01H8V13Zm4 0h.01v.01H12V13Zm4 0h.01v.01H16V13Zm-8 4h.01v.01H8V17Zm4 0h.01v.01H12V17Zm4 0h.01v.01H16V17Z"
+              />
+            </svg>
+          </div>
+          <input
+            id={inputId}
+            type="text"
+            name={name}
+            value={value}
+            onChange={onChange}
+            placeholder={placeholder || "Select date"}
+            data-datepicker
+            data-datepicker-autohide
+            required={isMandatory}
+            className="block w-full ps-9 pe-3 py-2.5 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
+          />
+        </div>
+      </div>
+    </>
   );
 };

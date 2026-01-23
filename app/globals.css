@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
+
 :root {
     --primary-color: #014921;
+    --primary-light-color: #E8F5EE;
     --secondary-color: #56B680;
     --tertiary-color: #BFEC43;
     --accesnt-color: #F5A623;
@@ -49,6 +51,15 @@ section[id] {
         background-color: var(--primary-color);
     }
 
+    .bg-primary-light {
+        background-color: var(--primary-light-color);
+    }
+
+    .bg-primary-light::after,
+    .bg-primary-light:after {
+        background-color: var(--primary-light-color);
+    }
+
     .bg-secondary {
         background-color: var(--secondary-color);
     }
@@ -69,7 +80,7 @@ section[id] {
 
     .bg-accent,
     .bg-accent::after {
-        @apply bg-(--accesnt-color);
+        @apply bg-(--accent-color);
     }
 
     /* declare text color variables */
@@ -95,6 +106,14 @@ section[id] {
     }
 
     /* declare border color variables */
+
+    .border-primary {
+        @apply border-(--primary-color);
+    }
+
+    .border-primary-light {
+        @apply border-(--primary-light-color);
+    }
 
     .border-primary {
         @apply border-(--primary-color);

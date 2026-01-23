@@ -1,19 +1,24 @@
 import React from "react";
 
 export const TextButton: React.FC<{
-  text: string;
-  variant: "primary" | "secondary" | "outline" | "outline-danger";
+  text?: string;
+  ref?: React.Ref<HTMLButtonElement>;
+  variant: "primary" | "secondary" | "light" | "outline" | "outline-danger";
   className?: string;
   onClick?: () => void;
   width?: "full" | "half" | "fit";
   icon?: React.ReactNode;
   isSubmit?: boolean;
-}> = ({ text, variant, className, onClick, width, icon, isSubmit }) => {
+}> = ({ text, variant, className, onClick, width, icon, isSubmit, ref }) => {
   let defaultStyle = "";
   switch (variant) {
     case "primary":
       defaultStyle =
         "bg-primary text-white border h-fit py-2 sm:py-2 px-3 sm:px-4 text-sm sm:text-base rounded-sm font-medium hover:opacity-90";
+      break;
+    case "light":
+      defaultStyle =
+        "bg-primary-light text-primary border h-fit py-2 sm:py-2 px-3 sm:px-4 text-sm sm:text-base rounded-sm font-medium hover:opacity-90";
       break;
     case "secondary":
       defaultStyle =
@@ -21,7 +26,7 @@ export const TextButton: React.FC<{
       break;
     case "outline":
       defaultStyle =
-        "border bg-white border-gray-300 h-fit py-2 sm:py-2 px-3 sm:px-4 text-sm sm:text-base rounded-sm font-medium hover:bg-gray-50";
+        "border bg-white border-gray-300 h-fitc sm:py-2 px-3 sm:px-4 text-sm sm:text-base rounded-sm font-medium hover:bg-gray-50";
       break;
     case "outline-danger":
       defaultStyle =

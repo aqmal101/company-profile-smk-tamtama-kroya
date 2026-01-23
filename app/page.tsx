@@ -15,6 +15,7 @@ import { AiOutlineTool } from "react-icons/ai";
 import { HiOutlineComputerDesktop } from "react-icons/hi2";
 import { FaRegMoneyBill1 } from "react-icons/fa6";
 import { FaRegHandshake } from "react-icons/fa";
+import { MdCall, MdEmail, MdLanguage, MdLocationOn } from "react-icons/md";
 
 export default function LandingPage() {
   const registrationPathTabs = [
@@ -167,6 +168,76 @@ export default function LandingPage() {
     { image: "/brochure/brosur-belakang.png", alt: "Brosur Belakang" },
   ];
 
+  const contactList = [
+    {
+      name: "Telepon",
+      contact: "0282-494-126",
+      icon: <MdCall />,
+    },
+    {
+      name: "Email",
+      contact: "smktamtamakroya.clp@yahoo.com",
+      icon: <MdEmail />,
+    },
+    {
+      name: "Website Sekolah",
+      contact: "www.smktamtamakroya.sch.id",
+      icon: <MdLanguage />,
+    },
+    {
+      name: "Alamat Sekolah",
+      contact:
+        "Jl. Semangka, Kedawung, Kroya, <br/> Cilacap, Jawa Tengah, 53282",
+      icon: <MdLocationOn />,
+    },
+  ];
+
+  const socialList = [
+    {
+      name: "Instagram",
+      contact: "@smktamtamakroya",
+      icon: "/sosmed/instagram.svg",
+      hyperlink: "https://www.instagram.com/smk_tamtama_kroya",
+    },
+    {
+      name: "Tiktok",
+      contact: "@smk.tamtama.kroya.clp",
+      icon: "/sosmed/tiktok.svg",
+      hyperlink: "https://www.tiktok.com/@smk.tamtama.kroya.clp",
+    },
+    {
+      name: "Youtube",
+      contact: "@smktamtamakroya4678",
+      icon: "/sosmed/youtube.svg",
+      hyperlink: "https://www.youtube.com/@smktamtamakroya4678",
+    },
+    {
+      name: "Facebook",
+      contact: "SMK Tamtama KROYA",
+      icon: "/sosmed/facebook.svg",
+      hyperlink:
+        "https://www.facebook.com/people/SMK-Tamtama-KROYA/100067793231479/#",
+    },
+  ];
+
+  const adminList = [
+    {
+      number: "6281325767718",
+      label: "0813-2576-7718",
+      adminName: "(WR)",
+    },
+    {
+      number: "082221857717",
+      label: "0822-2185-7717",
+      adminName: "(Sutardi)",
+    },
+    {
+      number: "088215261410",
+      label: "0882 - 1526 - 1410",
+      adminName: "(Anas)",
+    },
+  ];
+
   return (
     <main className="h-fit bg-linear-to-b from-[#fafafa] to-gray-50 pt-16 sm:pt-20">
       {/* Hero Section */}
@@ -200,7 +271,12 @@ export default function LandingPage() {
       />
 
       {/* Kontak & Sosial Media */}
-      <ContactAndSocial id="kontak-sosial-media" />
+      <ContactAndSocial
+        id="kontak-sosial-media"
+        contactList={contactList}
+        socialList={socialList}
+        adminList={adminList}
+      />
 
       {/* Info Brosur */}
       <BrochureSection id="info-brosur" brochureList={brochureList} />

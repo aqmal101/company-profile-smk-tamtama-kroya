@@ -138,11 +138,18 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
         <DateInput
           label="Tanggal Lahir"
           name="tanggalLahir"
-          value={formData.tanggalLahir}
-          onChange={handleChange}
           placeholder="Masukkan Tanggal Lahir Anda"
+          value={formData.tanggalLahir}
           isMandatory
+          max={new Date().toISOString().split("T")[0]}
+          onChange={(date) => {
+            setFormData((prev) => ({
+              ...prev,
+              tanggalLahir: date ? date.toISOString().split("T")[0] : "",
+            }));
+          }}
         />
+
         <SearchableSelect
           label="Asal SMP/MTs"
           name="asalSekolah"

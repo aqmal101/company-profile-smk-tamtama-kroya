@@ -1,12 +1,86 @@
-import { NavItems } from "@/configs/navbarMenu";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 import { MdOutlineArrowDropDown, MdMenu, MdClose } from "react-icons/md";
 import { TextButton } from "../Buttons/TextButton";
 import Link from "next/link";
+import { LuSchool, LuTrophy } from "react-icons/lu";
+import { FaGraduationCap, FaHandHoldingHeart, FaPhone } from "react-icons/fa6";
+import { AiOutlineRise } from "react-icons/ai";
+import { PiPathBold } from "react-icons/pi";
+import { FaCheckCircle } from "react-icons/fa";
+import { CiLocationOn } from "react-icons/ci";
+import { IoMdPin } from "react-icons/io";
 
 const currentYear = new Date().getFullYear();
+
+export const NavItems = [
+  { label: "Beranda", href: "/" },
+  {
+    label: "Tentang Sekolah",
+    children: [
+      {
+        label: "Kegiatan Sekolah",
+        href: "/tentang-sekolah/kegiatan",
+        icon: <LuSchool />,
+      },
+      {
+        label: "Fasilitas",
+        href: "/tentang-sekolah/fasilitas",
+        icon: <FaHandHoldingHeart />,
+      },
+      {
+        label: "Prestasi",
+        href: "/tentang-sekolah/prestasi",
+        icon: <LuTrophy />,
+      },
+      {
+        label: "Profil Alumni",
+        href: "/tentang-sekolah/alumni",
+        icon: <FaGraduationCap />,
+      },
+    ],
+  },
+  {
+    label: "Program Keahlian",
+    href: "/program-keahlian",
+  },
+  {
+    label: "PPDB",
+    children: [
+      {
+        label: "Statistik Pendaftaran",
+        href: "/#jumlah-peminat",
+        icon: <AiOutlineRise />,
+      },
+      {
+        label: "Jalur Pendaftaran",
+        href: "/#jalur-pendaftaran",
+        icon: <PiPathBold />,
+      },
+      {
+        label: "Syarat Pendaftaran",
+        href: "/#syarat-periode-daftar",
+        icon: <FaCheckCircle />,
+      },
+    ],
+  },
+  {
+    label: "Informasi",
+    children: [
+      {
+        label: "Lokasi Sekolah",
+        href: "/#lokasi-sekolah",
+        icon: <IoMdPin />,
+      },
+      {
+        label: "Kontak",
+        href: "/#kontak-sosial-media",
+        icon: <FaPhone />,
+      },
+    ],
+  },
+];
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
@@ -85,8 +159,9 @@ export const Header: React.FC = () => {
                 </a>
                 {item?.children && (
                   <div
-                    className="absolute left-0 top-full mt-0 w-fit min-w-48 max-w-92 bg-white shadow-lg drop-shadow-gray-300 border border-gray-200 rounded-md p-3 sm:p-4
+                    className="absolute left-0 top-full mt-0 w-fit min-w-52 max-w-full bg-white shadow-lg drop-shadow-gray-300 border border-gray-200 rounded-md p-3 sm:p-4
                     opacity-0 translate-y-2 pointer-events-none invisible
+                    space-y-6
                     transition-all duration-300 ease-out
                     group-hover/nav:opacity-100 group-hover/nav:translate-y-0 group-hover/nav:pointer-events-auto group-hover/nav:visible
                     group-focus-within/nav:opacity-100 group-focus-within/nav:translate-y-0 group-focus-within/nav:pointer-events-auto group-focus-within/nav:visible"
@@ -96,12 +171,12 @@ export const Header: React.FC = () => {
                         key={child.label}
                         href={child.href}
                         className="
-                        w-fit relative flex flex-row mb-3 last:mb-0 justify-left items-center text-xs sm:text-sm font-medium text-black hover:text-primary transition-colors duration-200 ease-in-out
+                        w-full relative flex flex-row mb-3 last:mb-0 justify-left items-center text-xs sm:text-sm font-medium text-black hover:text-primary transition-colors duration-200 ease-in-out
                         after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0.5 after:bg-[#014921] 
                         after:transition-all after:duration-300 after:ease-in-out
-                        hover:after:w-full"
+                        hover:after:w-full gap-3"
                       >
-                        {child.label}
+                        {child?.icon ?? ""} {child.label}
                       </a>
                     ))}
                   </div>
