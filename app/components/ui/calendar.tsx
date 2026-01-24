@@ -79,9 +79,14 @@ function Calendar({
           defaultClassNames.month_caption,
         ),
         dropdowns: cn(
-          "w-full flex items-center text-sm font-medium justify-center h-(--cell-size) gap-1.5",
+          "flex items-center gap-2",
+          "rounded-md px-2 py-1 bg-background",
           defaultClassNames.dropdowns,
         ),
+        // dropdowns: cn(
+        //   "w-full flex items-center text-sm font-medium justify-center h-(--cell-size) gap-1.5",
+        //   defaultClassNames.dropdowns,
+        // ),
         dropdown_root: cn(
           "relative cn-calendar-dropdown-root rounded-(--cell-radius)",
           defaultClassNames.dropdown_root,
@@ -91,7 +96,7 @@ function Calendar({
           defaultClassNames.dropdown,
         ),
         caption_label: cn(
-          "select-none font-medium",
+          "select-none mr-2 font-medium",
           captionLayout === "label"
             ? "text-sm"
             : "cn-calendar-caption-label rounded-(--cell-radius) flex items-center gap-1 text-sm  [&>svg]:text-muted-foreground [&>svg]:size-3.5",
@@ -100,7 +105,7 @@ function Calendar({
         table: "w-full border-collapse",
         // Baris Minggu
         weekdays: cn(
-          "flex flex-row justify-around border border-transparent gap-4",
+          "flex flex-row justify-around border border-transparent gap-3",
           defaultClassNames.weekdays,
         ),
         // Label Hari
@@ -110,7 +115,7 @@ function Calendar({
         ),
         // grid tanggal
         week: cn(
-          "flex w-full mt-2 gap-8 border border-transparent flex-row justify-between",
+          "flex w-full mt-2 gap-6 border border-transparent flex-row justify-between",
           defaultClassNames.week,
         ),
         week_number_header: cn(

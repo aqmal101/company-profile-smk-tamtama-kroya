@@ -1,14 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
-import { MdMenu, MdClose } from "react-icons/md";
+import React from "react";
 
 const currentYear = new Date().getFullYear();
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const ppdbRoutes = ["/ppdb", "/"];
 

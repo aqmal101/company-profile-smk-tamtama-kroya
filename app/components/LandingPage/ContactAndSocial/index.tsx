@@ -72,8 +72,8 @@ export const ContactAndSocial: React.FC<{
         <div className="w-full h-full flex flex-col row-span-3 max-md:grid max-md:grid-cols-2 border-r-2 max-md:border-none border-gray-300 max-md:justify-around justify-around max-md:space-y-6 px-4 max-md:px-0">
           {contactList.map((contact, index) => (
             <ScrollAnimationWrapper key={index} direction="up">
-              <div className="w-full h-full flex p-4 max-md:p-1 justify-start space-x-5 max-md:space-x-1 flex-row items-start  bg-white border-gray-300">
-                <div className="w-12 max-md:w-8 max-md:h-8 h-12 text-4xl max-md:text-2xl flex justify-center items-center text-primary rounded-md text-primary bg-[#E8F5EE] shrink-0">
+              <div className="w-full h-full flex p-4 max-md:p-1 justify-start space-x-5 max-md:space-x-1 flex-row max-sm:flex-col items-start  bg-white border-gray-300">
+                <div className="w-12 max-md:w-8 max-md:h-8 h-12 text-4xl max-md:text-2xl flex justify-center items-center text-primary rounded-md text-primary bg-[#E8F5EE] shrink-0 max-sm:mb-3">
                   {contact.icon}
                 </div>
                 <div>
@@ -91,22 +91,22 @@ export const ContactAndSocial: React.FC<{
         </div>
         {/* sisi kiri */}
         {/* sisi kanan atas */}
-        <div className="w-full max-md:mt-6 row-span-2 px-4">
+        <div className="w-full max-md:mt-6 row-span-2 px-4 max-sm:px-2">
           <div className="w-full">
-            <h3 className="text-xl mb-4 text-primary font-semibold">
+            <h3 className="text-xl max-sm:text-lg mb-4 text-primary font-semibold">
               Sosial Media Resmi
             </h3>
-            <h3 className="text-base">
+            <h3 className="text-base max-sm:text-sm">
               Ikuti dan pantau informasi terbaru PPDB kami melalui media sosial
               resmi:
             </h3>
           </div>
-          <div className="w-full grid grid-cols-1 gap-3 border-b-2 border-gray-300 my-4 pb-4 max-md:pb-1">
+          <div className="w-full grid grid-cols-1 max-sm:grid-cols-2 gap-3 border-b-2 border-gray-300 my-4 pb-4 max-md:pb-1 max-sm:pb-6">
             {socialList.map((contact, index) => (
               <ScrollAnimationWrapper key={index} direction="up">
-                <div className="max-w-xl max-md:max-w-full grid grid-cols-3 justify-center items-center p-0 rounded-md bg-white border-gray-300">
+                <div className="max-w-xl max-sm:w-full max-md:w-full grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-y-2 xl:mb-6 justify-center items-center p-0 rounded-md bg-white border-gray-300 max-sm:mb-3">
                   <div className="w-full flex flex-row justify-start items-center space-x-4">
-                    <div className="w-12 h-12 max-md:text-lg text-4xl flex justify-center items-center text-primary rounded-md">
+                    <div className="w-fit h-fit shrink-0 max-md:text-lg text-4xl flex justify-center items-center text-primary">
                       <Image
                         width={10}
                         height={10}
@@ -115,11 +115,11 @@ export const ContactAndSocial: React.FC<{
                         className="w-8 h-8 object-contain"
                       />
                     </div>
-                    <div className="text-lg max-md:text-sm w-fit font-semibold">
+                    <div className="text-lg h-full max-md:text-sm w-fit font-semibold">
                       {contact.name}
                     </div>
                   </div>
-                  <span>
+                  <div className="w-full">
                     <a
                       href={`${contact.hyperlink || "#"}`}
                       target="_blank"
@@ -128,19 +128,19 @@ export const ContactAndSocial: React.FC<{
                     >
                       {contact.contact}
                     </a>{" "}
-                  </span>
+                  </div>
                 </div>
               </ScrollAnimationWrapper>
             ))}
           </div>
         </div>
         {/* sisi kanan bawah */}
-        <div className="w-full grid row-span-1 cols-span-1 p-3 ">
+        <div className="w-full grid row-span-1 cols-span-1 p-3 max-sm:p-1">
           <div className="w-full flex flex-row justify-between">
             {/* Whatsapp Button */}
             <div className="h-full relative z-11 w-[60%]">
               <button
-                className={`h-full w-full border ${modalOpen ? "border-primary-light" : ""} border-primary flex flex-row px-6 py-2 rounded-sm bg-primary justify-between items-center space-x-4 max-md:px-2 max-md:py-1 max-md:text-sm text-white group 
+                className={`h-full w-full border ${modalOpen ? "border-primary-light" : ""} border-primary flex flex-row px-6 py-2 rounded-sm bg-primary justify-between items-center space-x-4 max-md:px-1 max-md:py-1 max-md:text-sm text-white group 
             transition-transform duration-200 ease-in-out cursor-pointer`}
                 onClick={() => setModalOpen((prev) => !prev)}
               >
@@ -150,7 +150,9 @@ export const ContactAndSocial: React.FC<{
                   height={24}
                   alt="whatsapp"
                 />
-                <p className={`${modalOpen ? "font-bold" : ""}`}>
+                <p
+                  className={` max-sm:text-xs ${modalOpen ? "font-bold" : ""}`}
+                >
                   Hubungi via Whatsapp
                 </p>
                 <IoChevronDown
@@ -159,7 +161,7 @@ export const ContactAndSocial: React.FC<{
               </button>
               {modalOpen && (
                 <div
-                  className="absolute mt-0 max-md:-top-32 w-full z-20 flex items-center justify-center bg-transparent"
+                  className="absolute mt-0 max-md:-top-32 max-sm:-top-34  w-full z-20 flex items-center justify-center bg-transparent"
                   onClick={closeModal}
                 >
                   <div

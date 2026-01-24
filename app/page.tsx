@@ -233,7 +233,7 @@ export default function LandingPage() {
     },
     {
       number: "088215261410",
-      label: "0882 - 1526 - 1410",
+      label: "0882-1526-1410",
       adminName: "(Anas)",
     },
   ];

@@ -201,7 +201,7 @@ export const Header: React.FC = () => {
         }`}
       >
         <div className="mt-4 pb-4 border-t border-gray-200">
-          <div className="flex flex-col space-y-3 overflow-y-scroll">
+          <div className="flex flex-col space-y-4 overflow-y-scroll overflow-hidden">
             {NavItems.map((item) => (
               <div key={item.label} className="flex flex-col">
                 <div
@@ -235,14 +235,15 @@ export const Header: React.FC = () => {
                   )}
                 </div>
                 {item?.children && expandedItem === item.label && (
-                  <div className="ml-4 flex flex-col space-y-2 mt-2 border-l border-gray-200 pl-3 animate-in fade-in duration-200">
+                  <div className="ml-4 flex flex-col space-y-4 mt-2 border-l border-gray-200 pl-3 animate-in fade-in duration-200">
                     {item.children.map((child) => (
                       <a
                         key={child.label}
                         href={child.href}
-                        className="text-xs font-medium text-gray-700 hover:text-primary transition-colors py-1"
+                        className="text-sm flex flex-row gap-2 font-medium text-gray-700 hover:text-primary transition-colors py-1"
                         onClick={() => setIsMenuOpen(false)}
                       >
+                        {child?.icon ?? ""}
                         {child.label}
                       </a>
                     ))}
@@ -251,12 +252,11 @@ export const Header: React.FC = () => {
               </div>
             ))}
           </div>
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="pt-6 mt-6 border-t border-gray-200">
             <TextButton
               onClick={routeToRegistration}
               variant="primary"
               text="Daftar Sekarang"
-              className="w-full text-sm"
               width="full"
             />
           </div>

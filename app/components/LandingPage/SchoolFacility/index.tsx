@@ -26,11 +26,15 @@ export const SchoolFacility: React.FC<{
         {facilityList.map((facility, index) => (
           <ScrollAnimationWrapper key={index} direction="up">
             <div className="w-full h-full flex p-4 justify-start space-y-5 flex-col items-start border-r bg-white rounded-xl border border-gray-300">
-              <div className="w-12 h-12 text-4xl flex justify-center items-center text-white rounded-md bg-primary">
-                {facility.icon}
+              <div className="w-full flex-col h-fit flex max-sm:justify-start items-start max-sm:items-center max-sm:flex-row">
+                <div className="w-12 h-12 max-sm:w-10 max-sm:h-10 text-4xl max-sm:text-2xl mb-4 max-sm:mb-0 mr-4 flex justify-center items-center text-white rounded-md bg-primary">
+                  {facility.icon}
+                </div>
+                <h4 className="text-lg max-sm:text-base font-semibold">
+                  {facility.name}
+                </h4>
               </div>
-              <h4 className="text-lg font-semibold">{facility.name}</h4>
-              <p className="text-sm">{facility.description}</p>
+              <p className="text-sm max-sm:text-xs">{facility.description}</p>
             </div>
           </ScrollAnimationWrapper>
         ))}

@@ -26,24 +26,24 @@ export const WhyChooseUs: React.FC<{ id?: string }> = ({ id }) => {
           direction="up"
           className="w-full lg:w-4/10 h-48 sm:h-64 lg:h-full flex items-center justify-center"
         >
-          <div className="w-full h-full bg-gray-300 rounded-2xl"></div>
+          <div className="w-full h-full bg-gray-300 rounded-2xl max-sm:rounded-lg"></div>
         </ScrollAnimationWrapper>
 
         <ScrollAnimationWrapper
           direction="up"
-          className="w-full lg:w-6/10 h-auto lg:h-full py-6 sm:py-10 lg:py-20 px-4 sm:px-6 lg:px-10 flex justify-center items-center"
+          className="w-full lg:w-6/10 h-auto lg:h-full py-6 max-sm:py-0 lg:py-20 max-sm:px-0 px-4 sm:px-6 lg:px-10 flex justify-center items-center"
         >
           <div className="w-full h-full flex justify-center items-center">
-            <ol className="w-full space-y-6 sm:space-y-8 lg:space-y-12">
+            <ol className="w-full space-y-6 lg:space-y-12">
               {reasons.map((item, index) => (
                 <li
                   key={index}
-                  className="w-full flex flex-row items-start gap-3 sm:gap-4"
+                  className="w-full flex flex-row items-start gap-3"
                 >
                   <div className="w-8 h-8 sm:w-10 sm:h-10 min-w-8 sm:min-w-10 rounded-full bg-[#AADAC045] flex justify-center items-center shrink-0 flex-shrink-0">
-                    <FaCheck size={18} className="sm:w-6 sm:h-6" />
+                    <FaCheck size={18} className="max-sm:w-6 max-sm:h-6" />
                   </div>
-                  <p className="text-sm sm:text-base lg:text-lg text-justify leading-relaxed">
+                  <p className="text-sm max-sm:text-sm lg:text-lg text-justify leading-relaxed">
                     {item}
                   </p>
                 </li>

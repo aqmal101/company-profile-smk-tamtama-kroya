@@ -21,7 +21,7 @@ export default function VacationCard({
   return (
     <div
       key={index}
-      className={`relative w-full border border-gray-300 border-l-10 h-60 max-sm:h-fit lg:h-fit max-md:h-fit max-sm:p-6 sm:p-4 rounded-xl p-10 flex flex-col justify-between transition-all duration-300 ease-in-out`}
+      className={`relative w-full border border-gray-300 border-l-10 h-60 max-sm:h-fit lg:h-fit max-md:h-fit max-sm:p-3 sm:p-4 rounded-xl p-10 flex flex-col justify-between transition-all duration-300 ease-in-out`}
       style={{ borderLeftColor: item.color }}
     >
       {item.isPopular && (
@@ -32,21 +32,23 @@ export default function VacationCard({
       )}
       <div className="flex flex-row justify-start items-center space-x-6">
         <div
-          className="w-20 h-20 sm:w-16 sm:h-16 rounded-md flex justify-center items-center"
+          className="w-20 h-20 max-sm:w-16 max-sm:h-16 rounded-md flex justify-center items-center"
           style={{
             backgroundColor: item.color + "20",
           }}
         >
-          <div className="text-4xl sm:text-3xl text-gray-700">{item.icon}</div>
+          <div className="text-4xl max-sm:text-2xl text-gray-700">
+            {item.icon}
+          </div>
         </div>
         <div className="flex flex-col">
           <h3
-            className={`font-semibold text-2xl sm:text-xl`}
+            className={`font-semibold text-2xl max-sm:text-xl`}
             style={{ color: item.color }}
           >
             {item.name}
           </h3>
-          <p className="text-lg sm:text-base">{item.description}</p>
+          <p className="text-lg max-sm:text-base">{item.description}</p>
         </div>
       </div>
       <div className="w-full mt-4 space-y-3 border-t-2 border-gray-300">

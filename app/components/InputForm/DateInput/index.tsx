@@ -9,7 +9,8 @@ import {
 } from "@/components/ui/popover";
 import dayjs from "dayjs";
 import "dayjs/locale/id";
-import { BiCalendar } from "react-icons/bi";
+import { BiCalendar, BiCloset } from "react-icons/bi";
+import { IoClose } from "react-icons/io5";
 
 dayjs.locale("id");
 
@@ -51,27 +52,38 @@ export const DateInput: React.FC<DateInputProps> = ({
           <button
             // variant="link"
             id={name}
-            className="w-full flex flex-row border border-gray-300 justify-start text-left px-4 py-2 rounded-sm font-normal"
+            className="w-full flex flex-row border border-gray-300 justify-start text-left px-4 py-2 max-sm:py-1 rounded-sm font-normal"
           >
-            <div className="w-full">
+            <div className="w-full max-sm:text-sm flex items-center">
               {" "}
-              {selectedDate
-                ? dayjs(selectedDate)
-                    .locale("id-ID")
-                    .format("dddd, DD MMMM YYYY")
-                : placeholder || "Pilih tanggal"}
+              {selectedDate ? (
+                dayjs(selectedDate).locale("id-ID").format("dddd, DD MMMM YYYY")
+              ) : (
+                <p className="text-gray-400">
+                  {placeholder || "Pilih tanggal"}
+                </p>
+              )}
             </div>
-            <BiCalendar className="text-2xl" />
+            {selectedDate ? (
+              <IoClose
+                className="text-2xl"
+                onClick={() => onChange(undefined)}
+              />
+            ) : (
+              <BiCalendar className="text-2xl" />
+            )}
           </button>
         </PopoverTrigger>
 
         <PopoverContent className="w-full p-0" align="start">
           <Calendar
-            // className="border"
+            className="border-none"
             mode="single"
             selected={selectedDate}
             defaultMonth={selectedDate}
             captionLayout="dropdown"
+            fromYear={2000}
+            toYear={2020}
             toDate={max ? dayjs(max).toDate() : undefined}
             onSelect={(date) => {
               if (!date) return;

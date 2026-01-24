@@ -31,7 +31,7 @@ export const RegistrationPathSection: React.FC<
   return (
     <section
       id={id || "jalur-pendaftaran"}
-      className="w-full h-fit px-4 sm:px-8 lg:px-24 xl:px-56 2xl:px-56 space-y-12 py-8 sm:py-10"
+      className="w-full h-fit px-4 sm:px-3 lg:px-24 xl:px-56 2xl:px-56 space-y-12 py-8 sm:py-10"
     >
       <SectionTitle
         title="Jalur Pendaftaran"
@@ -82,12 +82,12 @@ export const RegistrationPathSection: React.FC<
               </div>
 
               {/* Content Section */}
-              <div className="flex w-full lg:w-1/2 h-auto lg:h-full flex-col items-center justify-center sm:p-6 lg:p-10">
+              <div className="flex w-full lg:w-1/2 h-auto lg:h-full flex-col items-center justify-center sm:p-3 lg:p-10">
                 <div className="w-full h-fit space-y-8 max-sm:space-y-8 max-lg:space-y-5">
                   {activeTabData.items.map((item, index) => (
                     <ScrollAnimationWrapper
                       key={index}
-                      className="flex items-start gap-3 sm:gap-4"
+                      className="flex items-start gap-3 sm:gap-1"
                     >
                       <div className="text-2xl max-sm:text-xl shrink-0">
                         {item.icon}
