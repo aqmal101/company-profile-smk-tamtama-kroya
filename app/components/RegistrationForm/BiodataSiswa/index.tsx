@@ -100,6 +100,7 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
           onChange={handleChange}
           placeholder="Masukkan Nama Lengkap Anda"
           isMandatory
+          isCapitalize
         />
         <InputText
           label="Email Aktif"

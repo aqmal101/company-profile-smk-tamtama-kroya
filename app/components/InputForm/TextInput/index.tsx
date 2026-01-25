@@ -2,6 +2,8 @@
 
 import { IoMdClose } from "react-icons/io";
 
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
 export const InputText: React.FC<{
   label: string;
   name: string;
@@ -11,6 +13,7 @@ export const InputText: React.FC<{
   isMandatory?: boolean;
   isEmail?: boolean;
   limit?: number;
+  isCapitalize?: boolean;
 }> = ({
   label,
   name,
@@ -20,6 +23,7 @@ export const InputText: React.FC<{
   isMandatory,
   isEmail,
   limit,
+  isCapitalize,
 }) => {
   const isAboveLimit = limit ? value.length > limit : false;
 
@@ -57,7 +61,7 @@ export const InputText: React.FC<{
       <input
         type={isEmail ? "email" : "text"}
         name={name}
-        value={value}
+        value={isCapitalize ? capitalize(value) : value}
         onChange={onChange}
         required={isMandatory}
         className={`w-full px-4 py-2 max-sm:py-1 border rounded-sm 
@@ -166,8 +170,10 @@ export const InputTextArea: React.FC<{
         className={`w-full px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-transparent 
           max-sm:px-2  max-sm:text-xs
           transition-colors resize-none ${
-          isAboveLimit ? "border-red-500 focus:ring-red-500" : "border-gray-300"
-        }`}
+            isAboveLimit
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300"
+          }`}
         placeholder={placeholder}
         maxLength={limit}
         rows={6}

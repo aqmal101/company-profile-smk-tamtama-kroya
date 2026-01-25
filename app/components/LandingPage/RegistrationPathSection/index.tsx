@@ -129,10 +129,6 @@ export const DateInput: React.FC<{
 
   return (
     <>
-      <Script
-        src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"
-        strategy="afterInteractive"
-      />
       <div className="mb-4 max-sm:mb-1">
         <label className="block text-sm max-sm:text-xs font-semibold text-gray-700 mb-2">
           {label} {isMandatory && <span className="text-red-500">*</span>}

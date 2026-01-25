@@ -167,17 +167,22 @@ export const Header: React.FC = () => {
                     group-focus-within/nav:opacity-100 group-focus-within/nav:translate-y-0 group-focus-within/nav:pointer-events-auto group-focus-within/nav:visible"
                   >
                     {item.children.map((child) => (
-                      <a
+                      <div
                         key={child.label}
-                        href={child.href}
-                        className="
-                        w-full relative flex flex-row mb-3 last:mb-0 justify-left items-center text-xs sm:text-sm font-medium text-black hover:text-primary transition-colors duration-200 ease-in-out
+                        className="w-full flex flex-row gap-3"
+                      >
+                        {child?.icon ?? ""}
+                        <a
+                          href={child.href}
+                          className="
+                        w-fit relative last:mb-0 justify-left items-center text-xs sm:text-sm font-medium text-black hover:text-primary transition-colors duration-200 ease-in-out
                         after:content-[''] after:absolute after:-bottom-1 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0.5 after:bg-[#014921] 
                         after:transition-all after:duration-300 after:ease-in-out
-                        hover:after:w-full gap-3"
-                      >
-                        {child?.icon ?? ""} {child.label}
-                      </a>
+                        hover:after:w-full"
+                        >
+                          {child.label}
+                        </a>
+                      </div>
                     ))}
                   </div>
                 )}

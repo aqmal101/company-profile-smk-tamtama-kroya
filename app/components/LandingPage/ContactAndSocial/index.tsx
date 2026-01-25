@@ -150,11 +150,7 @@ export const ContactAndSocial: React.FC<{
                   height={24}
                   alt="whatsapp"
                 />
-                <p
-                  className={` max-sm:text-xs ${modalOpen ? "font-bold" : ""}`}
-                >
-                  Hubungi via Whatsapp
-                </p>
+                <p className={` max-sm:text-xs`}>Hubungi via Whatsapp</p>
                 <IoChevronDown
                   className={`w-6 h-6 ${modalOpen ? "-rotate-90" : ""} transition-transform duration-300`}
                 />

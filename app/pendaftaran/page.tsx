@@ -6,8 +6,9 @@ import { BiodataWali } from "@/components/RegistrationForm/BiodataWali";
 import { PilihJurusan } from "@/components/RegistrationForm/PilihJurusan";
 import { Selesai } from "@/components/RegistrationForm/Selesai";
 import { TabsStep } from "@/components/TabStep";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GoArrowLeft } from "react-icons/go";
+import { getSchoolList } from "../api/registration/get-school";
 
 const tabsData = [
   "Biodata Siswa",
@@ -29,6 +30,14 @@ export default function RegistrationPage() {
   const [registrationData, setRegistrationData] = useState<RegistrationData>(
     {},
   );
+
+  useEffect(() => {
+    const fetchSchools = async () => {
+      const schools = await getSchoolList();
+      console.log("School List:", schools);
+    };
+    fetchSchools();
+  }, []);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);

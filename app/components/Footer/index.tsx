@@ -45,15 +45,15 @@ export const Footer: React.FC = () => {
           <div className="w-fit grid grid-cols-4 gap-3 sm:gap-4 lg:gap-6 justify-start items-center">
             {[
               {
-                link: "https://www.instagram.com",
+                link: "https://www.instagram.com/smk_tamtama_kroya",
                 icon: <PiInstagramLogo size={20} className="sm:w-6 sm:h-6" />,
               },
               {
-                link: "https://www.tiktok.com",
+                link: "https://www.tiktok.com/@smk.tamtama.kroya.clp",
                 icon: <PiTiktokLogo size={20} className="sm:w-6 sm:h-6" />,
               },
               {
-                link: "https://www.youtube.com",
+                link: "https://www.youtube.com/@smktamtamakroya4678",
                 icon: <PiYoutubeLogo size={20} className="sm:w-6 sm:h-6" />,
               },
               {
