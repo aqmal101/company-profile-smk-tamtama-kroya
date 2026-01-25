@@ -18,7 +18,6 @@ export const TextButton: React.FC<{
   width,
   icon,
   isSubmit,
-  ref,
   disabled,
 }) => {
   let defaultStyle = "";

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface SearchableSelectProps {
   label: string;
@@ -9,7 +9,9 @@ interface SearchableSelectProps {
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;
-  options: string[];
+  options?: string[];
+  fetchOptions?: (query: string) => Promise<string[]>;
+  minChars?: number;
   placeholder?: string;
   isMandatory?: boolean;
 }
@@ -19,7 +21,9 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   name,
   value,
   onChange,
-  options,
+  options = [],
+  fetchOptions,
+  minChars = 3,
   placeholder = "Pilih atau ketik...",
   isMandatory = false,
 }) => {
@@ -28,16 +32,84 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const [useTextInput, setUseTextInput] = useState(
     () => value && !options.includes(value),
   );
+  const [remoteOptions, setRemoteOptions] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const debounceTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  // Filter options berdasarkan search value
-  const filteredOptions = options.filter((option) =>
-    option.toLowerCase().includes(searchValue.toLowerCase()),
+  const baseOptions = options || [];
+  const combinedOptions = Array.from(
+    new Set([...baseOptions, ...remoteOptions]),
   );
+  const isValueInOptions = combinedOptions.includes(value);
 
-  // Check jika value ada di options
-  const isValueInOptions = options.includes(value);
+  // Update useTextInput ketika value berubah
+  useEffect(() => {
+    if (!value) {
+      setUseTextInput(false);
+      return;
+    }
+    if (!combinedOptions.includes(value)) {
+      setUseTextInput(true);
+    }
+  }, [value, combinedOptions]);
+
+  // Fetch options dari API dengan debounce
+  useEffect(() => {
+    if (!fetchOptions) return;
+
+    const query = searchValue.trim();
+
+    // Clear jika query kurang dari minChars
+    if (query.length < minChars) {
+      setRemoteOptions([]);
+      setFetchError(null);
+      setIsLoading(false);
+      return;
+    }
+
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    let isCancelled = false;
+    setIsLoading(true);
+    setFetchError(null);
+
+    // Debounce fetch dengan delay 300ms
+    debounceTimerRef.current = setTimeout(async () => {
+      try {
+        const result = await fetchOptions(query);
+        if (!isCancelled) {
+          setRemoteOptions(Array.isArray(result) ? result : []);
+          setFetchError(null);
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Gagal memuat data sekolah";
+          setFetchError(errorMessage);
+          setRemoteOptions([]);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    }, 300);
+
+    return () => {
+      isCancelled = true;
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [fetchOptions, minChars, searchValue]);
 
   // Handle click outside dropdown
   useEffect(() => {
@@ -106,6 +178,143 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     }, 0);
   };
 
+  // Render options berdasarkan apakah menggunakan fetch atau static
+  const renderDropdownContent = () => {
+    if (fetchOptions) {
+      // Mode API fetch
+      return (
+        <>
+          {/* Pesan minimal karakter */}
+          {searchValue.trim().length < minChars && (
+            <div className="px-4 py-2 text-gray-500 text-sm">
+              Ketik minimal {minChars} karakter untuk mencari
+            </div>
+          )}
+
+          {/* Loading state */}
+          {searchValue.trim().length >= minChars && isLoading && (
+            <div className="px-4 py-2 text-gray-500 text-sm">
+              Memuat data sekolah...
+            </div>
+          )}
+
+          {/* Error state */}
+          {searchValue.trim().length >= minChars && fetchError && (
+            <div className="px-4 py-2 text-red-500 text-sm">{fetchError}</div>
+          )}
+
+          {/* Options list */}
+          {searchValue.trim().length >= minChars &&
+            !isLoading &&
+            !fetchError &&
+            remoteOptions.length > 0 && (
+              <>
+                {remoteOptions.map((option) => (
+                  <div
+                    key={option}
+                    onClick={() => handleSelectOption(option)}
+                    className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
+                      value === option
+                        ? "bg-primary text-white hover:bg-primary"
+                        : ""
+                    }`}
+                  >
+                    {option}
+                  </div>
+                ))}
+                <div
+                  onClick={() => handleAddCustom(searchValue)}
+                  className="px-4 py-2 bg-blue-50 text-primary font-semibold cursor-pointer hover:bg-blue-100 border-t border-gray-300 transition-colors"
+                >
+                  Tidak Ada Pilihan
+                </div>
+              </>
+            )}
+
+          {/* Empty state */}
+          {searchValue.trim().length >= minChars &&
+            !isLoading &&
+            !fetchError &&
+            remoteOptions.length === 0 && (
+              <div className="py-2">
+                <div className="px-4 py-2 text-gray-500 text-sm">
+                  Tidak ada pilihan yang sesuai
+                </div>
+                <div
+                  onClick={() => handleAddCustom(searchValue)}
+                  className="px-4 py-2 bg-blue-50 text-primary font-semibold cursor-pointer hover:bg-blue-100 border-t border-gray-300 transition-colors"
+                >
+                  + Tambah &quot;{searchValue}&quot; sebagai pilihan baru
+                </div>
+              </div>
+            )}
+        </>
+      );
+    }
+
+    // Mode static options (fallback)
+    const filteredOptions = combinedOptions.filter((option) =>
+      option.toLowerCase().includes(searchValue.toLowerCase()),
+    );
+
+    if (filteredOptions.length > 0) {
+      return (
+        <>
+          {filteredOptions.map((option) => (
+            <div
+              key={option}
+              onClick={() => handleSelectOption(option)}
+              className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
+                value === option ? "bg-primary text-white hover:bg-primary" : ""
+              }`}
+            >
+              {option}
+            </div>
+          ))}
+          <div
+            onClick={() => handleAddCustom(searchValue)}
+            className="px-4 py-2 bg-blue-50 text-primary font-semibold cursor-pointer hover:bg-blue-100 border-t border-gray-300 transition-colors"
+          >
+            Tidak Ada Pilihan
+          </div>
+        </>
+      );
+    }
+
+    if (searchValue) {
+      return (
+        <div className="py-2">
+          <div className="px-4 py-2 text-gray-500 text-sm">
+            Tidak ada pilihan yang sesuai
+          </div>
+          <div
+            onClick={() => handleAddCustom(searchValue)}
+            className="px-4 py-2 bg-blue-50 text-primary font-semibold cursor-pointer hover:bg-blue-100 border-t border-gray-300 transition-colors"
+          >
+            + Tambah &quot;{searchValue}&quot; sebagai pilihan baru
+          </div>
+        </div>
+      );
+    }
+
+    // Show all options saat belum search
+    return (
+      <>
+        {combinedOptions.map((option) => (
+          <div
+            key={option}
+            onClick={() => handleSelectOption(option)}
+            className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
+              value === option ? "bg-primary text-white hover:bg-primary" : ""
+            }`}
+          >
+            {option}
+          </div>
+        ))}
+      </>
+    );
+  };
+
   return (
     <div className="mb-2 max-sm:mb-1" ref={dropdownRef}>
       <label className="block text-sm max-sm:text-xs font-semibold text-gray-700 mb-2">
@@ -120,7 +329,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             name={name}
             value={value}
             onChange={handleCustomInputChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full max-sm:text-xs px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             placeholder={placeholder}
             required={isMandatory}
           />
@@ -152,57 +361,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
           {isOpen && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-sm shadow-lg z-50 max-h-60 overflow-y-auto">
-              {filteredOptions.length > 0 ? (
-                <>
-                  {filteredOptions.map((option, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleSelectOption(option)}
-                      className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
-                        value === option
-                          ? "bg-primary text-white hover:bg-primary"
-                          : ""
-                      }`}
-                    >
-                      {option}
-                    </div>
-                  ))}
-                  <div
-                    onClick={() => handleAddCustom(searchValue)}
-                    className="px-4 py-2 bg-blue-50 text-primary font-semibold cursor-pointer hover:bg-blue-100 border-t border-gray-300 transition-colors"
-                  >
-                    Tidak Ada Pilihan
-                  </div>
-                </>
-              ) : searchValue ? (
-                // Tampilkan pesan "tidak ada" + tombol tambah custom
-                <div className="py-2">
-                  <div className="px-4 py-2 text-gray-500 text-sm">
-                    Tidak ada pilihan yang sesuai
-                  </div>
-                  <div
-                    onClick={() => handleAddCustom(searchValue)}
-                    className="px-4 py-2 bg-blue-50 text-primary font-semibold cursor-pointer hover:bg-blue-100 border-t border-gray-300 transition-colors"
-                  >
-                    + Tambah &quot;{searchValue}&quot; sebagai pilihan baru
-                  </div>
-                </div>
-              ) : (
-                // Tampilkan semua options saat belum search
-                options.map((option, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleSelectOption(option)}
-                    className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
-                      value === option
-                        ? "bg-primary text-white hover:bg-primary"
-                        : ""
-                    }`}
-                  >
-                    {option}
-                  </div>
-                ))
-              )}
+              {renderDropdownContent()}
             </div>
           )}
         </div>

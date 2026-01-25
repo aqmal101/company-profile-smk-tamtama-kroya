@@ -155,7 +155,7 @@ export const BiodataOrangTua: React.FC<BiodataOrangTuaProps> = ({
             )}
           />
 
-          <div className="col-span-2">
+          <div className="col-span-2 max-sm:col-span-1">
             <FormField
               control={form.control}
               name="alamat"

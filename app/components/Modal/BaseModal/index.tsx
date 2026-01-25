@@ -16,7 +16,7 @@ interface BaseModalProps {
 }
 
 const sizeClasses = {
-  sm: "max-w-sm",
+  sm: "max-w-xs",
   md: "max-w-md md:w-[50vw]",
   lg: "max-w-lg md:w-[60vw]",
   xl: "max-w-xl md:w-[70vw]",
@@ -42,7 +42,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
       onClick={onClose}
     >
       <div
-        className={`bg-white rounded-lg shadow-2xl max-h-[90vh] overflow-hidden flex flex-col ${sizeClasses[size]} sm:max-w-screen sm:w-screen max-md:flex-col max-md:max-w-screen ${contentClassName}`}
+        className={`bg-white rounded-lg shadow-2xl max-h-[90vh] max-w-[80vw] max-sm:w-[90vw] overflow-hidden flex flex-col ${sizeClasses[size]} sm:max-w-screen sm:w-screen max-md:flex-col max-md:max-w-screen ${contentClassName}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -54,7 +54,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
                 {showCloseButton && (
                   <button
                     onClick={onClose}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors text-3xl"
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors text-3xl max-sm:text-2xl"
                     aria-label="Close modal"
                   >
                     <IoClose />

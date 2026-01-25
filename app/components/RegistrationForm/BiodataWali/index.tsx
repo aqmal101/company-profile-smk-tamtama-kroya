@@ -73,7 +73,7 @@ export const BiodataWali: React.FC<BiodataWaliProps> = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, onError)} className="w-full">
         <MandatoryLabel notes="Data wali hanya perlu diisi apabila orang tua tidak dapat dihubungi atau tidak tersedia." />
-        <div className="grid grid-cols-2 gap-x-5 max-sm:grid-cols-1 gap-y-5 max-sm:gap-y-2">
+        <div className="grid grid-cols-2 gap-x-5 max-sm:grid-cols-1 gap-y-5 max-sm:gap-y-4">
           <FormField
             control={form.control}
             name="namaWali"
@@ -110,7 +110,7 @@ export const BiodataWali: React.FC<BiodataWaliProps> = ({
               </FormItem>
             )}
           />
-          <div className="col-span-2">
+          <div className="col-span-2 max-sm:col-span-1">
             <FormField
               control={form.control}
               name="alamatWali"

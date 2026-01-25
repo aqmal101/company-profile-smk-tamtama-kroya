@@ -123,13 +123,40 @@ export default function RegistrationPage() {
     }
   };
 
-  useEffect(() => {
-    const fetchSchools = async () => {
-      const schools = await getSchoolList();
-      console.log("School List:", schools);
-    };
-    fetchSchools();
-  }, []);
+  // useEffect(() => {
+  //   const fetchSchools = async () => {
+  //     const schools = await getSchoolList();
+  //     console.log("School List:", schools);
+  //   };
+  //   fetchSchools();
+  // }, []);
+
+  const fetchSchools = async (query: string): Promise<string[]> => {
+    try {
+      const res = await fetch(
+        `/api/registrations/school-lookup?q=${encodeURIComponent(query)}`,
+      );
+      const result = await res.json();
+
+      if (!res.ok) {
+        // Handle error response
+        if (result.errors && Array.isArray(result.errors)) {
+          const errorMsg = result.errors[0]?.message || result.message;
+          throw new Error(errorMsg);
+        }
+        throw new Error(result.message || "Gagal mengambil data sekolah");
+      }
+
+      const schools = result.data || [];
+      return Array.isArray(schools) ? schools : [];
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Terjadi kesalahan saat mengambil data sekolah";
+      throw new Error(message);
+    }
+  };
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);

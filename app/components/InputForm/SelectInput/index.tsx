@@ -24,7 +24,7 @@ const SelectInput = React.forwardRef<HTMLSelectElement, SelectInputProps>(
         <div className="relative">
           <select
             ref={ref}
-            className={`appearance-none w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer transition-all duration-200 max-sm:px-2 max-sm:text-xs ${
+            className={`appearance-none max-sm:text-xs w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer transition-all duration-200 max-sm:px-2 ${
               !props.value && placeholder ? "text-gray-400" : "text-gray-900"
             } ${
               error ? "border-red-500 focus:ring-red-500" : ""

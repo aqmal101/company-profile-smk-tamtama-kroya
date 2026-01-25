@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 export async function getSchoolList() {
   try {
     const res = await fetch(
-      `${process.env.BACKEND_URL}/school-lookup?q=smp `,
+      `${process.env.BACKEND_URL}/school-lookup?q=ab `,
       {
         cache: "no-store", 
         next: { revalidate: 86400 }

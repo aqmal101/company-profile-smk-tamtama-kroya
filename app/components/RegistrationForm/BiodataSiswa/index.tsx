@@ -96,6 +96,33 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
     onNext(data as BiodataSiswaForm);
   };
 
+  const fetchSchools = async (query: string): Promise<string[]> => {
+    try {
+      const res = await fetch(
+        `/api/registrations/school-lookup?q=${encodeURIComponent(query)}`,
+      );
+      const result = await res.json();
+
+      if (!res.ok) {
+        // Handle error response
+        if (result.errors && Array.isArray(result.errors)) {
+          const errorMsg = result.errors[0]?.message || result.message;
+          throw new Error(errorMsg);
+        }
+        throw new Error(result.message || "Gagal mengambil data sekolah");
+      }
+
+      const schools = result.data || [];
+      return Array.isArray(schools) ? schools : [];
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Terjadi kesalahan saat mengambil data sekolah";
+      throw new Error(message);
+    }
+  };
+
   const onError = (errors: Record<string, { message?: string }>) => {
     const firstError = Object.values(errors)[0];
     if (firstError?.message) {
@@ -243,8 +270,10 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                   <SearchableSelect
                     label="Asal SMP/MTs"
                     {...field}
-                    options={smpOptions}
-                    placeholder="Pilih atau ketik asal sekolah Anda"
+                    fetchOptions={fetchSchools}
+                    minChars={3}
+                    placeholder="Cari sekolah (min 3 karakter)"
+                    isMandatory
                   />
                 </FormControl>
                 <FormMessage />
