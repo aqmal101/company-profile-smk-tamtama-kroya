@@ -6,6 +6,7 @@ import { AlertProvider } from "@/components/ui/alert";
 import { usePathname } from "next/navigation";
 import { JSX } from "react";
 import { BsWhatsapp } from "react-icons/bs";
+import DashboardHeader from "@/components/Headers/DashboardHeader";
 
 export default function LayoutWrapper({
   children,
@@ -32,10 +33,15 @@ export default function LayoutWrapper({
   // ];
 
   const registrationHeaderRoutes = ["/pendaftaran"];
+  const dashboardRoutes = ["/dashboard"];
 
   // Cek apakah pathname dimulai dengan path tanpa header
   const isNoHeader = noHeader.some((route) => pathname.startsWith(route));
   const isRegistrationPage = registrationHeaderRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
+
+  const isDashboardPage = dashboardRoutes.some((route) =>
     pathname.startsWith(route),
   );
 
@@ -50,7 +56,13 @@ export default function LayoutWrapper({
 
   return (
     <AlertProvider>
-      {isRegistrationPage ? <RegistrationHeader /> : <Header />}
+      {isRegistrationPage ? (
+        <RegistrationHeader />
+      ) : isDashboardPage ? (
+        <DashboardHeader />
+      ) : (
+        <Header />
+      )}
       {children}
       <a
         href={`https://wa.me/6281325767718?text=${encodedMessage}`}
@@ -60,7 +72,7 @@ export default function LayoutWrapper({
       >
         <BsWhatsapp size={30} color="white" />
       </a>
-      {isRegistrationPage ? <></> : <Footer />}
+      {isRegistrationPage || isDashboardPage ? <></> : <Footer />}
     </AlertProvider>
   );
 }

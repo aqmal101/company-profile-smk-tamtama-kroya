@@ -14,6 +14,7 @@ import {
   LuCheckCheck,
   LuCircleX,
   LuTriangleAlert,
+  LuCheck,
 } from "react-icons/lu";
 
 export type AlertVariant = "info" | "success" | "warning" | "error";
@@ -73,7 +74,7 @@ const variantStyles: Record<
   },
   success: {
     container: "bg-emerald-50 border-emerald-200 text-emerald-800",
-    icon: <LuCheckCheck className="mt-0.5 text-emerald-600" size={18} />,
+    icon: <LuCheck className="mt-0.5 text-emerald-600" size={18} />,
   },
   warning: {
     container: "bg-amber-50 border-amber-200 text-amber-800",

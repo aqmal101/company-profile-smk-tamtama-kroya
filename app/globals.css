@@ -8,6 +8,7 @@
     --tertiary-color: #BFEC43;
     --accesnt-color: #F5A623;
     --black-color: #2D2D2D;
+    --danger-color: #FF3B30;
 }
 
 * {
@@ -87,6 +88,10 @@ section[id] {
 
     .text-primary {
         @apply text-(--primary-color);
+    }
+
+    .text-danger {
+        @apply text-(--danger-color);
     }
 
     .text-secondary {

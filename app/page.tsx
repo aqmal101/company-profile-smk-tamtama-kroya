@@ -253,6 +253,7 @@ export default function LandingPage() {
 
       {/* Syarat & Periode Pendaftaran */}
       <RegistrationRequirementsSection
+        id="syarat-periode-daftar"
         requirements={requirements}
         periods={registrationPeriods}
       />

@@ -64,7 +64,14 @@ export default function LoginPage() {
       localStorage.setItem("tokenExpiresAt", result.expiresAt);
 
       // Redirect ke halaman dashboard atau home
-      router.push("/");
+      showAlert({
+        title: "Login berhasil",
+        description: "Anda diarahkan ke dashboard",
+        variant: "success",
+      });
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1500);
     } catch (error) {
       showAlert({ title: "Terjadi kesalahan, coba lagi", variant: "error" });
       console.error("Login error:", error);

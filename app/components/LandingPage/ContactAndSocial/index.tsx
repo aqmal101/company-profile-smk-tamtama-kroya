@@ -4,11 +4,12 @@ import Image from "next/image";
 import { TextButton } from "@/components/Buttons/TextButton";
 import {
   IoChatboxEllipsesOutline,
-  IoChevronDown,
   IoGlobeSharp,
   IoLocationOutline,
 } from "react-icons/io5";
 import React from "react";
+import Dropdown from "@/components/Dropdown";
+import { BsWhatsapp } from "react-icons/bs";
 
 interface contactList {
   name: string;
@@ -19,7 +20,7 @@ interface contactList {
 interface socialList {
   name: string;
   contact: string;
-  icon: string;
+  icon: React.ReactNode | string;
   hyperlink?: string;
 }
 
@@ -107,13 +108,17 @@ export const ContactAndSocial: React.FC<{
                 <div className="max-w-xl max-sm:w-full max-md:w-full grid grid-cols-2 max-sm:grid-cols-1 max-sm:gap-y-2 xl:mb-6 justify-center items-center p-0 rounded-md bg-white border-gray-300 max-sm:mb-3">
                   <div className="w-full flex flex-row justify-start items-center space-x-4">
                     <div className="w-fit h-fit shrink-0 max-md:text-lg text-4xl flex justify-center items-center text-primary">
-                      <Image
-                        width={10}
-                        height={10}
-                        src={contact.icon}
-                        alt={contact.name}
-                        className="w-8 h-8 object-contain"
-                      />
+                      {typeof contact.icon === "string" ? (
+                        <Image
+                          width={10}
+                          height={10}
+                          src={contact.icon}
+                          alt={contact.name}
+                          className="w-8 h-8 object-contain"
+                        />
+                      ) : (
+                        contact.icon
+                      )}
                     </div>
                     <div className="text-lg h-full max-md:text-sm w-fit font-semibold">
                       {contact.name}
@@ -138,7 +143,7 @@ export const ContactAndSocial: React.FC<{
         <div className="w-full grid row-span-1 cols-span-1 p-3 max-sm:p-1">
           <div className="w-full flex flex-row justify-between">
             {/* Whatsapp Button */}
-            <div className="h-full relative z-11 w-[60%]">
+            {/* <div className="h-full relative z-11 w-[60%]">
               <button
                 className={`h-full w-full border ${modalOpen ? "border-primary-light" : ""} border-primary flex flex-row px-6 py-2 rounded-sm bg-primary justify-between items-center space-x-4 max-md:px-1 max-md:py-1 max-md:text-sm text-white group 
             transition-transform duration-200 ease-in-out cursor-pointer`}
@@ -164,16 +169,7 @@ export const ContactAndSocial: React.FC<{
                     className="w-full rounded-lg bg-transparent shadow-xl"
                     onClick={(event) => event.stopPropagation()}
                   >
-                    <div className="w-full flex justify-start h-2 bg-transparent">
-                      {/* <div
-                        className="w-0 h-0 
-                        border-2
-                        border-t-0 border-t-transparent
-                        border-l-2 border-l-blue-300
-                        border-b-24 border-b-blue-300 
-                        border-r-30 border-r-transparent"
-                      ></div> */}
-                    </div>
+                    <div className="w-full flex justify-start h-2 bg-transparent"></div>
 
                     <div className="w-full border border-gray-400 bg-white flex flex-col p-2 rounded-md space-y-2">
                       {adminList.map((admin, index) => (
@@ -193,18 +189,38 @@ export const ContactAndSocial: React.FC<{
                         </div>
                       ))}
                     </div>
-                    {/* <div className="mt-3 flex justify-end">
-                      <TextButton
-                        className="py-0"
-                        variant="outline"
-                        text="Tutup"
-                        onClick={closeModal}
-                      />
-                    </div> */}
                   </div>
                 </div>
               )}
-            </div>
+            </div> */}
+            <Dropdown
+              isOpen={modalOpen}
+              onOpen={() => setModalOpen(true)}
+              onClose={() => setModalOpen(false)}
+              label="Hubungi via Whatsapp"
+              leftIcon={<BsWhatsapp size={20} />}
+              width="w-[60%]"
+              color="bg-primary"
+              textColor="text-white"
+              rounded="rounded-md"
+            >
+              {adminList.map((admin, index) => (
+                <div
+                  key={index}
+                  className="w-full p-1 text-primary flex justify-between items-center font-normal hover:translate-x-2 group hover:underline hover:underline-offset-2 transition-transform duration-200"
+                >
+                  <a
+                    href={`https://wa.me/${admin.number}?text=${encodedMessage}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-left max-sm:text-xs"
+                  >
+                    {admin.label} {admin.adminName}
+                  </a>
+                  <IoChatboxEllipsesOutline className="w-6 h-6 hidden group-hover:block items-end" />
+                </div>
+              ))}
+            </Dropdown>
             {/* Whatsapp Button */}
             <TextButton
               className="w-[40%] h-full text-primary bg-primary-light border-primary"

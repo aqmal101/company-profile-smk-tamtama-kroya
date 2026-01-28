@@ -20,6 +20,7 @@ interface RegistrationPeriod {
 }
 
 interface RegistrationRequirementsSectionProps {
+  id?: string;
   requirements: Requirement[];
   periods: RegistrationPeriod[];
 }
@@ -62,10 +63,10 @@ export const PathCard = ({
 
 export const RegistrationRequirementsSection: React.FC<
   RegistrationRequirementsSectionProps
-> = ({ requirements }) => {
+> = ({ requirements, periods, id }) => {
   return (
     <section
-      id="syarat-periode-daftar"
+      id={id || "syarat-periode-daftar"}
       className="w-full h-fit px-6 sm:px-8 md:px-16 lg:px-10 xl:px-56 py-10"
     >
       <SectionTitle

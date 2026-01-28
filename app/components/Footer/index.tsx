@@ -90,7 +90,7 @@ export const Footer: React.FC = () => {
             />
             <TextButton
               text="Log In Guru"
-              variant="ghost"
+              variant="accent"
               onClick={routeToLogin}
             />
           </div>

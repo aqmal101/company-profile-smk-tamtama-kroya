@@ -5,6 +5,7 @@ export const TextButton: React.FC<{
   ref?: React.Ref<HTMLButtonElement>;
   variant:
     | "primary"
+    | "accent"
     | "secondary"
     | "light"
     | "outline"
@@ -31,6 +32,10 @@ export const TextButton: React.FC<{
     case "primary":
       defaultStyle =
         "bg-primary text-white border h-fit py-2 sm:py-2 px-3 sm:px-4 text-sm sm:text-base rounded-sm font-medium hover:opacity-90";
+      break;
+    case "accent":
+      defaultStyle =
+        "bg-[#f5a623] text-primary border h-fit py-2 sm:py-2 px-3 sm:px-4 text-sm sm:text-base rounded-sm font-medium hover:opacity-90";
       break;
     case "light":
       defaultStyle =
