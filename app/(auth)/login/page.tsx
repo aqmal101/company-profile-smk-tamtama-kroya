@@ -19,7 +19,7 @@ import { TextButton } from "@/components/Buttons/TextButton";
 import { useAlert } from "@/components/ui/alert";
 
 const loginSchema = z.object({
-  username: z.string().min(1, "Username tidak boleh kosong"),
+  username: z.string().min(1, "Mohon isi username terlebih dahulu"),
   password: z.string().min(6, "Password minimal 6 karakter"),
 });
 
@@ -79,6 +79,10 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  const message = "Halo! Mohon bantu saya untuk pembuatan akun guru";
+
+  const encodedMessage = encodeURIComponent(message);
 
   return (
     <div className="w-full max-w-md px-6 flex flex-col items-center space-y-6">
@@ -168,7 +172,12 @@ export default function LoginPage() {
           <TextButton
             variant="primary"
             isSubmit
-            disabled={loading}
+            disabled={
+              loading ||
+              form.formState.isSubmitting ||
+              !form.formState.isValid ||
+              false
+            }
             className="w-full bg-primary hover:bg-primary/90 text-white rounded-md font-semibold transition"
             text={loading ? "Memuat..." : "Masuk"}
           />
@@ -178,7 +187,12 @@ export default function LoginPage() {
       {/* Links */}
       <p className="text-center text-sm text-gray-600">
         Belum punya akun?{" "}
-        <Link href="/register" className="text-primary underline font-semibold">
+        <Link
+          href={`https://wa.me/6281325767718?text=${encodedMessage}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary underline font-semibold"
+        >
           Hubungi Admin
         </Link>
       </p>

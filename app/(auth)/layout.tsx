@@ -17,7 +17,7 @@ export default function AuthLayout({
           </section>
 
           {/* Kolom Kanan - Image/Branding */}
-          <section className="w-full h-full bg-primary hidden sm:flex items-center justify-center">
+          <section className="w-full h-full bg-gray-400 hidden sm:flex items-center justify-center">
             {/* <div className="text-white text-center px-8">
             <h1 className="text-4xl font-bold mb-4">SMK Tamtama Kroya</h1>
             <p className="text-lg opacity-90">

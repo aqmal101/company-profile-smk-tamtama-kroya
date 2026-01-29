@@ -14,6 +14,7 @@ interface SearchableSelectProps {
   minChars?: number;
   placeholder?: string;
   isMandatory?: boolean;
+  error?: string;
 }
 
 export const SearchableSelect: React.FC<SearchableSelectProps> = ({
@@ -26,6 +27,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   minChars = 3,
   placeholder = "Pilih atau ketik...",
   isMandatory = false,
+  error,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -35,6 +37,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const [remoteOptions, setRemoteOptions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [touched, setTouched] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -44,6 +47,11 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     new Set([...baseOptions, ...remoteOptions]),
   );
   const isValueInOptions = combinedOptions.includes(value);
+
+  // Validasi error: mandatory tapi kosong dan sudah di-touch
+  const isEmpty = isMandatory && !value && touched;
+  const showError = error || (isEmpty ? "Asal Sekolah wajib diisi" : "");
+  const hasError = !!showError;
 
   // Update useTextInput ketika value berubah
   useEffect(() => {
@@ -130,6 +138,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     setSearchValue("");
     setIsOpen(false);
     setUseTextInput(false);
+    setTouched(true);
 
     const syntheticEvent = {
       target: { name, value: selectedValue },
@@ -151,10 +160,15 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     setIsOpen(true);
   };
 
+  const handleBlur = () => {
+    setTouched(true);
+  };
+
   const handleAddCustom = (customSearchValue: string) => {
     setUseTextInput(true);
     setIsOpen(false);
     setSearchValue("");
+    setTouched(true);
 
     const syntheticEvent = {
       target: { name, value: customSearchValue },
@@ -185,11 +199,11 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       return (
         <>
           {/* Pesan minimal karakter */}
-          {searchValue.trim().length < minChars && (
+          {/* {searchValue.trim().length < minChars && (
             <div className="px-4 py-2 text-gray-500 text-sm">
               Ketik minimal {minChars} karakter untuk mencari
             </div>
-          )}
+          )} */}
 
           {/* Loading state */}
           {searchValue.trim().length >= minChars && isLoading && (
@@ -329,7 +343,12 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             name={name}
             value={value}
             onChange={handleCustomInputChange}
-            className="w-full max-sm:text-xs px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            onBlur={handleBlur}
+            className={`w-full max-sm:text-xs px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
+              hasError
+                ? "border-red-500 focus:ring-red-500"
+                : "border-gray-300 focus:ring-primary"
+            }`}
             placeholder={placeholder}
             required={isMandatory}
           />
@@ -352,8 +371,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             value={searchValue || (value && isValueInOptions ? value : "")}
             onChange={handleSearchChange}
             onFocus={() => setIsOpen(true)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
-            max-sm:px-2  max-sm:text-xs"
+            onBlur={handleBlur}
+            className={`w-full px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:border-transparent transition-colors
+            max-sm:px-2 max-sm:text-xs ${
+              hasError
+                ? "border-red-500 focus:ring-red-500"
+                : "border-gray-300 focus:ring-primary"
+            }`}
             placeholder={placeholder}
             required={isMandatory && !value}
             autoComplete="off"
@@ -365,6 +389,11 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             </div>
           )}
         </div>
+      )}
+
+      {/* Error message */}
+      {hasError && (
+        <span className="text-red-500 text-xs mt-1 block">{showError}</span>
       )}
     </div>
   );

@@ -96,8 +96,6 @@ export const Header: React.FC = () => {
     window.location.href = "/pendaftaran";
   };
 
-
-
   const isPPDBRoute = ppdbRoutes.some((route) => pathname.startsWith(route));
 
   return (
@@ -138,7 +136,7 @@ export const Header: React.FC = () => {
         </button>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:w-[70%] lg:flex lg:flex-row lg:justify-between sm:items-center sm:justify-end">
+        <div className="hidden lg:w-[76%] lg:flex lg:flex-row lg:justify-between sm:items-center sm:justify-end">
           <div className="w-auto flex flex-row space-x-6 lg:space-x-8">
             {NavItems.map((item) => (
               <div key={item.label} className="relative group/nav">
@@ -192,6 +190,18 @@ export const Header: React.FC = () => {
             ))}
           </div>
           <div className="flex flex-row">
+            <TextButton
+              onClick={() =>
+                window.open(
+                  "https://youtu.be/ZrENGBxv5cg?si=VlwJaA0cye0QKbzK",
+                  "_blank",
+                )
+              }
+              variant="outline"
+              text="Tutorial Pendaftaran"
+              className="w-fit px-3 h-fit py-3 md:text-sm ml-6"
+              width="fit"
+            />
             <TextButton
               onClick={routeToRegistration}
               variant="primary"
@@ -262,6 +272,18 @@ export const Header: React.FC = () => {
             ))}
           </div>
           <div className="pt-6 mt-6 border-t border-gray-200 flex flex-row justify-center">
+            <TextButton
+              onClick={() =>
+                window.open(
+                  "https://youtu.be/ZrENGBxv5cg?si=VlwJaA0cye0QKbzK",
+                  "_blank",
+                )
+              }
+              variant="outline"
+              text="Tutorial Pendaftaran"
+              className="w-fit px-3 h-fit py-3 md:text-sm ml-6"
+              width="full"
+            />
             <TextButton
               onClick={routeToRegistration}
               variant="primary"

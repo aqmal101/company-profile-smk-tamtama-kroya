@@ -59,6 +59,22 @@ const formatValue = (key: string, value: unknown): string => {
             ? "Desain Komunikasi Visual (DKV)"
             : String(value);
   }
+  if (key === "agama") {
+    return value === "islam"
+      ? "Islam"
+      : value === "christian"
+        ? "Kristen"
+        : value === "catholic"
+          ? "Katolik"
+          : value === "hindu"
+            ? "Hindu"
+            : value === "buddhist"
+              ? "Buddha"
+              : value === "confucianism"
+                ? "Konghucu"
+                : String(value);
+  }
+
   if (dateKeys.includes(key) && typeof value === "string") {
     const date = new Date(value);
     return date.toLocaleDateString("id-ID", {

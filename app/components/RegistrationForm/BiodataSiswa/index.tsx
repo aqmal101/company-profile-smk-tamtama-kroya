@@ -26,11 +26,11 @@ import {
 import { useAlert } from "@/components/ui/alert";
 
 const biodataSiswaSchema = z.object({
-  namaLengkap: z.string().min(1, "Nama lengkap harus diisi"),
+  namaLengkap: z.string().min(1, "Nama lengkap wajib diisi"),
   email: z
     .string()
     .email("Format email tidak valid")
-    .min(1, "Email harus diisi"),
+    .min(1, "Email wajib diisi"),
   nik: z.string().default(""),
   nisn: z
     .string()
@@ -38,12 +38,12 @@ const biodataSiswaSchema = z.object({
     .refine((val) => !val || val.length >= 10, {
       message: "NISN minimal 10 digit",
     }),
-  tempatLahir: z.string().min(1, "Tempat lahir harus diisi"),
-  tanggalLahir: z.string().min(1, "Tanggal lahir harus diisi"),
-  asalSekolah: z.string().min(1, "Asal sekolah harus diisi"),
-  alamat: z.string().min(1, "Alamat harus diisi"),
-  jenisKelamin: z.string().min(1, "Jenis kelamin harus dipilih"),
-  agama: z.string().min(1, "Agama harus dipilih"),
+  tempatLahir: z.string().min(1, "Tempat lahir wajib diisi"),
+  tanggalLahir: z.string().min(1, "Tanggal lahir wajib diisi"),
+  asalSekolah: z.string().min(1, ""),
+  alamat: z.string().min(1, "Alamat wajib diisi"),
+  jenisKelamin: z.string().min(1, "Jenis kelamin wajib dipilih"),
+  agama: z.string().min(1, "Agama wajib dipilih"),
   adaKip: z.boolean(),
   nomorWhatsapp: z.string().min(10, "Nomor WhatsApp minimal 10 digit"),
 });
@@ -264,6 +264,7 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                     {...field}
                     fetchOptions={fetchSchools}
                     minChars={3}
+                    error={form.formState.errors.asalSekolah?.message}
                     placeholder="Pilih Asal Sekolah Anda"
                     isMandatory
                   />

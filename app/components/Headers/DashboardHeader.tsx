@@ -4,9 +4,12 @@ import React from "react";
 import { LuLogOut } from "react-icons/lu";
 import { useAlert } from "../ui/alert";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function DashboardHeader() {
   const router = useRouter();
+  const currentYear = new Date().getFullYear();
   const { showAlert } = useAlert();
   const handleLogout = () => {
     localStorage.removeItem("authToken");
@@ -21,11 +24,27 @@ export default function DashboardHeader() {
   };
 
   const [modalOpen, setModalOpen] = React.useState(false);
+
   return (
     <header className="fixed bg-white text-black shadow-lg w-full px-4 sm:px-6 lg:px-10 py-3 sm:py-4 z-100 top-0">
       <div className="w-full flex flex-row justify-between items-center">
         <div className="w-auto sm:w-[36%] flex flex-row items-center justify-start">
-          Dashboard
+          <Link href="/">
+            <Image
+              src="/header/logo.png"
+              alt="logo-smk-tamtama-kroya"
+              width={40}
+              height={40}
+            />
+          </Link>
+          <div className="hidden sm:flex flex-col ml-3">
+            <h1 className="text-sm sm:text-base font-bold">
+              SMK Tamtama Kroya
+            </h1>
+            <p className="text-xs sm:text-sm">
+              PPDB {currentYear}/{currentYear + 1}
+            </p>
+          </div>
         </div>
         <Dropdown
           isOpen={modalOpen}

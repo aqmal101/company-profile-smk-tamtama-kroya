@@ -1,5 +1,6 @@
 import { TextButton } from "@/components/Buttons/TextButton";
 import ScrollAnimationWrapper from "@/components/ScrollAnimationWrapper";
+import Image from "next/image";
 import { GiGraduateCap } from "react-icons/gi";
 const currentYear = new Date().getFullYear();
 
@@ -62,8 +63,15 @@ export const HeroSection: React.FC = () => {
           </ScrollAnimationWrapper> */}
         </div>
         {/* Image Section */}
-        <ScrollAnimationWrapper className="w-[34%] max-sm:mt-6 max-sm:w-full min-h-100 lg:h-120 bg-gray-300 rounded-lg h-full flex items-center justify-center">
-          <div className="w-full h-full rounded-2xl"></div>
+        <ScrollAnimationWrapper className="w-[36%] max-sm:mt-6 max-sm:w-full h-auto flex items-center justify-center aspect-square">
+          <Image
+            src="/ppdb/hero-image.png"
+            alt="Hero Image"
+            width={500}
+            height={400}
+            priority
+            className="w-full h-auto object-contain rounded-lg"
+          />
         </ScrollAnimationWrapper>
       </div>
     </section>

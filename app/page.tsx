@@ -128,7 +128,7 @@ export default function LandingPage() {
     {
       name: "Fasilitas Sekolah",
       description:
-        "Program kelas industri bersama Isuzu, Panasonic, Astra, dan mitra industri terpercaya.",
+        "Didukung ruang kelas nyaman, laboratorium modern, perpustakaan, area praktik, serta fasilitas penunjang belajar yang lengkap dan terawat.",
       icon: <HiOutlineAcademicCap />,
     },
     {
@@ -146,13 +146,13 @@ export default function LandingPage() {
     {
       name: "Pembelajaran Berbasis Teknologi",
       description:
-        "Program kelas industri bersama Isuzu, Panasonic, Astra, dan mitra industri terpercaya.",
+        "Proses belajar mengajar memanfaatkan teknologi digital, media interaktif, dan sistem pembelajaran online untuk meningkatkan pemahaman dan kesiapan siswa di dunia kerja.",
       icon: <HiOutlineComputerDesktop />,
     },
     {
       name: "Beasiswa & Biaya Terjangkau",
       description:
-        "Program kelas industri bersama Isuzu, Panasonic, PT. Mada Wikri Tunggal, dan mitra industri terpercaya.",
+        "Tersedia berbagai program beasiswa prestasi dan bantuan biaya pendidikan bagi siswa berprestasi maupun kurang mampu, sehingga pendidikan berkualitas dapat diakses oleh semua.",
       icon: <FaRegMoneyBill1 />,
     },
     {

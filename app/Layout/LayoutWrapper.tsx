@@ -24,19 +24,13 @@ export default function LayoutWrapper({
     "/not-found",
   ];
 
-  // Auth pages - sudah memiliki layout tersendiri di app/(auth)/layout.tsx
-  // const authRoutes = [
-  //   "/login",
-  //   "/register",
-  //   "/forgot-password",
-  //   "/reset-password",
-  // ];
-
   const registrationHeaderRoutes = ["/pendaftaran"];
+
   const dashboardRoutes = ["/dashboard"];
 
   // Cek apakah pathname dimulai dengan path tanpa header
   const isNoHeader = noHeader.some((route) => pathname.startsWith(route));
+
   const isRegistrationPage = registrationHeaderRoutes.some((route) =>
     pathname.startsWith(route),
   );
@@ -64,14 +58,16 @@ export default function LayoutWrapper({
         <Header />
       )}
       {children}
-      <a
-        href={`https://wa.me/6281325767718?text=${encodedMessage}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed z-50 drop-shadow-xl bottom-4 md:right-8 right-2 bg-[#25d366] p-2 md:mr-4 md:mb-8 rounded-full flex items-center justify-center hover:scale-105 transition-transform"
-      >
-        <BsWhatsapp size={30} color="white" />
-      </a>
+      {!isDashboardPage && (
+        <a
+          href={`https://wa.me/6281325767718?text=${encodedMessage}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed z-50 drop-shadow-xl bottom-4 md:right-8 right-2 bg-[#25d366] p-2 md:mr-4 md:mb-8 rounded-full flex items-center justify-center hover:scale-105 transition-transform"
+        >
+          <BsWhatsapp size={30} color="white" />
+        </a>
+      )}
       {isRegistrationPage || isDashboardPage ? <></> : <Footer />}
     </AlertProvider>
   );
