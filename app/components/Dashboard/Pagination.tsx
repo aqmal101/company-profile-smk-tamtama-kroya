@@ -89,7 +89,7 @@ export function Pagination({
 
         {/* Range Info */}
         <div className="text-sm text-gray-700">
-          Menampilkan <span className="font-medium">{startItem}</span> sampai{" "}
+          <span className="font-medium">{startItem}</span> -{" "}
           <span className="font-medium">{endItem}</span> dari{" "}
           <span className="font-medium">{total}</span> data
         </div>

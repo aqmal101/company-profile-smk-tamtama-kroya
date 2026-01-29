@@ -11,6 +11,8 @@ interface SuccessModalProps {
   registrationNumber?: string;
   studentName?: string;
   majorChoiceCode?: string;
+  isTeacherMode?: boolean;
+  teacherName?: string;
 }
 
 export const SuccessModal: React.FC<SuccessModalProps> = ({
@@ -19,6 +21,8 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
   registrationNumber,
   studentName,
   majorChoiceCode,
+  isTeacherMode = false,
+  teacherName,
 }) => {
   // Mapping major codes to full names
   const majorNames: Record<string, string> = {
@@ -44,11 +48,16 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
         <h2 className="text-2xl font-bold text-primary">
           Pendaftaran Berhasil!
         </h2>
-        {studentName && (
+        {isTeacherMode && teacherName && studentName ? (
+          <p className="text-lg text-gray-700 text-center">
+            Selamat, <span className="font-bold">{teacherName}</span> berhasil
+            mendaftarkan ananda <span className="font-bold">{studentName}</span>
+          </p>
+        ) : studentName && !isTeacherMode ? (
           <p className="text-lg text-gray-700">
             Selamat, <span className="font-bold">{studentName}</span>!
           </p>
-        )}
+        ) : null}
         <div className="bg-gray-50 p-4 rounded-lg w-full space-y-3">
           <div>
             <p className="text-sm text-gray-600 mb-1">Nomor Pendaftaran:</p>
@@ -73,16 +82,33 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           )}
         </div>
         <div className="text-left space-y-2 w-full">
-          <p className="text-sm text-gray-700">
-            📧 Bukti pendaftaran telah dikirim ke email Anda.
-          </p>
-          <p className="text-sm text-gray-700">
-            📄 Simpan bukti pendaftaran untuk ditunjukkan saat daftar ulang.
-          </p>
-          <p className="text-sm text-gray-700">
-            🏫 Silakan datang ke SMK Tamtama Kroya untuk melanjutkan proses
-            pendaftaran.
-          </p>
+          {isTeacherMode ? (
+            <>
+              <p className="text-sm text-gray-700">
+                📧 Bukti pendaftaran telah dikirim ke email siswa/orang tua.
+              </p>
+              <p className="text-sm text-gray-700">
+                📄 Simpan nomor pendaftaran untuk referensi.
+              </p>
+              <p className="text-sm text-gray-700">
+                🏫 Siswa dapat datang ke SMK Tamtama Kroya untuk melanjutkan
+                proses pendaftaran.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-gray-700">
+                📧 Bukti pendaftaran telah dikirim ke email Anda.
+              </p>
+              <p className="text-sm text-gray-700">
+                📄 Simpan bukti pendaftaran untuk ditunjukkan saat daftar ulang.
+              </p>
+              <p className="text-sm text-gray-700">
+                🏫 Silakan datang ke SMK Tamtama Kroya untuk melanjutkan proses
+                pendaftaran.
+              </p>
+            </>
+          )}
         </div>
         <TextButton
           variant="primary"

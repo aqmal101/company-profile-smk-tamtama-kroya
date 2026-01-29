@@ -285,7 +285,7 @@ export function StudentDataTable() {
 
 export default function DashboardPage() {
   return (
-    <div className="w-full h-full min-h-screen space-y-6">
+    <div className="w-full h-full min-h-screen space-y-6 p-10">
       <GreetingCard />
       <StatsGrid />
       <StudentDataTable />
