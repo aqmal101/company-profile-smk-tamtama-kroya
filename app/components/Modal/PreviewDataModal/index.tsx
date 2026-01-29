@@ -39,6 +39,11 @@ const labelMap: Record<string, string> = {
   jurusanDipilih: "Jurusan Dipilih",
 };
 
+// Urutan field untuk setiap section
+const fieldOrder: Record<string, string[]> = {
+  biodataWali: ["namaWali", "noTelponWali", "alamatWali"],
+};
+
 const formatValue = (key: string, value: unknown): string => {
   if (value === null || value === undefined || value === "") return "-";
   if (key === "adaKip") return value ? "Ya" : "Tidak";
@@ -90,15 +95,30 @@ const DataSection = ({
   title,
   data,
   columns = 2,
+  sectionKey,
 }: {
   title: string;
   data?: unknown;
   columns?: 1 | 2;
+  sectionKey?: string;
 }) => {
   if (!data || typeof data !== "object") return null;
 
-  const entries = Object.entries(data as Record<string, unknown>);
+  let entries = Object.entries(data as Record<string, unknown>);
   if (entries.length === 0) return null;
+
+  // Sort entries berdasarkan fieldOrder jika ada
+  if (sectionKey && fieldOrder[sectionKey]) {
+    const order = fieldOrder[sectionKey];
+    entries = entries.sort((a, b) => {
+      const indexA = order.indexOf(a[0]);
+      const indexB = order.indexOf(b[0]);
+      if (indexA === -1 && indexB === -1) return 0;
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+  }
 
   return (
     <div className={`mb-6 `}>
@@ -159,6 +179,7 @@ export const ModalPreviewData: React.FC<ModalPreviewDataProps> = ({
               title="Biodata Wali"
               data={data.biodataWali}
               columns={1}
+              sectionKey="biodataWali"
             />
             <DataSection
               title="Pilih Jurusan"

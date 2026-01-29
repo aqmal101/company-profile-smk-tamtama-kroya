@@ -17,7 +17,7 @@ export const HeroSection: React.FC = () => {
     <section className="w-full h-fit min-h-[80vh] bg-[#F5F5F5] text-primary flex flex-row items-center justify-center px-48 max-sm:px-8 max-md:px-16 max-lg:px-12 max-xl:px-40 py-10">
       <div className="w-full h-full flex flex-row max-sm:flex-col justify-between items-center">
         {/* Text Section */}
-        <div className=" h-full w-[56%] border max-sm:w-full flex flex-col items-center justify-center">
+        <div className=" h-full w-[56%] max-sm:w-full flex flex-col items-center justify-center">
           <div className="w-full h-full flex-col space-y-4">
             <ScrollAnimationWrapper className="relative max-sm:ml-10">
               <h2 className="text-xl max-sm:text-lg">Selamat Datang di</h2>
@@ -60,7 +60,7 @@ export const HeroSection: React.FC = () => {
           </div>
         </div>
         {/* Image Section */}
-        <ScrollAnimationWrapper className="w-[36%] border max-sm:mt-6 max-sm:w-full h-fit flex items-center justify-center">
+        <ScrollAnimationWrapper className="w-[36%] max-sm:mt-6 max-sm:w-full h-fit flex items-center justify-center">
           <Image
             src="/ppdb/hero-image.png"
             alt="Hero Image"
