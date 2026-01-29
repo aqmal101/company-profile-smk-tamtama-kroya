@@ -35,6 +35,7 @@ interface BiodataWaliProps {
   onCancel?: () => void;
   initialData?: BiodataWaliForm;
   onValidationError?: (message: string) => void;
+  isTeacherMode?: boolean;
 }
 
 export const BiodataWali: React.FC<BiodataWaliProps> = ({
@@ -42,6 +43,7 @@ export const BiodataWali: React.FC<BiodataWaliProps> = ({
   onPrev,
   onCancel,
   initialData,
+  isTeacherMode = false,
 }) => {
   const { showAlert } = useAlert();
 
@@ -83,7 +85,11 @@ export const BiodataWali: React.FC<BiodataWaliProps> = ({
                   <FormInput
                     {...field}
                     label="Nama Wali"
-                    placeholder="Masukkan Nama Wali Anda"
+                    placeholder={
+                      isTeacherMode
+                        ? "Masukkan Nama Wali Calon Murid"
+                        : "Masukkan Nama Wali Anda"
+                    }
                     error={form.formState.errors.namaWali?.message}
                   />
                 </FormControl>
@@ -102,7 +108,11 @@ export const BiodataWali: React.FC<BiodataWaliProps> = ({
                     {...field}
                     label="Nomor Telpon Wali"
                     limit={15}
-                    placeholder="Masukkan Nomor Telpon Wali"
+                    placeholder={
+                      isTeacherMode
+                        ? "Masukkan Nomor Telpon Wali Calon Murid"
+                        : "Masukkan Nomor Telpon Wali"
+                    }
                     error={form.formState.errors.noTelponWali?.message}
                   />
                 </FormControl>
@@ -120,7 +130,11 @@ export const BiodataWali: React.FC<BiodataWaliProps> = ({
                     <FormTextarea
                       {...field}
                       label="Alamat"
-                      placeholder="Masukkan Alamat Domisili Wali Anda"
+                      placeholder={
+                        isTeacherMode
+                          ? "Masukkan Alamat Domisili Wali Calon Murid"
+                          : "Masukkan Alamat Domisili Wali Anda"
+                      }
                       error={form.formState.errors.alamatWali?.message}
                     />
                   </FormControl>

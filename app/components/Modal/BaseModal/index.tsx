@@ -42,19 +42,21 @@ export const BaseModal: React.FC<BaseModalProps> = ({
       onClick={onClose}
     >
       <div
-        className={`bg-white rounded-lg shadow-2xl max-h-[90vh] max-w-[80vw] max-sm:w-[90vw] overflow-hidden flex flex-col ${sizeClasses[size]} sm:max-w-screen sm:w-screen max-md:flex-col max-md:max-w-screen ${contentClassName}`}
+        className={`bg-white rounded-lg shadow-2xl max-h-[90vh] w-fit max-w-[80vw] min-h-[50%] h-fit max-sm:w-[90vw] overflow-hidden flex flex-col ${sizeClasses[size]} sm:max-w-screen sm:w-screen max-md:flex-col max-md:max-w-screen ${contentClassName}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="w-full">
           {(title || showCloseButton) && (
-            <div className="w-full p-4">
-              <div className="flex justify-between items-center border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-primary">{title}</h2>
+            <div className="w-full p-3 pb-0 max-sm:p-1">
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg max-sm:text-xs font-semibold text-primary">
+                  {title}
+                </h2>
                 {showCloseButton && (
                   <button
                     onClick={onClose}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors text-3xl max-sm:text-2xl"
+                    className="p-2 max-sm:p-1 hover:bg-gray-100 rounded-full transition-colors text-2xl max-sm:text-xl"
                     aria-label="Close modal"
                   >
                     <IoClose />
@@ -66,7 +68,9 @@ export const BaseModal: React.FC<BaseModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-4 h-[80%]">{children}</div>
+        <div className="flex-1 p-3 max-sm:p-1 w-full pt-0 h-[80%]">
+          {children}
+        </div>
         {footer && <div className="p-4 border-t border-gray-300">{footer}</div>}
       </div>
     </div>

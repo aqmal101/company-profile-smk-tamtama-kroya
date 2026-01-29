@@ -141,58 +141,7 @@ export const ContactAndSocial: React.FC<{
         </div>
         {/* sisi kanan bawah */}
         <div className="w-full grid row-span-1 cols-span-1 p-3 max-sm:p-1">
-          <div className="w-full flex flex-row justify-between">
-            {/* Whatsapp Button */}
-            {/* <div className="h-full relative z-11 w-[60%]">
-              <button
-                className={`h-full w-full border ${modalOpen ? "border-primary-light" : ""} border-primary flex flex-row px-6 py-2 rounded-sm bg-primary justify-between items-center space-x-4 max-md:px-1 max-md:py-1 max-md:text-sm text-white group 
-            transition-transform duration-200 ease-in-out cursor-pointer`}
-                onClick={() => setModalOpen((prev) => !prev)}
-              >
-                <Image
-                  src="/sosmed/whatsapp.svg"
-                  width={24}
-                  height={24}
-                  alt="whatsapp"
-                />
-                <p className={` max-sm:text-xs`}>Hubungi via Whatsapp</p>
-                <IoChevronDown
-                  className={`w-6 h-6 ${modalOpen ? "-rotate-90" : ""} transition-transform duration-300`}
-                />
-              </button>
-              {modalOpen && (
-                <div
-                  className="absolute mt-0 max-md:-top-32 max-sm:-top-30  w-full z-20 flex items-center justify-center bg-transparent"
-                  onClick={closeModal}
-                >
-                  <div
-                    className="w-full rounded-lg bg-transparent shadow-xl"
-                    onClick={(event) => event.stopPropagation()}
-                  >
-                    <div className="w-full flex justify-start h-2 bg-transparent"></div>
-
-                    <div className="w-full border border-gray-400 bg-white flex flex-col p-2 rounded-md space-y-2">
-                      {adminList.map((admin, index) => (
-                        <div
-                          key={index}
-                          className="w-full p-1 text-primary flex justify-between items-center font-normal hover:translate-x-2 group hover:underline hover:underline-offset-2 transition-transform duration-200"
-                        >
-                          <a
-                            href={`https://wa.me/${admin.number}?text=${encodedMessage}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-left max-sm:text-xs"
-                          >
-                            {admin.label} {admin.adminName}
-                          </a>
-                          <IoChatboxEllipsesOutline className="w-6 h-6 hidden group-hover:block items-end" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div> */}
+          <div className="w-full flex flex-row gap-3">
             <Dropdown
               isOpen={modalOpen}
               onOpen={() => setModalOpen(true)}
@@ -207,7 +156,7 @@ export const ContactAndSocial: React.FC<{
               {adminList.map((admin, index) => (
                 <div
                   key={index}
-                  className="w-full p-1 text-primary flex justify-between items-center font-normal hover:translate-x-2 group hover:underline hover:underline-offset-2 transition-transform duration-200"
+                  className="w-full p-1 text-primary flex justify-between items-center font-normal group hover:underline hover:underline-offset-2 transition-transform duration-200"
                 >
                   <a
                     href={`https://wa.me/${admin.number}?text=${encodedMessage}`}
@@ -217,7 +166,7 @@ export const ContactAndSocial: React.FC<{
                   >
                     {admin.label} {admin.adminName}
                   </a>
-                  <IoChatboxEllipsesOutline className="w-6 h-6 hidden group-hover:block items-end" />
+                  {/* <IoChatboxEllipsesOutline className="w-6 h-6 hidden group-hover:block items-end" /> */}
                 </div>
               ))}
             </Dropdown>

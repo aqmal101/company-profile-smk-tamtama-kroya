@@ -32,6 +32,7 @@ interface BiodataOrangTuaProps {
   onCancel?: () => void;
   initialData?: BiodataOrangTuaForm;
   onValidationError?: (message: string) => void;
+  isTeacherMode?: boolean;
 }
 
 export const BiodataOrangTua: React.FC<BiodataOrangTuaProps> = ({
@@ -39,6 +40,7 @@ export const BiodataOrangTua: React.FC<BiodataOrangTuaProps> = ({
   onPrev,
   onCancel,
   initialData,
+  isTeacherMode = false,
 }) => {
   const { showAlert } = useAlert();
 
@@ -82,7 +84,10 @@ export const BiodataOrangTua: React.FC<BiodataOrangTuaProps> = ({
                   <FormInput
                     {...field}
                     label="Nama Ayah"
-                    placeholder="Masukkan Nama Ayah Anda"
+                    placeholder={
+                      "Masukkan Nama Ayah " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     isMandatory
                     error={form.formState.errors.namaAyah?.message}
                   />
@@ -105,7 +110,11 @@ export const BiodataOrangTua: React.FC<BiodataOrangTuaProps> = ({
                       { value: "alive", label: "Hidup" },
                       { value: "deceased", label: "Meninggal" },
                     ]}
-                    placeholder="Pilih Kondisi Ayah Anda"
+                    placeholder={
+                      isTeacherMode
+                        ? "Pilih Kondisi Ayah Calon Murid"
+                        : "Pilih Kondisi Ayah Anda"
+                    }
                     isMandatory
                   />
                 </FormControl>
@@ -123,7 +132,10 @@ export const BiodataOrangTua: React.FC<BiodataOrangTuaProps> = ({
                   <FormInput
                     {...field}
                     label="Nama Ibu"
-                    placeholder="Masukkan Nama Ibu Anda"
+                    placeholder={
+                      "Masukkan Nama Ibu " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     isMandatory
                     error={form.formState.errors.namaIbu?.message}
                   />
@@ -146,7 +158,10 @@ export const BiodataOrangTua: React.FC<BiodataOrangTuaProps> = ({
                       { value: "alive", label: "Hidup" },
                       { value: "deceased", label: "Meninggal" },
                     ]}
-                    placeholder="Pilih Kondisi Ibu Anda"
+                    placeholder={
+                      "Pilih Kondisi Ibu " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     isMandatory
                   />
                 </FormControl>
@@ -165,7 +180,10 @@ export const BiodataOrangTua: React.FC<BiodataOrangTuaProps> = ({
                     <FormTextarea
                       {...field}
                       label="Alamat"
-                      placeholder="Masukkan Alamat Domisili Orang Tua Anda"
+                      placeholder={
+                        "Masukkan Alamat Domisili Orang Tua " +
+                        (isTeacherMode ? "Calon Murid" : "Anda")
+                      }
                       isMandatory
                       error={form.formState.errors.alamat?.message}
                     />

@@ -9,7 +9,6 @@ import { TabsStep } from "@/components/TabStep";
 import { SuccessModal } from "@/components/Modal/SuccessModal";
 import { ConfirmationAlert } from "@/components/Modal/ConfirmationAlert";
 import { useState, useEffect } from "react";
-import { GoArrowLeft } from "react-icons/go";
 import { transformToApiFormat } from "@/utils/transformRegistrationData";
 import {
   RegistrationData,
@@ -465,14 +464,14 @@ export default function RegistrationPage() {
       <div className="w-full p-5 sm:border max-sm:p-5 md:p-10 lg:p-14 xl:p-20 flex flex-col items-center gap-6">
         {activeTab === "Biodata Siswa" && (
           <div className="w-full flex flex-col mb-6 max-sm:mb-0">
-            <div className="w-full flex flex-row justify-between mb-3">
+            {/* <div className="w-full flex flex-row justify-between mb-3">
               <div
                 className="w-10 h-10 text-2xl drop-shadow bg-white rounded-md flex justify-center items-center cursor-pointer"
                 onClick={handleRouteToHome}
               >
                 <GoArrowLeft />
               </div>
-            </div>
+            </div> */}
             <div className="w-full">
               <p className="text-primary text-2xl max-sm:text-xl mb-2">
                 Halo, calon murid <span className="font-bold">Tamtama!</span>
@@ -482,10 +481,10 @@ export default function RegistrationPage() {
                 📢 Pastikan semua data telah diisi dengan benar sebelum
                 mengirimkan formulir.
               </p>
-              <p className="text-gray-700 text-lg max-sm:text-base">
+              {/* <p className="text-gray-700 text-lg max-sm:text-base">
                 Jika sudah yakin, silakan klik tombol
                 <span className="font-semibold"> Daftar Sekarang.</span>
-              </p>
+              </p> */}
             </div>
           </div>
         )}

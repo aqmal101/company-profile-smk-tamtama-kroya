@@ -226,6 +226,13 @@ export default function LoginPage() {
             className="w-full bg-primary hover:bg-primary/90 text-white rounded-md font-semibold transition"
             text={loading ? "Memuat..." : "Masuk"}
           />
+          <TextButton
+            variant="outline"
+            isSubmit
+            text={"Kembali"}
+            onClick={() => router.push("/")}
+            className="w-full rounded-md font-semibold transition"
+          />
         </form>
       </Form>
 

@@ -33,12 +33,6 @@ interface RegistrationPayload {
   majorChoiceCode: string;
 }
 
-interface ValidationError {
-  field: string;
-  message: string;
-  rule: string;
-}
-
 export async function POST(request: NextRequest) {
   try {
     const body: RegistrationPayload = await request.json();

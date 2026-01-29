@@ -47,7 +47,7 @@ export const WhyChooseUs: React.FC<{ id?: string }> = ({ id }) => {
                   <div className="w-8 h-8 sm:w-10 sm:h-10 min-w-8 sm:min-w-10 rounded-full bg-[#AADAC045] flex justify-center items-center shrink-0 flex-shrink-0">
                     <FaCheck size={18} className="max-sm:w-6 max-sm:h-6" />
                   </div>
-                  <p className="text-sm max-sm:text-sm lg:text-lg text-justify leading-relaxed">
+                  <p className="text-sm max-sm:text-sm lg:text-lg text-left leading-relaxed">
                     {item}
                   </p>
                 </li>

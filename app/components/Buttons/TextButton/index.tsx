@@ -27,7 +27,7 @@ export const TextButton: React.FC<{
   icon,
   isSubmit,
   disabled,
-  hoverEffect = true,
+  hoverEffect = false,
 }) => {
   let defaultStyle = "";
   switch (variant) {

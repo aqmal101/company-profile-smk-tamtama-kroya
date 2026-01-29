@@ -12,6 +12,7 @@ interface SelesaiProps {
   onCancel?: () => void;
   registrationData?: RegistrationData;
   isSubmitting?: boolean;
+  isTeacherMode?: boolean;
 }
 
 export const Selesai: React.FC<SelesaiProps> = ({
@@ -20,6 +21,7 @@ export const Selesai: React.FC<SelesaiProps> = ({
   onCancel,
   registrationData,
   isSubmitting = false,
+  isTeacherMode = false,
 }) => {
   const [modalDetailData, setModalDetailData] = useState(false);
 
@@ -33,7 +35,9 @@ export const Selesai: React.FC<SelesaiProps> = ({
               telah menyelesaikan seluruh tahapan pengisian formulir pendaftaran
             </p>
             <p className="text-primary font-bold">
-              Calon Murid Baru SMK Tamtama Kroya.
+              {isTeacherMode
+                ? "Murid Baru SMK Tamtama Kroya."
+                : "Calon Murid Baru SMK Tamtama Kroya."}
             </p>
           </div>
           <div className="w-full">
@@ -58,7 +62,11 @@ export const Selesai: React.FC<SelesaiProps> = ({
               <span className="text-primary font-bold">
                 File Bukti Pendaftaran
               </span>{" "}
-              ke alamat email yang telah dimasukkan saat proses pendaftaran.
+              ke alamat email{" "}
+              {isTeacherMode
+                ? "siswa/orang tua"
+                : "yang telah dimasukkan saat proses pendaftaran"}
+              .
             </p>
           </div>
           <div className="w-full">

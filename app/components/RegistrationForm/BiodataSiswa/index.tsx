@@ -56,6 +56,7 @@ interface BiodataSiswaProps {
   onCancel?: () => void;
   initialData?: BiodataSiswaForm;
   onValidationError?: (message: string) => void;
+  isTeacherMode?: boolean;
 }
 
 export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
@@ -63,6 +64,7 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
   onPrev,
   onCancel,
   initialData,
+  isTeacherMode = false,
 }) => {
   const { showAlert } = useAlert();
 
@@ -140,7 +142,10 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                   <FormInput
                     {...field}
                     label="Nama Lengkap (Sesuai KK)"
-                    placeholder="Masukkan Nama Lengkap Anda"
+                    placeholder={
+                      "Masukkan Nama Lengkap " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     isMandatory
                     isUppercase
                     error={form.formState.errors.namaLengkap?.message}
@@ -160,7 +165,10 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                   <FormInput
                     {...field}
                     label="Email Aktif"
-                    placeholder="Masukkan Email Aktif Anda"
+                    placeholder={
+                      "Masukkan Email Aktif " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     isMandatory
                     isEmail
                     error={form.formState.errors.email?.message}
@@ -181,7 +189,9 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                     {...field}
                     label="NIK (Nomor Induk Kependudukan)"
                     limit={16}
-                    placeholder="Masukkan NIK Anda"
+                    placeholder={
+                      "Masukkan NIK " + (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     error={form.formState.errors.nik?.message}
                   />
                 </FormControl>
@@ -200,7 +210,10 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                     {...field}
                     label="NISN (Nomor Induk Siswa Nasional)"
                     minLength={10}
-                    placeholder="Masukkan NISN Anda"
+                    placeholder={
+                      "Masukkan NISN " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     error={form.formState.errors.nisn?.message}
                   />
                 </FormControl>
@@ -218,7 +231,10 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                   <FormInput
                     {...field}
                     label="Tempat Lahir"
-                    placeholder="Masukkan Tempat Lahir Anda"
+                    placeholder={
+                      "Masukkan Tempat Lahir " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     isMandatory
                     error={form.formState.errors.tempatLahir?.message}
                   />
@@ -237,7 +253,10 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                   <DateInput
                     label="Tanggal Lahir"
                     name="tanggalLahir"
-                    placeholder="Masukkan Tanggal Lahir Anda"
+                    placeholder={
+                      "Masukkan Tanggal Lahir " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     max={new Date().toISOString().split("T")[0]}
                     isMandatory
                     value={field.value}
@@ -265,7 +284,10 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                     fetchOptions={fetchSchools}
                     minChars={3}
                     error={form.formState.errors.asalSekolah?.message}
-                    placeholder="Pilih Asal Sekolah Anda"
+                    placeholder={
+                      "Masukkan Asal Sekolah " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     isMandatory
                   />
                 </FormControl>
@@ -282,7 +304,10 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                   <FormTextarea
                     {...field}
                     label="Alamat"
-                    placeholder="Masukkan Alamat Sesuai Dengan KTP Anda"
+                    placeholder={
+                      "Masukkan Alamat " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     isMandatory
                     error={form.formState.errors.alamat?.message}
                   />
@@ -305,7 +330,10 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                       { value: "1", label: "Laki-laki" },
                       { value: "2", label: "Perempuan" },
                     ]}
-                    placeholder="Pilih Jenis Kelamin"
+                    placeholder={
+                      "Pilih Jenis Kelamin " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     isMandatory
                   />
                 </FormControl>
@@ -331,7 +359,9 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                       { value: "buddhist", label: "Buddha" },
                       { value: "confucianism", label: "Konghucu" },
                     ]}
-                    placeholder="Pilih Agama"
+                    placeholder={
+                      "Pilih Agama " + (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     isMandatory
                   />
                 </FormControl>
@@ -375,7 +405,11 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                     {...field}
                     label="Nomor Whatsapp"
                     minLength={10}
-                    placeholder="Masukkan Nomor WhatsApp Anda"
+                    limit={15}
+                    placeholder={
+                      "Masukkan Nomor WhatsApp " +
+                      (isTeacherMode ? "Calon Murid" : "Anda")
+                    }
                     error={form.formState.errors.nomorWhatsapp?.message}
                   />
                 </FormControl>

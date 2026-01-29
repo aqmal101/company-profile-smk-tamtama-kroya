@@ -134,7 +134,7 @@ export default function LandingPage() {
     {
       name: "Kurikulum Siap Kerja",
       description:
-        "Program kelas industri bersama Isuzu, Panasonic, Astra, dan mitra industri terpercaya.",
+        "Program kelas industri bersama Isuzu, Panasonic, PT. Mada Wikri Tunggal, dan mitra industri terpercaya.",
       icon: <LiaIndustrySolid />,
     },
     {

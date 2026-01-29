@@ -19,6 +19,8 @@ import {
 } from "@/utils/registrationTypes";
 import { useAlert } from "@/components/ui/alert";
 import { useAuth } from "@/components/AuthGuard";
+import { getAuthHeader } from "@/utils/auth";
+import { useRouter } from "next/navigation";
 
 const tabsData = [
   "Biodata Siswa",
@@ -34,6 +36,7 @@ const STORAGE_TAB_KEY = "smk_tamako_teacher_active_tab";
 export default function RegistrationByTeacherPage() {
   const { showAlert } = useAlert();
   const { user } = useAuth();
+  const router = useRouter();
   const [isHydrated, setIsHydrated] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("");
   const [registrationData, setRegistrationData] = useState<RegistrationData>(
@@ -223,6 +226,7 @@ export default function RegistrationByTeacherPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...getAuthHeader(),
         },
         body: JSON.stringify(apiPayload),
       });
@@ -274,8 +278,8 @@ export default function RegistrationByTeacherPage() {
     }
   };
 
-  const handleRouteToHome = () => {
-    window.location.href = "/";
+  const handleRouteToDashboard = () => {
+    router.push("/dashboard");
   };
 
   // BATAL: Show confirmation alert
@@ -415,11 +419,12 @@ export default function RegistrationByTeacherPage() {
         return (
           <BiodataSiswa
             key={`biodataSiswa-${formKey}`}
-            onPrev={handleRouteToHome}
+            onPrev={handleRouteToDashboard}
             onNext={handleNextBiodataSiswa}
             onCancel={handleResetBiodataSiswa}
             initialData={registrationData.biodataSiswa}
             onValidationError={handleValidationError}
+            isTeacherMode={true}
           />
         );
       case "Biodata Orang Tua":
@@ -431,6 +436,7 @@ export default function RegistrationByTeacherPage() {
             onCancel={handleResetBiodataOrangTua}
             initialData={registrationData.biodataOrangTua}
             onValidationError={handleValidationError}
+            isTeacherMode={true}
           />
         );
       case "Biodata Wali":
@@ -442,6 +448,7 @@ export default function RegistrationByTeacherPage() {
             onCancel={handleResetBiodataWali}
             initialData={registrationData.biodataWali}
             onValidationError={handleValidationError}
+            isTeacherMode={true}
           />
         );
       case "Pilih Jurusan":
@@ -464,6 +471,7 @@ export default function RegistrationByTeacherPage() {
             onCancel={handleResetSelesai}
             registrationData={registrationData}
             isSubmitting={isSubmitting}
+            isTeacherMode={true}
           />
         );
       default:

@@ -194,6 +194,7 @@ export const Header: React.FC = () => {
               }
             >
               <TextButton
+                hoverEffect={false}
                 variant="outline-danger"
                 icon={<LuLogOut className="w-6 h-6 items-end" />}
                 text="Keluar"
