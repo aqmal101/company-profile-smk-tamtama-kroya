@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthHeader } from "@/utils/auth";
 
 const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3333";
 
@@ -8,6 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authHeader = request.headers.get("Authorization");
     const { id } = await params;
 
     if (!id || isNaN(Number(id))) {
@@ -21,7 +21,7 @@ export async function GET(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        ...getAuthHeader(),
+        Authorization: authHeader || "",
       },
     });
 

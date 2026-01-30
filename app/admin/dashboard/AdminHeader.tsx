@@ -34,7 +34,7 @@ export default function AdminHeader({
   const handleLogout = async () => {
     showAlert({
       title: "Logout berhasil",
-      description: "Anda diarahkan ke beranda",
+      description: "Anda diarahkan ke halaman log in",
       variant: "info",
     });
     await logout();

@@ -9,6 +9,7 @@ interface ModalPreviewDataProps {
   onClose: () => void;
   data?: RegistrationData;
   onPrev?: () => void;
+  footer?: React.ReactNode;
 }
 
 const labelMap: Record<string, string> = {
@@ -144,6 +145,7 @@ export const ModalPreviewData: React.FC<ModalPreviewDataProps> = ({
   onClose,
   data,
   onPrev,
+  footer = null,
 }) => {
   return (
     <BaseModal
@@ -152,10 +154,16 @@ export const ModalPreviewData: React.FC<ModalPreviewDataProps> = ({
       title="Detail Data Formulir Pendaftaran"
       size="full"
       footer={
-        <div className="w-full justify-end flex gap-5">
-          <TextButton variant={"outline"} text="Edit" onClick={onPrev} />
-          <TextButton variant={"primary"} text="Konfirmasi" onClick={onClose} />
-        </div>
+        footer ? (
+          <div className="w-full justify-end flex gap-5">
+            <TextButton variant={"outline"} text="Edit" onClick={onPrev} />
+            <TextButton
+              variant={"primary"}
+              text="Konfirmasi"
+              onClick={onClose}
+            />
+          </div>
+        ) : null
       }
     >
       <div className="space-y-6 overflow-y-auto max-h-[60vh]">

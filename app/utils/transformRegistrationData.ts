@@ -127,7 +127,6 @@ export const transformFromApiFormat = (
       kondisiAyah: parentDetail.fatherLivingStatus,
       namaIbu: parentDetail.motherName,
       kondisiIbu: parentDetail.motherLivingStatus,
-      noTelponOrangTua: parentDetail.parentPhoneNumber || "",
     },
     biodataWali: parentDetail.guardianName ? {
       namaWali: parentDetail.guardianName,

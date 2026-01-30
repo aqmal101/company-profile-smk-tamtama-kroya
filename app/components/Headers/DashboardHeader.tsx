@@ -43,7 +43,7 @@ export const Header: React.FC = () => {
     // perform logout
     showAlert({
       title: "Logout berhasil",
-      description: "Anda diarahkan ke beranda",
+      description: "Anda diarahkan ke halaman log in",
       variant: "info",
     });
     await logout();

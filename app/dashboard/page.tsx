@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { ModalPreviewData } from "@/components/Modal/PreviewDataModal";
 import { RegistrationData } from "@/utils/registrationTypes";
 import { transformFromApiFormat } from "@/utils/transformRegistrationData";
+import { useAlert } from "@/components/ui/alert";
 
 export function GreetingCard() {
   const { user } = useAuth();
@@ -136,9 +137,12 @@ export function StatsGrid() {
 }
 
 export function StudentDataTable() {
+  const { showAlert } = useAlert();
+
   const [students, setStudents] = useState<Student[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingDetail, setLoadingDetail] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -222,29 +226,45 @@ export function StudentDataTable() {
   }
 
   const handleDetailClick = async (registrationId: number) => {
+    setLoadingDetail(true);
     console.log("Fetching details for registration ID:", registrationId);
     try {
-      const response = await fetch(`/api/registrations/${registrationId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          ...getAuthHeader(),
+      const response = await fetch(
+        `/api/dashboard/students/${registrationId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const data = await response.json();
         const transformedData = transformFromApiFormat(data);
         setSelectedData(transformedData);
         setIsModalOpen(true);
+        setLoadingDetail(false);
       } else {
         const errorData = await response.json();
-        alert(errorData.message || "Gagal mengambil data detail pendaftaran");
+        showAlert({
+          title: "Terjadi Kesalahan",
+          description:
+            errorData.message || "Gagal mengambil data detail pendaftaran",
+          variant: "error",
+        });
         setIsModalOpen(false);
+        setLoadingDetail(false);
       }
     } catch (error) {
       console.error("Failed to fetch registration details:", error);
-      alert("Terjadi kesalahan saat mengambil data detail");
+      showAlert({
+        title: "Terjadi Kesalahan",
+        description: "Terjadi kesalahan saat mengambil data detail",
+        variant: "error",
+      });
       setIsModalOpen(false);
+      setLoadingDetail(false);
     }
   };
 
@@ -296,6 +316,7 @@ export function StudentDataTable() {
         <>
           <div className="p-6">
             <StudentsTable
+              loadingDetail={loadingDetail}
               students={students}
               isLoading={isLoading}
               onDetailClick={handleDetailClick}
@@ -313,10 +334,11 @@ export function StudentDataTable() {
         </>
       )}
       <ModalPreviewData
+        footer={null}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         data={selectedData || undefined}
-        onPrev={() => {}} // Tidak ada edit di sini
+        // onPrev={() => {}} // Tidak ada edit di sini
       />
     </div>
   );

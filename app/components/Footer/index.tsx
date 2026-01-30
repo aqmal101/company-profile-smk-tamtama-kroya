@@ -98,7 +98,7 @@ export const Footer: React.FC = () => {
         <div className="w-full h-full border border-primary grid grid-cols-2 gap-0">
           <div className="border-r border-primary">
             <h4 className="mb-4 sm:mb-6 text-xs sm:text-sm font-semibold">
-              ShotCut Link
+              Aksi Cepat
             </h4>
             <div className="w-full h-fit space-y-2 sm:space-y-3">
               {navFooterSection.map((item) => (
@@ -118,7 +118,7 @@ export const Footer: React.FC = () => {
           </div>
           <div>
             <h4 className="mb-4 sm:mb-6 text-xs sm:text-sm font-semibold">
-              Page
+              Halaman
             </h4>
             <div className="w-full h-fit space-y-2 sm:space-y-3">
               {navFooterPage.map((item) => (
