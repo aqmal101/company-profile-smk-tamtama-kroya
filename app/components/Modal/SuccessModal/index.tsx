@@ -88,7 +88,8 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
           {isTeacherMode ? (
             <>
               <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
-                📧 Bukti pendaftaran telah dikirim ke email siswa/orang tua.
+                📧 Bukti pendaftaran telah dikirim ke email siswa/orang tua yang
+                dimasukkan pada langkah pertama.
               </p>
             </>
           ) : (

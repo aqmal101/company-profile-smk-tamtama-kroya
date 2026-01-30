@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import LayoutWrapper from "./Layout/LayoutWrapper";
+import { AlertProvider } from "./components/ui/alert";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -25,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
-        <LayoutWrapper>{children}</LayoutWrapper>
+        <AlertProvider>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </AlertProvider>
       </body>
     </html>
   );

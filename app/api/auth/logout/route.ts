@@ -4,9 +4,7 @@ const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3333";
 
 export async function POST(request: NextRequest) {
   try {
-    // Get authorization header from request
     const authHeader = request.headers.get("Authorization");
-
     if (!authHeader) {
       return NextResponse.json(
         {
@@ -17,7 +15,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Forward request to backend
     const backendResponse = await fetch(`${API_BASE_URL}/auth/logout`, {
       method: "POST",
       headers: {
@@ -25,9 +22,7 @@ export async function POST(request: NextRequest) {
         Authorization: authHeader,
       },
     });
-
     const data = await backendResponse.json();
-
     return NextResponse.json(data, { status: backendResponse.status });
   } catch (error) {
     console.error("Logout error:", error);

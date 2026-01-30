@@ -2,11 +2,13 @@
 import { Footer } from "@/components/Footer";
 import RegistrationHeader from "@/components/Headers/RegistrationHeader";
 import Header from "@/components/Headers";
-import { AlertProvider } from "@/components/ui/alert";
+import { AuthGuard } from "@/components/AuthGuard";
 import { usePathname } from "next/navigation";
-import { JSX } from "react";
+import { JSX, useState } from "react";
 import { BsWhatsapp } from "react-icons/bs";
 import DashboardHeader from "@/components/Headers/DashboardHeader";
+import AdminHeader from "@/app/admin/dashboard/AdminHeader";
+import Sidebar from "@/app/admin/dashboard/Sidebar";
 
 export default function LayoutWrapper({
   children,
@@ -14,6 +16,7 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }): JSX.Element {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
 
   // Untuk custom path tanpa header (bisa ditambahkan sesuai kebutuhan)
   const noHeader = [
@@ -27,6 +30,7 @@ export default function LayoutWrapper({
   const registrationHeaderRoutes = ["/pendaftaran"];
 
   const dashboardRoutes = ["/dashboard"];
+  const adminRoutes = ["/admin"];
 
   // Cek apakah pathname dimulai dengan path tanpa header
   const isNoHeader = noHeader.some((route) => pathname.startsWith(route));
@@ -39,6 +43,8 @@ export default function LayoutWrapper({
     pathname.startsWith(route),
   );
 
+  const isAdminPage = adminRoutes.some((route) => pathname.startsWith(route));
+
   if (isNoHeader) {
     return <>{children}</>;
   }
@@ -49,16 +55,33 @@ export default function LayoutWrapper({
   const encodedMessage = encodeURIComponent(message);
 
   return (
-    <AlertProvider>
-      {isRegistrationPage ? (
+    <>
+      {isAdminPage ? (
+        <AuthGuard allowedRoles={["admin"]}>
+          <AdminHeader collapsed={collapsed} setCollapsed={setCollapsed} />
+          <Sidebar collapsed={collapsed} />
+        </AuthGuard>
+      ) : isRegistrationPage ? (
         <RegistrationHeader />
       ) : isDashboardPage ? (
-        <DashboardHeader />
+        <AuthGuard allowedRoles={["teacher", "admin"]}>
+          <DashboardHeader />
+        </AuthGuard>
       ) : (
         <Header />
       )}
-      {children}
-      {!isDashboardPage && (
+      {isAdminPage ? (
+        <AuthGuard allowedRoles={["admin"]}>
+          <div
+            className={`pt-20 min-h-screen bg-gray-50 transition-all duration-300 ${collapsed ? "pl-16" : "pl-62"}`}
+          >
+            {children}
+          </div>
+        </AuthGuard>
+      ) : (
+        children
+      )}
+      {!isDashboardPage && !isAdminPage && (
         <a
           href={`https://wa.me/6281325767718?text=${encodedMessage}`}
           target="_blank"
@@ -68,7 +91,11 @@ export default function LayoutWrapper({
           <BsWhatsapp size={30} color="white" />
         </a>
       )}
-      {isRegistrationPage || isDashboardPage ? <></> : <Footer />}
-    </AlertProvider>
+      {isRegistrationPage || isDashboardPage || isAdminPage ? (
+        <></>
+      ) : (
+        <Footer />
+      )}
+    </>
   );
 }

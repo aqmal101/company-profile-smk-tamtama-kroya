@@ -195,28 +195,32 @@ export default function LandingPage() {
   const socialList = [
     {
       name: "Instagram",
-      contact: "@smktamtamakroya",
+      contact: ["@smk_tamtama_kroya", "@autotama_garage"],
       icon: "/sosmed/instagram.svg",
-      hyperlink: "https://www.instagram.com/smk_tamtama_kroya",
+      hyperlink: [
+        "https://www.instagram.com/smk_tamtama_kroya",
+        "https://www.instagram.com/autotama_garage",
+      ],
     },
     {
       name: "Tiktok",
-      contact: "@smk.tamtama.kroya.clp",
+      contact: ["@smk.tamtama.kroya.clp"],
       icon: "/sosmed/tiktok.svg",
-      hyperlink: "https://www.tiktok.com/@smk.tamtama.kroya.clp",
+      hyperlink: ["https://www.tiktok.com/@smk.tamtama.kroya.clp"],
     },
     {
       name: "Youtube",
-      contact: "@smktamtamakroya4678",
+      contact: ["@smktamtamakroya4678"],
       icon: "/sosmed/youtube.svg",
-      hyperlink: "https://www.youtube.com/@smktamtamakroya4678",
+      hyperlink: ["https://www.youtube.com/@smktamtamakroya4678"],
     },
     {
       name: "Facebook",
-      contact: "SMK Tamtama KROYA",
+      contact: ["SMK Tamtama KROYA"],
       icon: "/sosmed/facebook.svg",
-      hyperlink:
+      hyperlink: [
         "https://www.facebook.com/people/SMK-Tamtama-KROYA/100067793231479/#",
+      ],
     },
   ];
 

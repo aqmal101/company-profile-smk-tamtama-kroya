@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3333";
+
 interface StudentDetail {
   nisn: string;
   nik: string;
@@ -33,13 +35,9 @@ interface RegistrationPayload {
   majorChoiceCode: string;
 }
 
-const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3333";
-
 export async function POST(request: NextRequest) {
   try {
-    // Get authorization header using getAuthHeader utility
     const authHeader = request.headers.get("Authorization");
-
     if (!authHeader) {
       return NextResponse.json(
         {
@@ -50,10 +48,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get request body
     const body: RegistrationPayload = await request.json();
-
-    // Forward request to backend
     const apiResponse = await fetch(
       `${API_BASE_URL}/backoffice/registrations`,
       {
@@ -65,29 +60,35 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify(body),
       }
     );
-
     const apiData = await apiResponse.json();
 
     if (apiResponse.ok) {
-      return NextResponse.json({
-        success: true,
-        message: apiData.message || "Pendaftaran berhasil! Bukti pendaftaran telah dikirim ke email Anda.",
-        data: {
-          registrationNumber: apiData.registrationNumber,
-          registrationId: apiData.id,
-          majorChoiceCode: apiData.majorChoiceCode,
-          studentName: apiData.studentDetail?.fullName || body.studentDetail.fullName,
-          createdAt: apiData.createdAt,
+      return NextResponse.json(
+        {
+          success: true,
+          message:
+            apiData.message ||
+            "Pendaftaran berhasil! Bukti pendaftaran telah dikirim ke email Anda.",
+          data: {
+            registrationNumber: apiData.registrationNumber,
+            registrationId: apiData.id,
+            majorChoiceCode: apiData.majorChoiceCode,
+            studentName:
+              apiData.studentDetail?.fullName || body.studentDetail.fullName,
+            createdAt: apiData.createdAt,
+          },
         },
-      },
-      { status: 200 });
+        { status: 200 }
+      );
     } else {
-      return NextResponse.json({
-        success: false,
-        message: apiData.message || "Pendaftaran gagal",
-        errors: apiData.errors,
-      },
-      { status: apiResponse.status });
+      return NextResponse.json(
+        {
+          success: false,
+          message: apiData.message || "Pendaftaran gagal",
+          errors: apiData.errors,
+        },
+        { status: apiResponse.status }
+      );
     }
   } catch (error) {
     console.error("Registration error:", error);

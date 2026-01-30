@@ -44,6 +44,17 @@ section[id] {
     scroll-margin-top: 10vh;
 }
 
+::-webkit-scrollbar {
+    width: 6px;
+    background-color: #bebebe;
+
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #014921;
+    border-radius: 3px;
+}
+
 @layer components {
 
     /* declare background color variables */

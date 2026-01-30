@@ -91,20 +91,29 @@ export default function LoginPage() {
       };
       saveAuthData(authData, data.remember_me);
 
-      // Redirect ke halaman dashboard atau intended destination
+      // Redirect ke halaman sesuai role
       showAlert({
         title: "Login berhasil",
         description: `Selamat datang, ${result.user.fullName}!`,
         variant: "success",
       });
 
-      // Get redirect destination or default to dashboard
-      const redirectPath =
-        sessionStorage.getItem("redirectAfterLogin") || "/dashboard";
+      // Get redirect destination jika ada (misal user akses protected page),
+      // jika tidak, routing sesuai role
+      let redirectPath = sessionStorage.getItem("redirectAfterLogin");
       sessionStorage.removeItem("redirectAfterLogin");
+      if (!redirectPath) {
+        if (result.user.role === "admin") {
+          redirectPath = "/admin/dashboard";
+        } else if (result.user.role === "teacher") {
+          redirectPath = "/dashboard";
+        } else {
+          redirectPath = "/";
+        }
+      }
 
       setTimeout(() => {
-        router.push(redirectPath);
+        router.push(redirectPath!);
       }, 1500);
     } catch (error) {
       showAlert({ title: "Terjadi kesalahan, coba lagi", variant: "error" });

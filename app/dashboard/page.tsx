@@ -3,17 +3,12 @@
 import dayjs from "dayjs";
 import { useAuth } from "@/components/AuthGuard";
 import { useEffect, useState } from "react";
-import { getAuthHeader } from "@/utils/auth";
+import { getAuthHeader, getCurrentUser } from "@/utils/auth";
 import { StudentsTable, Student } from "@/components/Dashboard/StudentsTable";
 import { Pagination, PaginationMeta } from "@/components/Dashboard/Pagination";
 import { HiUserGroup } from "react-icons/hi";
 import { FaCalendarDay, FaCalendarWeek } from "react-icons/fa6";
-
-interface DashboardStats {
-  registration_total_count: number;
-  daily_registration_count: number;
-  weekly_registration_count: number;
-}
+import { useRouter } from "next/navigation";
 
 export function GreetingCard() {
   const { user } = useAuth();
@@ -283,7 +278,27 @@ export function StudentDataTable() {
   );
 }
 
+interface DashboardStats {
+  registration_total_count: number;
+  daily_registration_count: number;
+  weekly_registration_count: number;
+}
+
 export default function DashboardPage() {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    if (currentUser?.role === "admin") {
+      router.replace("/admin/dashboard");
+    }
+  }, [router]);
+
+  if (user?.role === "admin") {
+    return null; // Akan redirect
+  }
+
   return (
     <div className="w-full h-full min-h-screen space-y-6 p-10">
       <GreetingCard />
@@ -292,6 +307,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-// saat guru tersebut menekan teks link DASHBOARD atau aksi apapun yang mengakibatkan halaman penddaftaran tidak tampil, maka muncul modal menginformasikan data yang sudah diisikan akan hilang dan tidak tersimpan karena step belum selesai.
-// apa best practice yang bisa dilakukan?

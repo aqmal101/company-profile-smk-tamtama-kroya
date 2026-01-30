@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { MdMenu, MdClose } from "react-icons/md";
 import Link from "next/link";
 import Dropdown from "../Dropdown";
-import { LuLogOut } from "react-icons/lu";
+import { LuLogOut, LuUser } from "react-icons/lu";
 import { useAlert } from "../ui/alert";
 import { TextButton } from "../Buttons/TextButton";
 import { useAuth } from "../AuthGuard";
@@ -128,13 +128,9 @@ export const Header: React.FC = () => {
                   </div>
                 }
                 leftIcon={
-                  <Image
-                    src="https://github.com/shadcn.png"
-                    alt="User Avatar"
-                    width={30}
-                    height={30}
-                    className="rounded-full"
-                  />
+                  <div className="w-10 h-10 bg-gray-300 rounded-full flex justify-center items-center">
+                    <LuUser className="text-2xl" />{" "}
+                  </div>
                 }
                 width="max-w-fit"
                 color="bg-white"

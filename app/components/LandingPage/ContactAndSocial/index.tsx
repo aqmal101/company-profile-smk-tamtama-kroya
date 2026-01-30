@@ -2,11 +2,7 @@ import { SectionTitle } from "@/components/SectionTitle";
 import { ScrollAnimationWrapper } from "@/components/ScrollAnimationWrapper";
 import Image from "next/image";
 import { TextButton } from "@/components/Buttons/TextButton";
-import {
-  IoChatboxEllipsesOutline,
-  IoGlobeSharp,
-  IoLocationOutline,
-} from "react-icons/io5";
+import { IoGlobeSharp, IoLocationOutline } from "react-icons/io5";
 import React from "react";
 import Dropdown from "@/components/Dropdown";
 import { BsWhatsapp } from "react-icons/bs";
@@ -19,9 +15,9 @@ interface contactList {
 
 interface socialList {
   name: string;
-  contact: string;
+  contact: string | string[];
   icon: React.ReactNode | string;
-  hyperlink?: string;
+  hyperlink?: string | string[];
 }
 
 interface adminList {
@@ -125,14 +121,42 @@ export const ContactAndSocial: React.FC<{
                     </div>
                   </div>
                   <div className="w-full">
-                    <a
-                      href={`${contact.hyperlink || "#"}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-base max-md:text-sm text-gray-600 hover:underline hover:underline-offset-2"
-                    >
-                      {contact.contact}
-                    </a>{" "}
+                    {/* Instagram khusus: tampilkan vertikal jika array */}
+                    {Array.isArray(contact.contact) &&
+                    Array.isArray(contact.hyperlink) &&
+                    contact.name === "Instagram" ? (
+                      <div className="flex flex-col gap-1">
+                        {contact.contact.map((item, idx) => (
+                          <a
+                            key={idx}
+                            href={
+                              (contact.hyperlink && contact.hyperlink[idx]) ||
+                              "#"
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-base max-md:text-sm text-gray-600 hover:underline hover:underline-offset-2"
+                          >
+                            {item}
+                          </a>
+                        ))}
+                      </div>
+                    ) : (
+                      <a
+                        href={
+                          Array.isArray(contact.hyperlink)
+                            ? contact.hyperlink[0]
+                            : contact.hyperlink || "#"
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-base max-md:text-sm text-gray-600 hover:underline hover:underline-offset-2"
+                      >
+                        {Array.isArray(contact.contact)
+                          ? contact.contact[0]
+                          : contact.contact}
+                      </a>
+                    )}
                   </div>
                 </div>
               </ScrollAnimationWrapper>

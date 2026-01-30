@@ -11,7 +11,6 @@ import React, {
 import {
   LuInfo,
   LuX,
-  LuCheckCheck,
   LuCircleX,
   LuTriangleAlert,
   LuCheck,
