@@ -51,6 +51,10 @@ section[id] {
         background-color: var(--primary-color);
     }
 
+    .bg-danger {
+        background-color: var(--danger-color);
+    }
+
     .bg-primary::after,
     .bg-primary:after {
         background-color: var(--primary-color);

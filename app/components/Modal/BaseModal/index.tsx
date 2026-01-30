@@ -42,7 +42,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
       onClick={onClose}
     >
       <div
-        className={`bg-white rounded-lg shadow-2xl max-h-[90vh] w-fit max-w-[80vw] min-h-[50%] h-fit max-sm:w-[90vw] overflow-hidden flex flex-col ${sizeClasses[size]} sm:max-w-screen sm:w-screen max-md:flex-col max-md:max-w-screen ${contentClassName}`}
+        className={`bg-white rounded-lg shadow-2xl max-h-[90vh] w-fit max-w-[80vw] min-h-fit h-fit max-sm:w-[90vw] overflow-hidden flex flex-col ${sizeClasses[size]} sm:max-w-screen sm:w-screen max-md:flex-col max-md:max-w-screen ${contentClassName}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

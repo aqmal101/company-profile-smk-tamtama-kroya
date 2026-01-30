@@ -292,3 +292,6 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+// saat guru tersebut menekan teks link DASHBOARD atau aksi apapun yang mengakibatkan halaman penddaftaran tidak tampil, maka muncul modal menginformasikan data yang sudah diisikan akan hilang dan tidak tersimpan karena step belum selesai.
+// apa best practice yang bisa dilakukan?

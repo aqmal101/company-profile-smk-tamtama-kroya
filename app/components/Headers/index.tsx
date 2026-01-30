@@ -43,7 +43,7 @@ export const NavItems = [
   },
   {
     label: "Program Keahlian",
-    href: "/program-keahlian",
+    href: "/tentang-sekolah/program-keahlian",
   },
   {
     label: "PPDB",
@@ -218,7 +218,7 @@ export const Header: React.FC = () => {
           }`}
         >
           <div className="mt-4 pb-4 border-t border-gray-200">
-            <div className="flex flex-col space-y-4 overflow-y-scroll overflow-hidden">
+            <div className="flex flex-col space-y-4 overflow-hidden">
               {NavItems.map((item) => (
                 <div key={item.label} className="flex flex-col">
                   <div

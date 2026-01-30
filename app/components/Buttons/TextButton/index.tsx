@@ -10,6 +10,7 @@ export const TextButton: React.FC<{
     | "light"
     | "outline"
     | "outline-danger"
+    | "danger"
     | "ghost";
   className?: string;
   onClick?: () => void;
@@ -34,6 +35,10 @@ export const TextButton: React.FC<{
     case "primary":
       defaultStyle =
         "bg-primary text-white border h-fit py-2 sm:py-2 px-3 sm:px-4 text-sm sm:text-base rounded-sm font-medium hover:opacity-90";
+      break;
+    case "danger":
+      defaultStyle =
+        "bg-red-600 text-white border h-fit py-2 sm:py-2 px-3 sm:px-4 text-sm sm:text-base rounded-sm font-medium hover:opacity-90";
       break;
     case "accent":
       defaultStyle =

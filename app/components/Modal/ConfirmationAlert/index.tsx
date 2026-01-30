@@ -34,11 +34,11 @@ export const ConfirmationAlert: React.FC<ConfirmationAlertProps> = ({
       showCloseButton={true}
       size="md"
     >
-      <div className="flex flex-col items-center justify-center text-center space-y-4 py-4 overflow-hidden">
+      <div className="flex h-full flex-col items-center text-center justify-between">
         <LuTriangleAlert className={`${iconColor} text-5xl`} />
         <h2 className="text-xl font-bold text-gray-900">{title}</h2>
         <p className="text-gray-600 text-sm">{message}</p>
-        <div className="w-full flex gap-3 pt-4 justify-end">
+        <div className="w-full flex gap-3 pt-12 justify-end">
           <TextButton
             variant="outline"
             text={cancelText}
@@ -46,7 +46,7 @@ export const ConfirmationAlert: React.FC<ConfirmationAlertProps> = ({
             onClick={onCancel}
           />
           <TextButton
-            variant={variant === "danger" ? "primary" : "primary"}
+            variant="danger"
             text={confirmText}
             className="w-full"
             onClick={onConfirm}

@@ -228,9 +228,8 @@ export default function LoginPage() {
           />
           <TextButton
             variant="outline"
-            isSubmit
             text={"Kembali"}
-            onClick={() => router.push("/")}
+            onClick={() => router.replace("/")}
             className="w-full rounded-md font-semibold transition"
           />
         </form>
