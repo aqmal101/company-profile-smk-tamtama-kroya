@@ -28,6 +28,45 @@ interface RegistrationPayload {
   majorChoiceCode: string;
 }
 
+interface ApiRegistrationResponse {
+  id: number;
+  registrationNumber: number;
+  majorChoiceCode: string;
+  studentDetail: {
+    id: number;
+    nisn: string | null;
+    nik: string | null;
+    fullName: string;
+    placeOfBirth: string;
+    dateOfBirth: string;
+    gender: string;
+    religion: string;
+    schoolOriginName: string;
+    schoolOriginNpsn: string | null;
+    address: string;
+    phoneNumber: string;
+    email: string;
+    isKipRecipient: number;
+  };
+  parentDetail: {
+    id: number;
+    fatherName: string;
+    fatherLivingStatus: string;
+    motherName: string;
+    motherLivingStatus: string;
+    parentPhoneNumber: string | null;
+    parentAddress: string;
+    guardianName: string | null;
+    guardianPhoneNumber: string | null;
+    guardianAddress: string | null;
+  };
+  majorChoice: {
+    id: number;
+    name: string;
+    abbreviation: string;
+  };
+}
+
 export const transformToApiFormat = (
   data: RegistrationData
 ): RegistrationPayload => {
@@ -59,5 +98,44 @@ export const transformToApiFormat = (
       guardianAddress: biodataWali?.alamatWali || "",
     },
     majorChoiceCode: pilihJurusan?.jurusanDipilih || "",
+  };
+};
+
+export const transformFromApiFormat = (
+  data: ApiRegistrationResponse
+): RegistrationData => {
+  const { studentDetail, parentDetail, majorChoice } = data;
+
+  return {
+    biodataSiswa: {
+      namaLengkap: studentDetail.fullName,
+      email: studentDetail.email,
+      nik: studentDetail.nik || "",
+      nisn: studentDetail.nisn || "",
+      tempatLahir: studentDetail.placeOfBirth,
+      tanggalLahir: studentDetail.dateOfBirth,
+      asalSekolah: studentDetail.schoolOriginName,
+      alamat: studentDetail.address,
+      jenisKelamin: studentDetail.gender === "1" ? "Laki-laki" : "Perempuan",
+      agama: studentDetail.religion,
+      adaKip: studentDetail.isKipRecipient === 1,
+      nomorWhatsapp: studentDetail.phoneNumber,
+    },
+    biodataOrangTua: {
+      alamat: parentDetail.parentAddress,
+      namaAyah: parentDetail.fatherName,
+      kondisiAyah: parentDetail.fatherLivingStatus,
+      namaIbu: parentDetail.motherName,
+      kondisiIbu: parentDetail.motherLivingStatus,
+      noTelponOrangTua: parentDetail.parentPhoneNumber || "",
+    },
+    biodataWali: parentDetail.guardianName ? {
+      namaWali: parentDetail.guardianName,
+      noTelponWali: parentDetail.guardianPhoneNumber || "",
+      alamatWali: parentDetail.guardianAddress || "",
+    } : undefined,
+    pilihJurusan: {
+      jurusanDipilih: majorChoice.abbreviation,
+    },
   };
 };

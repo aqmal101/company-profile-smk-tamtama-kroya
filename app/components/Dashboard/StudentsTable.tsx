@@ -22,9 +22,14 @@ export interface Student {
 interface StudentsTableProps {
   students: Student[];
   isLoading?: boolean;
+  onDetailClick?: (registrationId: number) => void;
 }
 
-export function StudentsTable({ students, isLoading }: StudentsTableProps) {
+export function StudentsTable({
+  students,
+  isLoading,
+  onDetailClick,
+}: StudentsTableProps) {
   if (isLoading) {
     return (
       <div className="w-full overflow-x-auto">
@@ -75,6 +80,9 @@ export function StudentsTable({ students, isLoading }: StudentsTableProps) {
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
                 Asal SMP/MTs
               </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                Aksi
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -98,6 +106,14 @@ export function StudentsTable({ students, isLoading }: StudentsTableProps) {
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-900">
                   {student.schoolOriginName}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  <button
+                    onClick={() => onDetailClick?.(student.registrationId)}
+                    className="text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Detail
+                  </button>
                 </td>
               </tr>
             ))}

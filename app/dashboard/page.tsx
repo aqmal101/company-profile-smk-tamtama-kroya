@@ -9,6 +9,9 @@ import { Pagination, PaginationMeta } from "@/components/Dashboard/Pagination";
 import { HiUserGroup } from "react-icons/hi";
 import { FaCalendarDay, FaCalendarWeek } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
+import { ModalPreviewData } from "@/components/Modal/PreviewDataModal";
+import { RegistrationData } from "@/utils/registrationTypes";
+import { transformFromApiFormat } from "@/utils/transformRegistrationData";
 
 export function GreetingCard() {
   const { user } = useAuth();
@@ -141,6 +144,10 @@ export function StudentDataTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [limit, setLimit] = useState(10);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedData, setSelectedData] = useState<RegistrationData | null>(
+    null,
+  );
 
   // Debounce search term
   useEffect(() => {
@@ -214,6 +221,33 @@ export function StudentDataTable() {
     setCurrentPage(page);
   }
 
+  const handleDetailClick = async (registrationId: number) => {
+    console.log("Fetching details for registration ID:", registrationId);
+    try {
+      const response = await fetch(`/api/registrations/${registrationId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const transformedData = transformFromApiFormat(data);
+        setSelectedData(transformedData);
+        setIsModalOpen(true);
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || "Gagal mengambil data detail pendaftaran");
+        setIsModalOpen(false);
+      }
+    } catch (error) {
+      console.error("Failed to fetch registration details:", error);
+      alert("Terjadi kesalahan saat mengambil data detail");
+      setIsModalOpen(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="p-6 border-b border-gray-200">
@@ -261,7 +295,11 @@ export function StudentDataTable() {
       ) : (
         <>
           <div className="p-6">
-            <StudentsTable students={students} isLoading={isLoading} />
+            <StudentsTable
+              students={students}
+              isLoading={isLoading}
+              onDetailClick={handleDetailClick}
+            />
           </div>
           {meta && !isLoading && (
             <Pagination
@@ -274,6 +312,12 @@ export function StudentDataTable() {
           )}
         </>
       )}
+      <ModalPreviewData
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        data={selectedData || undefined}
+        onPrev={() => {}} // Tidak ada edit di sini
+      />
     </div>
   );
 }

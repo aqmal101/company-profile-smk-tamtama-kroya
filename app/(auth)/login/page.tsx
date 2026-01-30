@@ -90,6 +90,7 @@ export default function LoginPage() {
         user: result.user,
       };
       saveAuthData(authData, data.remember_me);
+      sessionStorage.removeItem("redirectAfterLogin");
 
       // Redirect ke halaman sesuai role
       showAlert({
@@ -101,7 +102,6 @@ export default function LoginPage() {
       // Get redirect destination jika ada (misal user akses protected page),
       // jika tidak, routing sesuai role
       let redirectPath = sessionStorage.getItem("redirectAfterLogin");
-      sessionStorage.removeItem("redirectAfterLogin");
       if (!redirectPath) {
         if (result.user.role === "admin") {
           redirectPath = "/admin/dashboard";

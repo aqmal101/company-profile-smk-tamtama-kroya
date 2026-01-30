@@ -138,6 +138,9 @@ export async function logoutAsync(): Promise<boolean> {
   } finally {
     // Always clear local storage regardless of API result
     clearAuthData();
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("redirectAfterLogin");
+    }
   }
 
   return true;
