@@ -46,12 +46,13 @@ section[id] {
 
 ::-webkit-scrollbar {
     width: 6px;
-    background-color: #bebebe;
+    border-radius: 3px;
+    background-color: #cbcbcb;
 
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #014921;
+    background-color: #f5f5f5;
     border-radius: 3px;
 }
 

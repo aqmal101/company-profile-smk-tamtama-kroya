@@ -460,6 +460,7 @@ export default function RegistrationByTeacherPage() {
             onCancel={handleResetPilihJurusan}
             initialData={registrationData.pilihJurusan}
             onValidationError={handleValidationError}
+            isTeacherMode={true}
           />
         );
       case "Selesai":

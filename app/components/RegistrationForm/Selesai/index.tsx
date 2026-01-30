@@ -36,7 +36,7 @@ export const Selesai: React.FC<SelesaiProps> = ({
             </p>
             <p className="text-primary font-bold">
               {isTeacherMode
-                ? "Murid Baru SMK Tamtama Kroya."
+                ? "Calon Murid Baru SMK Tamtama Kroya."
                 : "Calon Murid Baru SMK Tamtama Kroya."}
             </p>
           </div>

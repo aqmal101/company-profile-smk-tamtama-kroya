@@ -234,7 +234,7 @@ export const Alert: React.FC<AlertProps> = ({
   if (!floating) return body;
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex justify-center pointer-events-none">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-9999 flex justify-center pointer-events-none">
       <div className="w-full max-w-xl px-4 pointer-events-auto">{body}</div>
     </div>
   );
@@ -257,7 +257,7 @@ export const AlertProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <AlertContext.Provider value={{ showAlert, hideAlert }}>
       {children}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-3 pointer-events-none w-full max-w-xl px-4">
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-9999 flex flex-col gap-3 pointer-events-none w-full max-w-xl px-4">
         {alerts.map((alert) => (
           <div key={alert.id} className="pointer-events-auto">
             <Alert

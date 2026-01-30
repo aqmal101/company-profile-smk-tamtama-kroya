@@ -334,6 +334,7 @@ export function StudentDataTable() {
         </>
       )}
       <ModalPreviewData
+        title="Detail Data Pendaftaran Murid"
         footer={null}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -1,5 +1,7 @@
 import dayjs from "dayjs";
 import { TextButton } from "../Buttons/TextButton";
+import idLocale from "dayjs/locale/id";
+dayjs.locale(idLocale);
 
 export interface Student {
   id: number;
@@ -55,7 +57,7 @@ export function StudentsTable({
   }
 
   const formatDate = (dateString: string) => {
-    return dayjs(dateString).format("DD MMMM YYYY HH:mm");
+    return dayjs(dateString).locale("id").format("DD MMMM YYYY, HH:mm");
   };
 
   return (
@@ -83,7 +85,7 @@ export function StudentsTable({
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
                 Asal SMP/MTs
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
                 Aksi
               </th>
             </tr>
@@ -105,7 +107,12 @@ export function StudentsTable({
                   {formatDate(student.updatedAt)}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-900">
-                  {student.address}
+                  {student.address.slice(0, 30)}
+                  {student.address.length > 30 ? (
+                    <span className="text-gray-400">...</span>
+                  ) : (
+                    ""
+                  )}
                 </td>
                 <td className="px-4 py-3 text-sm text-gray-900">
                   {student.schoolOriginName}

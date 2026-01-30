@@ -6,6 +6,7 @@ import { RegistrationData } from "@/utils/registrationTypes";
 
 interface ModalPreviewDataProps {
   isOpen: boolean;
+  title?: string;
   onClose: () => void;
   data?: RegistrationData;
   onPrev?: () => void;
@@ -122,7 +123,7 @@ const DataSection = ({
   }
 
   return (
-    <div className={`mb-6 `}>
+    <div className={`mb-6 pt-4 border-t-2 border-gray-300`}>
       <h3 className="text-lg font-semibold text-primary mb-3 pb-2">{title}</h3>
       <div
         className={`grid ${columns === 2 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"} gap-x-6 gap-y-4 mt-4`}
@@ -146,12 +147,13 @@ export const ModalPreviewData: React.FC<ModalPreviewDataProps> = ({
   data,
   onPrev,
   footer = null,
+  title,
 }) => {
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Detail Data Formulir Pendaftaran"
+      title={title || "Detail Data Formulir Pendaftaran"}
       size="full"
       footer={
         footer ? (

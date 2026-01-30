@@ -27,6 +27,7 @@ interface PilihJurusanProps {
   onPrev: () => void;
   onCancel?: () => void;
   initialData?: PilihJurusanForm;
+  isTeacherMode?: boolean;
   onValidationError?: (message: string) => void;
 }
 
@@ -87,6 +88,7 @@ export const PilihJurusan: React.FC<PilihJurusanProps> = ({
   onPrev,
   onCancel,
   initialData,
+  isTeacherMode,
   onValidationError,
 }) => {
   const { showAlert } = useAlert();
@@ -123,7 +125,12 @@ export const PilihJurusan: React.FC<PilihJurusanProps> = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, onError)} className="w-full">
         <div className="grid grid-cols-1">
-          <MandatoryLabel notes="Pilih jurusan yang paling sesuai dengan minat dan rencana masa depanmu 😊" />
+          <MandatoryLabel
+            notes={
+              "Pilih jurusan yang paling sesuai dengan minat dan rencana masa " +
+              (isTeacherMode ? "calon murid" : "depanmu 😊")
+            }
+          />
           <FormField
             control={form.control}
             name="jurusanDipilih"

@@ -165,38 +165,41 @@ export const ContactAndSocial: React.FC<{
         </div>
         {/* sisi kanan bawah */}
         <div className="w-full grid row-span-1 cols-span-1 p-3 max-sm:p-1">
-          <div className="w-full flex flex-row gap-3">
-            <Dropdown
-              isOpen={modalOpen}
-              onOpen={() => setModalOpen(true)}
-              onClose={() => setModalOpen(false)}
-              label="Hubungi via Whatsapp"
-              leftIcon={<BsWhatsapp size={20} />}
-              width="w-[60%]"
-              color="bg-primary"
-              textColor="text-white"
-              rounded="rounded-md"
-            >
-              {adminList.map((admin, index) => (
-                <div
-                  key={index}
-                  className="w-full p-1 text-primary flex justify-between items-center font-normal group hover:underline hover:underline-offset-2 transition-transform duration-200"
-                >
-                  <a
-                    href={`https://wa.me/${admin.number}?text=${encodedMessage}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-left max-sm:text-xs"
+          <div className="w-full grid grid-cols-7 gap-4">
+            <div className="col-span-4">
+              <Dropdown
+                isOpen={modalOpen}
+                onOpen={() => setModalOpen(true)}
+                onClose={() => setModalOpen(false)}
+                label="Hubungi via Whatsapp"
+                leftIcon={<BsWhatsapp size={20} />}
+                color="bg-primary"
+                width="w-full"
+                className="px-4 max-sm:px-2"
+                textColor="text-white"
+                rounded="rounded-md"
+              >
+                {adminList.map((admin, index) => (
+                  <div
+                    key={index}
+                    className="w-full p-1 text-primary flex justify-between items-center font-normal group hover:underline hover:underline-offset-2 transition-transform duration-200"
                   >
-                    {admin.label} {admin.adminName}
-                  </a>
-                  {/* <IoChatboxEllipsesOutline className="w-6 h-6 hidden group-hover:block items-end" /> */}
-                </div>
-              ))}
-            </Dropdown>
+                    <a
+                      href={`https://wa.me/${admin.number}?text=${encodedMessage}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-left max-sm:text-xs"
+                    >
+                      {admin.label} {admin.adminName}
+                    </a>
+                    {/* <IoChatboxEllipsesOutline className="w-6 h-6 hidden group-hover:block items-end" /> */}
+                  </div>
+                ))}
+              </Dropdown>
+            </div>
             {/* Whatsapp Button */}
             <TextButton
-              className="w-[40%] h-full text-primary bg-primary-light border-primary"
+              className="w-full col-span-3 h-full text-primary bg-primary-light border-primary"
               icon={<IoGlobeSharp className="text-xl" />}
               variant="light"
               width="fit"

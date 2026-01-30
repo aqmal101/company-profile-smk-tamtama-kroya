@@ -78,7 +78,7 @@ export default function Dropdown({
   return (
     <div className={`relative ${width} ${height}`}>
       <button
-        className={`h-full w-full ${isOpen ? `${borderColor}` : borderColor} flex flex-row ${rounded} ${color} justify-between items-center space-x-4 max-md:px-1 max-md:py-1 max-md:text-sm ${textColor} group transition-transform duration-200 ease-in-out cursor-pointer ${className}`}
+        className={`h-full max-sm:text-xs w-full ${isOpen ? `${borderColor}` : borderColor} flex flex-row ${rounded} ${color} justify-between items-center space-x-4 max-md:px-1 max-md:py-1 max-md:text-sm ${textColor} group transition-transform duration-200 ease-in-out cursor-pointer ${className}`}
         onClick={onOpen}
         disabled={disabled}
       >
@@ -90,7 +90,7 @@ export default function Dropdown({
           {rightIcon && <div className="shrink-0">{rightIcon}</div>}
           {!hideChevron && (
             <IoChevronDown
-              className={`w-3 h-3 transition-transform duration-300 ${chevronRotation}`}
+              className={`w-4 h-4 transition-transform duration-300 ${chevronRotation}`}
             />
           )}
         </div>
