@@ -17,6 +17,11 @@ import {
   FiUsers,
 } from "react-icons/fi";
 import { MdExpandMore } from "react-icons/md";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const sidebarItems = [
   {
@@ -112,18 +117,33 @@ export default function Sidebar({ collapsed }: { collapsed: boolean }) {
     return new Set(activeGroup ? ["dashboard", activeGroup] : ["dashboard"]);
   };
 
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(getInitialExpandedGroups);
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
+    getInitialExpandedGroups,
+  );
 
   useEffect(() => {
     const activeGroup = sidebarItems.find((section) =>
       section.items.some((item) => item.href === pathname),
     )?.group;
 
-    if (activeGroup && !expandedGroups.has(activeGroup)) {
+    if (activeGroup && !expandedGroups.has(activeGroup) && !collapsed) {
       setExpandedGroups(new Set([...expandedGroups, activeGroup]));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  useEffect(() => {
+    if (!collapsed) {
+      const activeGroup = sidebarItems.find((section) =>
+        section.items.some((item) => item.href === pathname),
+      )?.group;
+
+      if (activeGroup && !expandedGroups.has(activeGroup)) {
+        setExpandedGroups(new Set([...expandedGroups, activeGroup]));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collapsed]);
 
   const toggleGroup = (group: string) => {
     setExpandedGroups((prev) => {
@@ -164,9 +184,19 @@ export default function Sidebar({ collapsed }: { collapsed: boolean }) {
                     key={item.label}
                     href={item.href}
                     className={`flex items-center gap-3 py-2 px-4 rounded ${pathname === item.href ? "bg-primary text-white" : ""} hover:bg-primary text-gray-800 font-medium transition-all ${collapsed ? "justify-center text-xl px-1" : "text-base"}`}
-                    title={item.label}
                   >
-                    <span>{<item.icon className="text-xl" />}</span>
+                    {collapsed ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span>{<item.icon className="text-xl" />}</span>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                          <p>{item.label}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <span>{<item.icon className="text-xl" />}</span>
+                    )}
                     {!collapsed && (
                       <span className="text-xs">{item.label}</span>
                     )}

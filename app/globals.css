@@ -63,6 +63,10 @@ section[id] {
         background-color: var(--primary-color);
     }
 
+    .fill-primary {
+        fill: var(--primary-color);
+    }
+
     .bg-danger {
         background-color: var(--danger-color);
     }
