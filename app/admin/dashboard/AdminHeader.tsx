@@ -9,7 +9,7 @@ import { useAlert } from "@/components/ui/alert";
 import { TextButton } from "@/components/Buttons/TextButton";
 import { useAuth } from "@/components/AuthGuard";
 import { ConfirmationAlert } from "@/components/Modal/ConfirmationAlert";
-import { FiSidebar } from "react-icons/fi";
+import { FiColumns, FiSidebar } from "react-icons/fi";
 
 const currentYear = new Date().getFullYear();
 
@@ -60,7 +60,7 @@ export default function AdminHeader({
                 height={40}
               />
               <div className="hidden sm:flex flex-col ml-3">
-                <h1 className="text-sm  text-primary sm:text-base font-bold">
+                <h1 className="text-sm text-primary sm:text-base font-bold">
                   SMK TAMTAMA KROYA
                 </h1>
                 <p className="text-xs sm:text-sm">
@@ -73,7 +73,11 @@ export default function AdminHeader({
               onClick={() => setCollapsed(!collapsed)}
               aria-label="Toggle Sidebar"
             >
-              <FiSidebar className="w-6 h-6" />
+              {collapsed ? (
+                <FiSidebar className="w-6 h-6" />
+              ) : (
+                <FiColumns className="w-6 h-6" />
+              )}
             </button>
           </div>
 

@@ -18,7 +18,7 @@ import { ModalPreviewData } from "@/components/Modal/PreviewDataModal";
 import { RegistrationData } from "@/utils/registrationTypes";
 import { transformFromApiFormat } from "@/utils/transformRegistrationData";
 import { useAlert } from "@/components/ui/alert";
-import Table from "@/components/Table";
+import ReusableTable, { Column } from "@/components/Table/ReusableTable";
 
 export function GreetingCard() {
   const { user } = useAuth();
@@ -222,15 +222,6 @@ export function StudentDataTable() {
     setCurrentPage(1); // Reset to first page when searching
   };
 
-  const handleLimitChange = (newLimit: number) => {
-    setLimit(newLimit);
-    setCurrentPage(1); // Reset to first page when changing limit
-  };
-
-  function handlePageChange(page: number): void {
-    setCurrentPage(page);
-  }
-
   const handleDetailClick = async (registrationId: number) => {
     setLoadingDetail(true);
     console.log("Fetching details for registration ID:", registrationId);
@@ -274,6 +265,66 @@ export function StudentDataTable() {
     }
   };
 
+  const columns: Column<Student>[] = [
+    {
+      title: "No",
+      dataIndex: "id",
+      key: "id",
+      render: (value, record, index) => (currentPage - 1) * limit + index + 1,
+      width: 60,
+      align: "center",
+    },
+    {
+      title: "Nama Murid",
+      dataIndex: "fullName",
+      key: "fullName",
+      sorter: true,
+    },
+    {
+      title: "No. Pendaftaran",
+      dataIndex: "registrationId",
+      key: "registrationId",
+      sorter: true,
+    },
+    {
+      title: "Waktu Pendaftaran",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      render: (value) =>
+        dayjs(value as string | number | Date | null | undefined)
+          .locale("id")
+          .format("DD MMMM YYYY, HH:mm"),
+      sorter: true,
+    },
+    {
+      title: "Alamat",
+      dataIndex: "address",
+      key: "address",
+      width: "10rem",
+    },
+    {
+      title: "Asal SMP/MTs",
+      dataIndex: "schoolOriginName",
+      key: "schoolOriginName",
+      sorter: true,
+    },
+    {
+      title: "Aksi",
+      dataIndex: "registrationId",
+      key: "actions",
+      render: (value) => (
+        <TextButton
+          text={loadingDetail ? "Memuat..." : "Detail"}
+          variant="primary"
+          disabled={loadingDetail}
+          onClick={() => handleDetailClick(Number(value))}
+        />
+      ),
+      align: "center",
+      width: 100,
+    },
+  ];
+
   return (
     <div className="bg-white max-w-screen rounded-lg shadow-sm overflow-hidden">
       <div className="p-6 border-b border-gray-200">
@@ -306,81 +357,31 @@ export function StudentDataTable() {
           </div>
         </div>
       ) : (
-        <Table
-          data={students}
-          isLoading={isLoading}
+        <ReusableTable
+          columns={columns}
+          dataSource={students}
+          loading={isLoading}
           emptyText="Belum ada data siswa terdaftar"
-          meta={
-            meta || { currentPage: 1, lastPage: 1, total: 0, perPage: limit }
-          }
-          onPageChange={handlePageChange}
-          limit={limit}
-          onLimitChange={handleLimitChange}
-          renderHead={() => (
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                No
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                Nama Murid
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                No. Pendaftaran
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                Waktu Pendaftaran
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                Alamat
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                Asal SMP/MTs
-              </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                Aksi
-              </th>
-            </tr>
-          )}
-          renderRow={(student, index) => {
-            const formatDate = (dateString: string) =>
-              dayjs(dateString).locale("id").format("DD MMMM YYYY, HH:mm");
-            return (
-              <tr
-                key={student.id}
-                className="hover:bg-gray-50 transition-colors"
-              >
-                <td className="px-4 py-3 text-sm text-gray-900">{index + 1}</td>
-                <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                  {student.fullName}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-900">
-                  {student.registrationId}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-900">
-                  {formatDate(student.updatedAt)}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-900">
-                  {student.address.slice(0, 30)}
-                  {student.address.length > 30 ? (
-                    <span className="text-gray-400">...</span>
-                  ) : (
-                    ""
-                  )}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-900">
-                  {student.schoolOriginName}
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-900">
-                  <TextButton
-                    text={loadingDetail ? "Memuat..." : "Detail"}
-                    variant="primary"
-                    disabled={loadingDetail}
-                    onClick={() => handleDetailClick(student.registrationId)}
-                  />
-                </td>
-              </tr>
-            );
+          pagination={{
+            current: currentPage,
+            pageSize: limit,
+            total: meta?.total || 0,
+            showSizeChanger: true,
+            pageSizeOptions: [5, 10, 25, 50, 100],
+            onChange: (page, pageSize) => {
+              setCurrentPage(page);
+              setLimit(pageSize);
+            },
+            onShowSizeChange: (current, size) => {
+              setCurrentPage(1);
+              setLimit(size);
+            },
           }}
+          rowKey="id"
+          // className="p-6"
+          serverSidePagination={true}
+          tableLayout="fixed"
+          scroll={{ y: 400 }}
         />
       )}
       <ModalPreviewData
@@ -416,7 +417,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="w-full h-full min-h-screen space-y-6 p-10 max-sm:p-2">
+    <div className="w-full max-w-screen h-full min-h-screen space-y-6 p-10 max-sm:p-2">
       <GreetingCard />
       <StatsGrid />
       <StudentDataTable />
