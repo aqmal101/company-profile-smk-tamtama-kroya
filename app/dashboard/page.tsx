@@ -4,15 +4,21 @@ import dayjs from "dayjs";
 import { useAuth } from "@/components/AuthGuard";
 import { useEffect, useState } from "react";
 import { getAuthHeader, getCurrentUser } from "@/utils/auth";
-import { StudentsTable, Student } from "@/components/Dashboard/StudentsTable";
-import { Pagination, PaginationMeta } from "@/components/Dashboard/Pagination";
+import { Student } from "@/components/Dashboard/StudentsTable";
+import { PaginationMeta } from "@/components/Dashboard/Pagination";
+import { TextButton } from "@/components/Buttons/TextButton";
 import { HiUserGroup } from "react-icons/hi";
-import { FaCalendarDay, FaCalendarWeek } from "react-icons/fa6";
+import {
+  FaCalendarDay,
+  FaCalendarWeek,
+  FaMagnifyingGlass,
+} from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import { ModalPreviewData } from "@/components/Modal/PreviewDataModal";
 import { RegistrationData } from "@/utils/registrationTypes";
 import { transformFromApiFormat } from "@/utils/transformRegistrationData";
 import { useAlert } from "@/components/ui/alert";
+import Table from "@/components/Table";
 
 export function GreetingCard() {
   const { user } = useAuth();
@@ -57,7 +63,7 @@ function StatCard({
   isLoading,
 }: StatCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 flex items-center gap-4">
+    <div className="bg-white w-full rounded-lg shadow-sm p-6 flex items-center gap-4">
       <div
         className={`w-14 h-14 ${bgColor} rounded-xl flex items-center justify-center`}
       >
@@ -269,7 +275,7 @@ export function StudentDataTable() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div className="bg-white max-w-screen rounded-lg shadow-sm overflow-hidden">
       <div className="p-6 border-b border-gray-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -277,30 +283,17 @@ export function StudentDataTable() {
               Data Murid Terdaftar
             </h3>
           </div>
-
           {/* Search Filter */}
           <div className="relative w-full sm:w-100">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg
-                className="h-5 w-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <FaMagnifyingGlass className="text-lg text-gray-400" />
             </div>
             <input
               type="text"
               placeholder="Cari Nama / nomor pendaftaran / atau asal sekolah..."
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="block max-sm:placeholder:text-xs w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
         </div>
@@ -313,25 +306,82 @@ export function StudentDataTable() {
           </div>
         </div>
       ) : (
-        <>
-          <div className="p-6">
-            <StudentsTable
-              loadingDetail={loadingDetail}
-              students={students}
-              isLoading={isLoading}
-              onDetailClick={handleDetailClick}
-            />
-          </div>
-          {meta && !isLoading && (
-            <Pagination
-              meta={meta}
-              onPageChange={handlePageChange}
-              isLoading={isLoading}
-              limit={limit}
-              onLimitChange={handleLimitChange}
-            />
+        <Table
+          data={students}
+          isLoading={isLoading}
+          emptyText="Belum ada data siswa terdaftar"
+          meta={
+            meta || { currentPage: 1, lastPage: 1, total: 0, perPage: limit }
+          }
+          onPageChange={handlePageChange}
+          limit={limit}
+          onLimitChange={handleLimitChange}
+          renderHead={() => (
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                No
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                Nama Murid
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                No. Pendaftaran
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                Waktu Pendaftaran
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                Alamat
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                Asal SMP/MTs
+              </th>
+              <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+                Aksi
+              </th>
+            </tr>
           )}
-        </>
+          renderRow={(student, index) => {
+            const formatDate = (dateString: string) =>
+              dayjs(dateString).locale("id").format("DD MMMM YYYY, HH:mm");
+            return (
+              <tr
+                key={student.id}
+                className="hover:bg-gray-50 transition-colors"
+              >
+                <td className="px-4 py-3 text-sm text-gray-900">{index + 1}</td>
+                <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  {student.fullName}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  {student.registrationId}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  {formatDate(student.updatedAt)}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  {student.address.slice(0, 30)}
+                  {student.address.length > 30 ? (
+                    <span className="text-gray-400">...</span>
+                  ) : (
+                    ""
+                  )}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  {student.schoolOriginName}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  <TextButton
+                    text={loadingDetail ? "Memuat..." : "Detail"}
+                    variant="primary"
+                    disabled={loadingDetail}
+                    onClick={() => handleDetailClick(student.registrationId)}
+                  />
+                </td>
+              </tr>
+            );
+          }}
+        />
       )}
       <ModalPreviewData
         title="Detail Data Pendaftaran Murid"
@@ -339,7 +389,6 @@ export function StudentDataTable() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         data={selectedData || undefined}
-        // onPrev={() => {}} // Tidak ada edit di sini
       />
     </div>
   );
@@ -367,7 +416,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="w-full h-full min-h-screen space-y-6 p-10">
+    <div className="w-full h-full min-h-screen space-y-6 p-10 max-sm:p-2">
       <GreetingCard />
       <StatsGrid />
       <StudentDataTable />

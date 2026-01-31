@@ -159,7 +159,7 @@ export default function Sidebar({ collapsed }: { collapsed: boolean }) {
 
   return (
     <aside
-      className={`bg-white h-[calc(100vh-4px)] mt-22 py-3 transition-all duration-300 z-50 ${collapsed ? "w-16" : "w-62 overflow-y-scroll"} fixed left-0 top-0`}
+      className={`bg-white h-[calc(100vh-0rem)] my-10 py-10 transition-all duration-300 z-50 ${collapsed ? "w-16" : "w-62 overflow-y-scroll"} fixed left-0 top-0`}
     >
       <nav className="mt-8 flex flex-col gap-2 h-full">
         {sidebarItems.map((section) => (

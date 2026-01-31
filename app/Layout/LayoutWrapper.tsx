@@ -16,7 +16,7 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }): JSX.Element {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   // Untuk custom path tanpa header (bisa ditambahkan sesuai kebutuhan)
   const noHeader = [

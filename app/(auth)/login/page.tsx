@@ -238,6 +238,7 @@ export default function LoginPage() {
           <TextButton
             variant="outline"
             text={"Kembali"}
+            disabled={loading}
             onClick={() => router.replace("/")}
             className="w-full rounded-md font-semibold transition"
           />

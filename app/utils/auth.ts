@@ -130,7 +130,11 @@ export async function logoutAsync(): Promise<boolean> {
       const data = await response.json();
 
       if (!response.ok) {
-        console.error("Logout API error:", data.message);
+        if (data && typeof data.message !== "undefined") {
+          console.error("Logout API error:", data.message);
+        } else {
+          console.error("Logout API error:", data);
+        }
       }
     }
   } catch (error) {

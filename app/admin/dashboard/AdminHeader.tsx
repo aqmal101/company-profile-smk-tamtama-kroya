@@ -69,7 +69,7 @@ export default function AdminHeader({
               </div>
             </div>
             <button
-              className="text-primary"
+              className="text-primary ml-6 4xl:ml-2"
               onClick={() => setCollapsed(!collapsed)}
               aria-label="Toggle Sidebar"
             >

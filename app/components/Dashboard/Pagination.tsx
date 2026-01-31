@@ -76,7 +76,7 @@ export function Pagination({
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 bg-white border-t border-gray-200">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between flex-row w-full gap-4">
         {/* Previous Button */}
         <button
           onClick={() => handlePageChange(currentPage - 1)}
@@ -122,9 +122,10 @@ export function Pagination({
             ),
           )}
         </div>
-
-        {/* Limit Selector */}
-        <div className="flex items-center gap-2">
+      </div>
+      {/* Limit Selector */}
+      <div className="w-full flex items-center justify-between flex-row gap-2">
+        <div className="flex items-center gap-3">
           <span className="text-sm text-gray-700">Tampilkan:</span>
           <select
             value={limit}
@@ -139,7 +140,6 @@ export function Pagination({
             <option value={100}>100</option>
           </select>
         </div>
-
         {/* Next Button */}
         <button
           onClick={() => handlePageChange(currentPage + 1)}

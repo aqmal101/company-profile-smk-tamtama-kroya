@@ -42,13 +42,13 @@ export const BaseModal: React.FC<BaseModalProps> = ({
       onClick={onClose}
     >
       <div
-        className={`bg-white rounded-lg shadow-2xl max-h-[90vh] w-fit max-w-[80vw] min-h-fit h-fit max-sm:w-[90vw] overflow-hidden flex flex-col ${sizeClasses[size]} sm:max-w-screen sm:w-screen max-md:flex-col max-md:max-w-screen ${contentClassName}`}
+        className={`bg-white rounded-lg shadow-2xl max-h-[90vh] w-fit max-w-[80vw] min-h-fit h-fit max-sm:w-[90vw] overflow-hidden flex flex-col ${sizeClasses[size]} max-md:flex-col max-md:max-w-[90vw] max-2xl:w-1/2 ${contentClassName}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="w-full">
           {(title || showCloseButton) && (
-            <div className="w-full p-3 pb-0 max-sm:p-1">
+            <div className="w-full p-3 pb-0 max-sm:p-2">
               <div className="flex justify-between items-center">
                 <h2 className="text-lg max-sm:text-xs font-semibold text-primary">
                   {title}
@@ -68,7 +68,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-3 max-sm:p-1 w-full pt-0 h-[80%]">
+        <div className="flex-1 p-3 w-full pt-0 h-[80%]">
           {children}
         </div>
         {footer && <div className="p-4 border-t border-gray-300">{footer}</div>}
