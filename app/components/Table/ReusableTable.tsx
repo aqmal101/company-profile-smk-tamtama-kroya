@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
+import { LuInbox } from "react-icons/lu";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 
 export interface Column<T = unknown> {
@@ -150,7 +151,10 @@ export default function ReusableTable<T extends object = any>({
 
   if (dataSource.length === 0) {
     return (
-      <div className={`w-full text-center py-12 ${className}`}>
+      <div
+        className={`w-full flex flex-col items-center gap-3 text-center py-12 ${className}`}
+      >
+        <LuInbox className="text-gray-500 text-5xl" />
         <p className="text-gray-500">{emptyText}</p>
       </div>
     );
@@ -186,13 +190,13 @@ export default function ReusableTable<T extends object = any>({
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                  className={`px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
                     column.sorter ? "cursor-pointer hover:bg-gray-100" : ""
                   } ${column.align === "center" ? "text-center" : column.align === "right" ? "text-right" : "text-left"}`}
                   style={{ width: column.width }}
                   onClick={() => handleSort(column)}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex text-center items-center justify-between">
                     <span
                       className={column.width ? "truncate block" : ""}
                       style={
@@ -230,7 +234,7 @@ export default function ReusableTable<T extends object = any>({
                   return (
                     <td
                       key={column.key}
-                      className={`px-6 py-4 text-sm max-sm:text-xs text-gray-900 ${column.width ? "truncate" : "wrap-break-word whitespace-normal"} ${
+                      className={`px-3 py-1 text-sm max-sm:text-xs text-gray-900 ${column.width ? "truncate" : "wrap-break-word whitespace-normal"} ${
                         column.align === "center"
                           ? "text-center"
                           : column.align === "right"

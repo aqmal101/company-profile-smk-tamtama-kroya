@@ -233,12 +233,14 @@ export default function LoginPage() {
               false
             }
             className="w-full bg-primary hover:bg-primary/90 text-white rounded-md font-semibold transition"
-            text={loading ? "Memuat..." : "Masuk"}
+            text={"Masuk"}
+            isLoading={loading}
           />
           <TextButton
             variant="outline"
             text={"Kembali"}
             disabled={loading}
+            isLoading={loading}
             onClick={() => router.replace("/")}
             className="w-full rounded-md font-semibold transition"
           />

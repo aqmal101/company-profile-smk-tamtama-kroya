@@ -25,6 +25,7 @@ export default function AdminHeader({
   const router = useRouter();
   const { user, logout } = useAuth();
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -32,6 +33,7 @@ export default function AdminHeader({
   const displayRole = user?.role === "admin" ? "Admin" : "Role";
 
   const handleLogout = async () => {
+    setIsLoading(true);
     showAlert({
       title: "Logout berhasil",
       description: "Anda diarahkan ke halaman log in",
@@ -41,6 +43,7 @@ export default function AdminHeader({
     setTimeout(() => {
       router.push("/login");
     }, 1500);
+    setIsLoading(false);
   };
 
   const confirmLogout = () => setShowLogoutConfirm(true);
@@ -114,6 +117,7 @@ export default function AdminHeader({
                 variant="outline-danger"
                 icon={<LuLogOut className="w-6 h-6 items-end" />}
                 text="Keluar"
+                isLoading={isLoading}
                 width="full"
                 className="flex justify-start"
                 onClick={confirmLogout}

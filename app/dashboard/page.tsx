@@ -287,6 +287,7 @@ export function StudentDataTable() {
       dataIndex: "registrationId",
       key: "registrationId",
       sorter: true,
+      align: "center",
       width: 200,
     },
     {
@@ -318,12 +319,16 @@ export function StudentDataTable() {
       dataIndex: "registrationId",
       key: "actions",
       render: (value) => (
-        <TextButton
-          text={loadingDetail ? "Memuat..." : "Detail"}
-          variant="primary"
-          disabled={loadingDetail}
-          onClick={() => handleDetailClick(Number(value))}
-        />
+        <div className="flex justify-center">
+          <TextButton
+            text={"Detail"}
+            isLoading={loadingDetail}
+            variant="primary"
+            className="w-fit py-1 px-3 text-xs"
+            disabled={loadingDetail}
+            onClick={() => handleDetailClick(Number(value))}
+          />
+        </div>
       ),
       align: "center",
       width: 120,
@@ -366,7 +371,7 @@ export function StudentDataTable() {
           columns={columns}
           dataSource={students}
           loading={isLoading}
-          emptyText="Belum ada data siswa terdaftar"
+          emptyText="Data Tidak Ada"
           pagination={{
             current: currentPage,
             pageSize: limit,
@@ -383,7 +388,6 @@ export function StudentDataTable() {
             },
           }}
           rowKey="id"
-          // className="p-6"
           serverSidePagination={true}
           tableLayout="fixed"
           scroll={{ y: 400 }}

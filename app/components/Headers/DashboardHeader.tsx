@@ -26,6 +26,7 @@ export const Header: React.FC = () => {
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href;
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -40,6 +41,7 @@ export const Header: React.FC = () => {
         : "Role";
 
   const handleLogout = async () => {
+    setIsLoading(true);
     // perform logout
     showAlert({
       title: "Logout berhasil",
@@ -50,6 +52,7 @@ export const Header: React.FC = () => {
     setTimeout(() => {
       router.push("/login");
     }, 1500);
+    setIsLoading(false);
   };
 
   const confirmLogout = () => {
@@ -68,14 +71,12 @@ export const Header: React.FC = () => {
         <div className="w-full flex flex-row justify-between items-center">
           <div className="w-[20%] pr-4 flex flex-row items-center justify-start border-r-2 border-gray-300">
             <div className="w-fit flex flex-row">
-              <Link href="/">
-                <Image
-                  src="/header/logo.png"
-                  alt="logo-smk-tamtama-kroya"
-                  width={40}
-                  height={40}
-                />
-              </Link>
+              <Image
+                src="/header/logo.png"
+                alt="logo-smk-tamtama-kroya"
+                width={40}
+                height={40}
+              />
               <div className="hidden sm:flex flex-col ml-3">
                 <h1 className="text-sm  text-primary sm:text-base font-bold">
                   SMK TAMTAMA KROYA
@@ -145,6 +146,7 @@ export const Header: React.FC = () => {
                   width="full"
                   className="flex justify-start"
                   onClick={confirmLogout}
+                  isLoading={isLoading}
                 />
               </Dropdown>
             </div>

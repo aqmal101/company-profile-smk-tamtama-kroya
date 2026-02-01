@@ -574,7 +574,7 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                         label="Nomor KIP"
                         placeholder="Masukkan Nomor KIP"
                         isMandatory
-                        maxLength={10}
+                        limit={10}
                         error={form.formState.errors.nomorKip?.message}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           field.onChange(e);

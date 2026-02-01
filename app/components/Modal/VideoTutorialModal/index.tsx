@@ -20,7 +20,7 @@ export const VideoTutorialModal: React.FC<VideoTutorialModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Tutorial Pendaftaran Calon Murid Baru SMK Tamtama Kroya"
-      size="xl"
+      size="full"
       className="z-50"
     >
       <div className="w-full aspect-video">
@@ -29,7 +29,7 @@ export const VideoTutorialModal: React.FC<VideoTutorialModalProps> = ({
           title="Tutorial Pendaftaran Calon Murid Baru SMK Tamtama Kroya"
           className="w-full h-full rounded-lg"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen   
+          allowFullScreen
         />
       </div>
     </BaseModal>

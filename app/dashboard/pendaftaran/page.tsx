@@ -573,7 +573,7 @@ export default function RegistrationByTeacherPage() {
         onConfirm={() => confirmLeave(true)}
         onCancel={() => confirmLeave(false)}
         confirmText="Keluar & Hapus"
-        cancelText="Tetap di Halaman"
+        cancelText="Lanjut Pendaftaran"
         variant="danger"
       />
     </main>

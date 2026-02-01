@@ -55,8 +55,9 @@ export function useLeavePageConfirm(
       }
     };
 
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
+    // Use capture phase so it runs before other click handlers (e.g., Next.js Link)
+    document.addEventListener("click", handler, true);
+    return () => document.removeEventListener("click", handler, true);
   }, [storageKey, options]);
 
   useEffect(() => {
@@ -78,17 +79,13 @@ export function useLeavePageConfirm(
       return "";
     };
 
-    const handleUnload = () => {
-      if (shouldPrompt()) {
-        clearSavedData();
-      }
-    };
-
+    // NOTE: We intentionally avoid clearing saved data automatically on 'unload'
+    // because that could delete the user's draft before they explicitly confirm.
+    // Clearing now happens only when the user confirms via the on-page dialog
+    // (confirmLeave(true) calls clearSavedData()).
     window.addEventListener("beforeunload", handleBeforeUnload);
-    window.addEventListener("unload", handleUnload);
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.removeEventListener("unload", handleUnload);
     };
   }, [storageKey, storageTabKey, options, clearSavedData]);
 
