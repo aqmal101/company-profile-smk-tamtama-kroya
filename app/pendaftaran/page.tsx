@@ -18,6 +18,9 @@ import {
   PilihJurusanForm,
 } from "@/utils/registrationTypes";
 import { useAlert } from "@/components/ui/alert";
+import { useLeavePageConfirm } from "@/hooks/useLeavePageConfirm";
+import { useStepTabs } from "@/hooks/useStepTabs";
+import type { AlertVariant } from "@/components/ui/alert";
 
 const tabsData = [
   "Biodata Siswa",
@@ -121,9 +124,27 @@ export default function RegistrationPage() {
     }
   };
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-  };
+  // Reusable leave page confirmation hook
+  const { leaveConfirmation, confirmLeave } = useLeavePageConfirm(
+    STORAGE_KEY,
+    STORAGE_TAB_KEY,
+  );
+
+  // Use reusable step tabs hook
+  const { handleTabChange } = useStepTabs(
+    tabsData,
+    activeTab,
+    setActiveTab,
+    registrationData,
+    {
+      showAlert: (opts) =>
+        showAlert({
+          title: opts.title,
+          description: opts.description,
+          variant: (opts.variant as AlertVariant) ?? "warning",
+        }),
+    },
+  );
 
   // SELANJUTNYA: Simpan data dan lanjut ke tab berikutnya
   const handleNextBiodataSiswa = (data: BiodataSiswaForm) => {
@@ -517,6 +538,18 @@ export default function RegistrationPage() {
         onCancel={() => setConfirmationAlert({ isOpen: false, type: null })}
         confirmText="Hapus"
         cancelText="Batal"
+        variant="danger"
+      />
+
+      {/* Confirmation for leaving page and deleting saved data */}
+      <ConfirmationAlert
+        isOpen={leaveConfirmation.isOpen}
+        title="Keluar dari Pendaftaran?"
+        message="Data pendaftaran Anda yang tersimpan akan dihapus. Apakah Anda yakin ingin keluar?"
+        onConfirm={() => confirmLeave(true)}
+        onCancel={() => confirmLeave(false)}
+        confirmText="Keluar & Hapus"
+        cancelText="Tetap di Halaman"
         variant="danger"
       />
     </main>

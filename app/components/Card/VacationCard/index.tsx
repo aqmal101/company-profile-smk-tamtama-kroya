@@ -1,3 +1,8 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { BsFire } from "react-icons/bs";
 
 interface VacationItem {
@@ -18,6 +23,7 @@ export default function VacationCard({
   item: VacationItem;
   index: number;
 }) {
+  console.log("Rendering VacationCard:", item.isPopular);
   return (
     <div
       key={index}
@@ -69,6 +75,7 @@ export default function VacationCard({
             </h3>
           </div>
         </div>
+
         <div className="relative w-full h-6 bg-gray-200 rounded-sm overflow-hidden">
           <div
             className="absolute inset-0 rounded-sm"
@@ -81,12 +88,25 @@ export default function VacationCard({
             className="relative h-full rounded-sm transition-all duration-300 flex items-center justify-end px-3"
             style={{
               backgroundColor: item.color,
-              width: `${item.precentage}%`,
+              // Use provided precentage (0-100). Fallback to safe calculation and clamp to [0,100]
+              width: `${Math.min(100, Math.max(0, Number.isFinite(item.precentage) ? item.precentage : item.quota ? (item.total / item.quota) * 100 : 0))}%`,
             }}
+            aria-label={`Progress ${item.precentage}%`}
           >
-            <span className="text-xs font-semibold text-white z-10">
-              {item.precentage}%
-            </span>
+            <Tooltip>
+              <TooltipTrigger className="">
+                <span className="text-xs font-semibold text-white z-10">
+                  {Number.isFinite(item.precentage)
+                    ? `${item.precentage}%`
+                    : `0%`}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                {Number.isFinite(item.precentage)
+                  ? `${item.precentage}%`
+                  : `0%`}
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </div>

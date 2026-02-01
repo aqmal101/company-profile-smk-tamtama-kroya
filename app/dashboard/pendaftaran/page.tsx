@@ -18,6 +18,9 @@ import {
   PilihJurusanForm,
 } from "@/utils/registrationTypes";
 import { useAlert } from "@/components/ui/alert";
+import { useLeavePageConfirm } from "@/hooks/useLeavePageConfirm";
+import { useStepTabs } from "@/hooks/useStepTabs";
+import type { AlertVariant } from "@/components/ui/alert";
 import { useAuth } from "@/components/AuthGuard";
 import { getAuthHeader } from "@/utils/auth";
 import { useRouter } from "next/navigation";
@@ -64,22 +67,17 @@ export default function RegistrationByTeacherPage() {
   } | null>(null);
   const [formKey, setFormKey] = useState(0); // Add key to force re-render
 
-  // Handle page unload confirmation
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      // Check if there's any registration data saved
-      const hasData = localStorage.getItem(STORAGE_KEY);
-      if (hasData && activeTab !== "Biodata Siswa") {
-        e.preventDefault();
-        e.returnValue =
-          "Data pendaftaran belum disimpan. Apakah Anda yakin ingin keluar?";
-        return e.returnValue;
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [activeTab]);
+  // Reusable leave page confirmation hook (only prompt when not on first step)
+  const { leaveConfirmation, confirmLeave } = useLeavePageConfirm(
+    STORAGE_KEY,
+    STORAGE_TAB_KEY,
+    {
+      canPrompt: () =>
+        Boolean(
+          localStorage.getItem(STORAGE_KEY) && activeTab !== "Biodata Siswa",
+        ),
+    },
+  );
 
   // Load data from localStorage on mount (client-side only)
   useEffect(() => {
@@ -143,9 +141,21 @@ export default function RegistrationByTeacherPage() {
     }
   };
 
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-  };
+  // Use reusable step tabs hook
+  const { handleTabChange } = useStepTabs(
+    tabsData,
+    activeTab,
+    setActiveTab,
+    registrationData,
+    {
+      showAlert: (opts) =>
+        showAlert({
+          title: opts.title,
+          description: opts.description,
+          variant: (opts.variant as AlertVariant) ?? "warning",
+        }),
+    },
+  );
 
   // SELANJUTNYA: Simpan data dan lanjut ke tab berikutnya
   const handleNextBiodataSiswa = (data: BiodataSiswaForm) => {
@@ -552,6 +562,18 @@ export default function RegistrationByTeacherPage() {
         onCancel={() => setConfirmationAlert({ isOpen: false, type: null })}
         confirmText="Hapus"
         cancelText="Batal"
+        variant="danger"
+      />
+
+      {/* Confirmation for leaving page and deleting saved data */}
+      <ConfirmationAlert
+        isOpen={leaveConfirmation?.isOpen}
+        title="Keluar dari Pendaftaran?"
+        message="Data pendaftaran Anda yang tersimpan akan dihapus. Apakah Anda yakin ingin keluar?"
+        onConfirm={() => confirmLeave(true)}
+        onCancel={() => confirmLeave(false)}
+        confirmText="Keluar & Hapus"
+        cancelText="Tetap di Halaman"
         variant="danger"
       />
     </main>

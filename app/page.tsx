@@ -16,8 +16,59 @@ import { HiOutlineComputerDesktop } from "react-icons/hi2";
 import { FaRegMoneyBill1 } from "react-icons/fa6";
 import { FaRegHandshake } from "react-icons/fa";
 import { MdCall, MdEmail, MdLanguage, MdLocationOn } from "react-icons/md";
+import { useEffect, useState } from "react";
+import type { VacationData } from "@/components/LandingPage/VacationTotal";
 
 export default function LandingPage() {
+  const [majorsData, setMajorsData] = useState<VacationData[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMajors = async () => {
+      try {
+        const response = await fetch(`/api/majors`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+
+          // Normalize backend response into an array of majors
+          let majorsArray: VacationData[] = [];
+          if (Array.isArray(data)) majorsArray = data as VacationData[];
+          else {
+            const obj = data as unknown as Record<string, unknown>;
+            if (Array.isArray(obj["majors"]))
+              majorsArray = obj["majors"] as unknown as VacationData[];
+            else if (Array.isArray(obj["data"]))
+              majorsArray = obj["data"] as unknown as VacationData[];
+            else if (Array.isArray(obj["items"]))
+              majorsArray = obj["items"] as unknown as VacationData[];
+            else if (data && typeof data === "object") {
+              // try to extract arrays from object values
+              for (const val of Object.values(obj)) {
+                if (Array.isArray(val)) {
+                  majorsArray = val as unknown as VacationData[];
+                  break;
+                }
+              }
+            }
+          }
+
+          setMajorsData(majorsArray);
+        }
+      } catch (error) {
+        console.error("Failed to fetch majors:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMajors();
+  }, []);
+
   const registrationPathTabs = [
     {
       id: "prestasi",
@@ -247,7 +298,11 @@ export default function LandingPage() {
       <WhyChooseUs id="mengapa-pilih-tamtama" />
 
       {/* Jumlah Pendaftar per Jurusan */}
-      <VacationTotal id="jumlah-peminat" />
+      <VacationTotal
+        id="jumlah-peminat"
+        data={majorsData ?? []}
+        loading={isLoading}
+      />
 
       {/* Jalur Pendaftaran */}
       <RegistrationPathSection
