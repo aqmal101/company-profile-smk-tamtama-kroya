@@ -14,7 +14,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className={`flex-1 pt-20 pb-8 transition-all duration-300 `}>
-        {children}
+        {children}s
       </main>
     </div>
   );

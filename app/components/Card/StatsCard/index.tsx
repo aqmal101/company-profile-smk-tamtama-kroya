@@ -14,7 +14,7 @@ export default function StatsCard({
   isLoading: boolean;
 }) {
   return (
-    <div className="w-full grid grid-cols-4 max-sm:grid-cols-1 gap-3 mb-4">
+    <div className="w-full grid grid-cols-4 max-md:grid-cols-2 max-sm:grid-cols-1 gap-3 mb-4">
       {data.map((item, idx) => (
         <div
           key={item.title}

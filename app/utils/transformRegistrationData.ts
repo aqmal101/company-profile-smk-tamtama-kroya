@@ -142,3 +142,59 @@ export const transformFromApiFormat = (
     },
   };
 };
+
+// New: transform recent registrations response into the Student table shape
+import type { Student } from "@/components/Dashboard";
+
+export function transformRecentRegistrations(items: unknown): Student[] {
+  console.log("Transformer input:", items);
+  // Normalize input: backend may return the array directly or wrapped in { data: [] } / { rows: [] }
+  let list: Array<Record<string, unknown>> = [];
+
+  if (Array.isArray(items)) {
+    list = items as Array<Record<string, unknown>>;
+  } else if (items && typeof items === "object") {
+    const obj = items as Record<string, unknown>;
+    if (Array.isArray(obj.data)) list = obj.data as Array<Record<string, unknown>>;
+    else if (Array.isArray(obj.rows)) list = obj.rows as Array<Record<string, unknown>>;
+    else list = [obj];
+  } else {
+    console.log("No valid array found in input");
+    return [];
+  }
+
+  console.log("Normalized list:", list);
+  const result = list.map((item) => {
+    const sd = (item["studentDetail"] as Record<string, unknown>) || {};
+
+    const id = Number(item["id"] ?? sd["id"] ?? 0);
+    const registrationNumber = Number(
+      item["registrationNumber"] ?? item["registrationId"] ?? sd["registrationId"] ?? id,
+    );
+    const updatedAt = String(
+      item["updatedAt"] ?? sd["updatedAt"] ?? item["createdAt"] ?? new Date().toISOString(),
+    );
+
+    return {
+      id: id,
+      nisn: String(sd["nisn"] ?? ""),
+      nik: String(sd["nik"] ?? ""),
+      fullName: String(sd["fullName"] ?? "-"),
+      placeOfBirth: String(sd["placeOfBirth"] ?? ""),
+      dateOfBirth: String(sd["dateOfBirth"] ?? ""),
+      gender: String(sd["gender"] ?? ""),
+      religion: String(sd["religion"] ?? ""),
+      schoolOriginName: String(sd["schoolOriginName"] ?? ""),
+      schoolOriginNpsn: sd["schoolOriginNpsn"] as string | null ?? null,
+      address: String(sd["address"] ?? ""),
+      phoneNumber: String(sd["phoneNumber"] ?? ""),
+      email: String(sd["email"] ?? ""),
+      isKipRecipient: Number(sd["isKipRecipient"] ?? 0),
+      registrationId: id,
+      registrationNumber: registrationNumber,
+      updatedAt: updatedAt,
+    };
+  });
+  console.log("Transformer output:", result);
+  return result;
+}

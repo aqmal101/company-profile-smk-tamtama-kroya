@@ -183,7 +183,7 @@ export default function Sidebar({ collapsed }: { collapsed: boolean }) {
                   <a
                     key={item.label}
                     href={item.href}
-                    className={`flex items-center gap-3 py-2 px-4 rounded ${pathname === item.href ? "bg-primary text-white" : ""} hover:bg-primary text-gray-800 font-medium transition-all ${collapsed ? "justify-center text-xl px-1" : "text-base"}`}
+                    className={`flex items-center gap-3 py-2 px-4 rounded ${pathname === item.href ? "bg-primary hover:bg-primary/70 text-white" : ""} hover:bg-primary text-gray-800 font-medium transition-all ${collapsed ? "justify-center text-xl px-1" : "text-base"}`}
                   >
                     {collapsed ? (
                       <Tooltip>

@@ -19,6 +19,7 @@ export interface Student {
   email: string;
   isKipRecipient: number;
   registrationId: number;
+  registrationNumber?: number;
   updatedAt: string;
 }
 
