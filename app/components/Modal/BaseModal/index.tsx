@@ -13,6 +13,7 @@ interface BaseModalProps {
   contentClassName?: string;
   size?: "sm" | "md" | "lg" | "xl" | "full";
   footer?: ReactNode | null;
+  hiddenOverlay?: boolean;
 }
 
 const sizeClasses = {
@@ -31,6 +32,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
   showCloseButton = true,
   className = "",
   contentClassName = "",
+  hiddenOverlay = false,
   size = "lg",
   footer = null,
 }) => {
@@ -38,7 +40,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 bg-black/70 flex items-center justify-center z-1000 ${className}`}
+      className={`fixed inset-0${hiddenOverlay ? "" : " bg-black/70"} flex items-center justify-center z-1000 ${className}`}
       onClick={onClose}
     >
       <div
@@ -68,9 +70,7 @@ export const BaseModal: React.FC<BaseModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-3 w-full pt-0 h-[80%]">
-          {children}
-        </div>
+        <div className="flex-1 p-3 w-full pt-0 h-[80%]">{children}</div>
         {footer && <div className="p-4 border-t border-gray-300">{footer}</div>}
       </div>
     </div>

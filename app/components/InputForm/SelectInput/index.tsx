@@ -1,10 +1,16 @@
 import React, { SelectHTMLAttributes } from "react";
 
+interface SelectOption {
+  value: string | number;
+  label: string;
+  disabled?: boolean;
+}
+
 interface SelectInputProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
   placeholder?: string;
-  options: Array<{ value: string | number; label: string }>;
+  options: SelectOption[];
   isMandatory?: boolean;
 }
 
@@ -40,6 +46,7 @@ const SelectInput = React.forwardRef<HTMLSelectElement, SelectInputProps>(
               <option
                 key={option.value}
                 value={option.value}
+                disabled={option.disabled}
                 className="bg-white text-gray-900 py-2 hover:bg-blue-100"
               >
                 {option.label}

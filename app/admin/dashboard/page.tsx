@@ -19,9 +19,15 @@ import { transformFromApiFormat } from "@/utils/transformRegistrationData";
 import { useAlert } from "@/components/ui/alert";
 import ReusableTable, { Column } from "@/components/Table/ReusableTable";
 import { ModalPreviewData } from "@/components/Modal/PreviewDataModal";
+import { BaseModal } from "@/components/Modal/BaseModal";
 import Skeleton from "@/components/Skeleton";
 import { LuEye, LuPen, LuTrash2 } from "react-icons/lu";
 import Link from "next/link";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function GreetingCard() {
   const { user } = useAuth();
@@ -42,10 +48,8 @@ export function GreetingCard() {
         {greeting}, {user?.fullName || "User"} 👋🏻
       </h1>
       <h2 className="text-sm text-gray-500">
-        Lihat statistik data terbaru pendaftaran calon murid baru
-      </h2>
-      <h2 className="text-sm text-gray-500">
-        SMK Tamtama Kroya tahun ajaran 2025/2026
+        Lihat statistik data terbaru pendaftaran calon murid baru SMK Tamtama
+        Kroya tahun ajaran 2025/2026
       </h2>
     </div>
   );
@@ -60,6 +64,7 @@ interface DashboardStats {
 }
 
 export default function AdminDashboardPage() {
+  // const router = useNavigation();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [trendData, setTrendData] = useState<{ date: string; count: number }[]>(
     [],
@@ -71,7 +76,6 @@ export default function AdminDashboardPage() {
   const { showAlert } = useAlert();
 
   const [students, setStudents] = useState<Student[]>([]);
-  console.log(students);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -82,6 +86,9 @@ export default function AdminDashboardPage() {
   const [selectedData, setSelectedData] = useState<RegistrationData | null>(
     null,
   );
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchRegistrationTrend = async () => {
@@ -227,6 +234,55 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const confirmDelete = (registrationId: number) => {
+    setDeletingId(registrationId);
+    setDeleteModalOpen(true);
+  };
+
+  const performDelete = async () => {
+    if (!deletingId) return;
+    setIsDeleting(true);
+    try {
+      const response = await fetch(
+        `/api/dashboard/registrations?id=${deletingId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
+        },
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        showAlert({
+          title: "Berhasil",
+          description: data.message || "Data Siswa berhasil dihapus.",
+          variant: "success",
+        });
+        fetchStudents(currentPage, "", limit);
+      } else {
+        showAlert({
+          title: "Gagal",
+          description: data.message || "Gagal menghapus data siswa.",
+          variant: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      showAlert({
+        title: "Gagal",
+        description: "Terjadi kesalahan saat menghapus data siswa.",
+        variant: "error",
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeleteModalOpen(false);
+      setDeletingId(null);
+    }
+  };
+
   const fetchStudents = async (
     page: number,
     search: string = "",
@@ -265,8 +321,6 @@ export default function AdminDashboardPage() {
         return;
       }
 
-      // Transform backend shape to frontend `Student` shape expected by the table
-      console.log("Raw API response:", data);
       try {
         const transformed = transformRecentRegistrations(
           data.data || data || [],
@@ -285,6 +339,10 @@ export default function AdminDashboardPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRouteDetail = (registrationId: number) => {
+    window.location.href = `/admin/ppdb/data-calon-murid/${registrationId}/edit`;
   };
 
   useEffect(() => {
@@ -352,28 +410,45 @@ export default function AdminDashboardPage() {
       width: 240,
       render: (value) => (
         <div className="flex justify-center gap-4">
-          <TextButton
-            icon={<LuEye className="text-xl" />}
-            isLoading={loadingDetail}
-            variant="outline-warning"
-            className="w-fit py-1 px-2! border-2"
-            disabled={loadingDetail}
-            onClick={() => handleDetailClick(Number(value))}
-          />
-          <TextButton
-            icon={<LuPen className="text-xl" />}
-            isLoading={loadingDetail}
-            variant="outline-info"
-            className="w-fit py-1 px-2! text-xs border-2 border-blue-500"
-            disabled={loadingDetail}
-          />
-          <TextButton
-            icon={<LuTrash2 className="text-xl" />}
-            isLoading={loadingDetail}
-            variant="outline-danger"
-            className="w-fit py-1 px-2! border-2"
-            disabled={loadingDetail}
-          />
+          <Tooltip>
+            <TooltipTrigger>
+              <TextButton
+                icon={<LuEye className="text-xl" />}
+                isLoading={loadingDetail}
+                variant="outline-warning"
+                className="w-fit py-1 px-2! border-2"
+                disabled={loadingDetail}
+                onClick={() => handleDetailClick(Number(value))}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="top">Detail Data Murid</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger>
+              <TextButton
+                icon={<LuPen className="text-xl" />}
+                isLoading={loadingDetail}
+                variant="outline-info"
+                className="w-fit py-1 px-2! text-xs border-2 border-blue-500"
+                disabled={loadingDetail}
+                onClick={() => handleRouteDetail(Number(value))}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="top">Edit Data Murid</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger>
+              <TextButton
+                icon={<LuTrash2 className="text-xl" />}
+                isLoading={loadingDetail}
+                variant="outline-danger"
+                className="w-fit py-1 px-2! border-2"
+                disabled={loadingDetail}
+                onClick={() => confirmDelete(Number(value))}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="top">Hapus Data Murid</TooltipContent>
+          </Tooltip>
         </div>
       ),
       // width: 120,
@@ -419,8 +494,8 @@ export default function AdminDashboardPage() {
               Pendaftaran Terbaru
             </h3>
             <Link
-              className="text-primary text-base hover:underline"
-              href="/pendaftaran"
+              className="text-primary text-sm hover:underline"
+              href="/admin/ppdb/data-calon-murid"
             >
               Lihat Selengkapnya
             </Link>
@@ -443,6 +518,30 @@ export default function AdminDashboardPage() {
           onClose={() => setIsModalOpen(false)}
           data={selectedData || undefined}
         />
+        <BaseModal
+          isOpen={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)}
+          title="Konfirmasi Hapus"
+          footer={
+            <div className="flex justify-end gap-2">
+              <TextButton
+                variant="outline"
+                text="Batal"
+                isLoading={isDeleting}
+                onClick={() => setDeleteModalOpen(false)}
+              />
+              <TextButton
+                text={"Hapus"}
+                variant="danger"
+                onClick={performDelete}
+                isLoading={isDeleting}
+              />
+            </div>
+          }
+        >
+          <p>Anda yakin ingin menghapus siswa ini?</p>
+          <p>Aksi tidak dapat dibatalkan.</p>
+        </BaseModal>
       </div>
     </div>
   );

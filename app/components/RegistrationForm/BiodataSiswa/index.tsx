@@ -75,6 +75,8 @@ interface BiodataSiswaProps {
   initialData?: BiodataSiswaForm;
   onValidationError?: (message: string) => void;
   isTeacherMode?: boolean;
+  skipNikCheck?: boolean;
+  nikReadOnly?: boolean;
 }
 
 export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
@@ -83,6 +85,8 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
   onCancel,
   initialData,
   isTeacherMode = false,
+  skipNikCheck = false,
+  nikReadOnly = false,
 }) => {
   const { showAlert } = useAlert();
 
@@ -112,7 +116,7 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
     const nikVal = data.nik;
 
     try {
-      if (checkingNik) {
+      if (!skipNikCheck && checkingNik) {
         showAlert({
           title: "Sedang Memeriksa NIK",
           description: "Harap tunggu sampai pemeriksaan NIK selesai.",
@@ -121,7 +125,7 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
         return;
       }
 
-      if (!nikVal || nikVal.length < 16) {
+      if ((!skipNikCheck && !nikVal) || nikVal.length < 16) {
         form.setError("nik", { type: "manual", message: "NIK harus 16 digit" });
         showAlert({
           title: "NIK Tidak Lengkap",
@@ -131,8 +135,8 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
         return;
       }
 
-      // If we already know it's invalid, block
-      if (nikValid === false) {
+      // If we already know it's invalid, block (only if not skipping check)
+      if (!skipNikCheck && nikValid === false) {
         form.setError("nik", {
           type: "manual",
           message: "NIK sudah digunakan",
@@ -146,7 +150,7 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
       }
 
       // Validation must have been done on the NIK field (onBlur). If it hasn't been done, block and ask user to validate first.
-      if (nikValid === null) {
+      if (!skipNikCheck && nikValid === null) {
         form.setError("nik", {
           type: "manual",
           message: "Nomor NIK tersebut sudah terdaftar di sistem.",
@@ -160,7 +164,7 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
         return;
       }
 
-      // At this point, NIK is valid
+      // At this point, NIK is valid or check is skipped
       onNext(data as BiodataSiswaForm);
     } catch (err) {
       setCheckingNik(false);
@@ -315,7 +319,9 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                       "Masukkan NIK " + (isTeacherMode ? "Calon Murid" : "Anda")
                     }
                     error={form.formState.errors.nik?.message}
+                    readOnly={nikReadOnly}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      if (nikReadOnly) return; // Prevent changes if read-only
                       field.onChange(e);
                       setNikValid(null);
                       if (form.formState.errors.nik) {
@@ -323,7 +329,10 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                       }
                     }}
                     onBlur={async (e: React.FocusEvent<HTMLInputElement>) => {
+                      if (nikReadOnly) return; // Skip validation if read-only
                       field.onBlur?.();
+                      if (skipNikCheck) return; // Skip NIK check for edit mode
+
                       const val = String(e.target.value || "");
                       // Only check when it looks like a full NIK (16 digits)
                       if (!val || val.length < 16) return;

@@ -26,6 +26,7 @@ export const InputText: React.FC<{
   limit?: number;
   isCapitalize?: boolean;
   isUppercase?: boolean;
+  viewOnly?: boolean;
 }> = ({
   label,
   name,
@@ -37,6 +38,7 @@ export const InputText: React.FC<{
   limit,
   isCapitalize,
   isUppercase,
+  viewOnly = false,
 }) => {
   const [touched, setTouched] = useState(false);
   const isAboveLimit = limit ? value.length > limit : false;
@@ -106,7 +108,7 @@ export const InputText: React.FC<{
         type={isEmail ? "email" : "text"}
         name={name}
         value={value}
-        onChange={handleChange}
+        onChange={viewOnly ? undefined : handleChange}
         onBlur={handleBlur}
         onFocus={handleFocus}
         required={isMandatory}
@@ -139,6 +141,7 @@ export const InputNumber: React.FC<{
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   isMandatory?: boolean;
+  viewOnly?: boolean;
 }> = ({
   label,
   name,
@@ -148,6 +151,7 @@ export const InputNumber: React.FC<{
   isMandatory,
   limit,
   minLength,
+  viewOnly = false,
 }) => {
   const isAboveLimit = limit ? value.length > limit : false;
 
@@ -176,7 +180,7 @@ export const InputNumber: React.FC<{
           type="number"
           name={name}
           value={value}
-          onChange={handleChange}
+          onChange={viewOnly ? undefined : handleChange}
           required={isMandatory}
           className={`w-full max-sm:text-xs px-4 max-sm:px-2 py-2 border rounded-sm
             placeholder-gray-400 max-sm:placeholder:text-xs
@@ -188,6 +192,7 @@ export const InputNumber: React.FC<{
           placeholder={placeholder}
           maxLength={limit}
           minLength={minLength}
+          readOnly={viewOnly}
         />
         {isAboveLimit && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center justify-center">

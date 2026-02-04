@@ -70,7 +70,7 @@ export const Header: React.FC = () => {
       >
         <div className="w-full flex flex-row justify-between items-center">
           <div className="w-[20%] pr-4 flex flex-row items-center justify-start border-r-2 border-gray-300">
-            <div className="w-fit flex flex-row">
+            <div className="w-fit shrink-0 flex flex-row">
               <Image
                 src="/header/logo.png"
                 alt="logo-smk-tamtama-kroya"

@@ -215,6 +215,11 @@ input::-ms-clear {
     display: none;
 }
 
+option:disabled {
+    @apply text-gray-400;
+    /* cursor: not-allowed; */
+}
+
 
 ::-webkit-scrollbar {
     width: 6px;

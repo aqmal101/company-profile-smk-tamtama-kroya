@@ -135,6 +135,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                 "border-red-500 focus:ring-red-500",
               !error && !isAboveLimit && !showEmailError && "border-gray-300",
               isPassword && "pr-12", // Add padding right for eye button
+              props.readOnly && "bg-gray-100 text-gray-600 cursor-not-allowed",
               className,
             )}
             onKeyDown={isEmail ? handleEmailKeyDown : undefined}
@@ -248,6 +249,7 @@ export const FormInputNumber = forwardRef<
               (isAboveLimit || error) &&
                 "border-red-500 focus:ring-red-500 pr-10",
               !error && !isAboveLimit && "border-gray-300",
+              props.readOnly && "bg-gray-100 text-gray-600 cursor-not-allowed",
               className,
             )}
             maxLength={limit}

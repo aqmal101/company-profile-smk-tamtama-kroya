@@ -85,6 +85,7 @@ export const Selesai: React.FC<SelesaiProps> = ({
             text="Kembali"
             className="px-8 py-2"
             onClick={onPrev}
+            isLoading={isSubmitting}
             disabled={isSubmitting}
           />
           <TextButton
@@ -92,6 +93,7 @@ export const Selesai: React.FC<SelesaiProps> = ({
             icon={<LuFileText />}
             text="Lihat Detail Data"
             className="px-8 py-2"
+            isLoading={isSubmitting}
             onClick={() => setModalDetailData(true)}
           />
         </div>
@@ -101,6 +103,7 @@ export const Selesai: React.FC<SelesaiProps> = ({
             text="Kosongkan Formulir"
             className="px-8 py-2"
             onClick={onCancel}
+            isLoading={isSubmitting}
             disabled={isSubmitting}
           />
           <TextButton
@@ -110,6 +113,7 @@ export const Selesai: React.FC<SelesaiProps> = ({
             }
             className="px-8 py-2"
             onClick={onSubmit}
+            isLoading={isSubmitting}
             disabled={isSubmitting}
           />
         </div>

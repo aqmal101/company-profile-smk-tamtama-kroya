@@ -3,7 +3,6 @@
 import { useAuth } from "@/components/AuthGuard";
 import { useEffect, useState } from "react";
 import { getAuthHeader, getCurrentUser } from "@/utils/auth";
-import { Student } from "@/components/Dashboard/StudentsTable";
 import { PaginationMeta } from "@/components/Dashboard/Pagination";
 import { TextButton } from "@/components/Buttons/TextButton";
 import { HiUserGroup } from "react-icons/hi";
@@ -15,11 +14,16 @@ import {
 import { useRouter } from "next/navigation";
 import { ModalPreviewData } from "@/components/Modal/PreviewDataModal";
 import { RegistrationData } from "@/utils/registrationTypes";
-import { transformFromApiFormat } from "@/utils/transformRegistrationData";
+import {
+  transformFromApiFormat,
+  transformRecentRegistrations,
+} from "@/utils/transformRegistrationData";
 import { useAlert } from "@/components/ui/alert";
 import ReusableTable, { Column } from "@/components/Table/ReusableTable";
 import dayjs from "dayjs";
 import "dayjs/locale/id";
+import SelectInput from "@/components/InputForm/SelectInput";
+import { Student } from "@/components/Dashboard";
 
 export function GreetingCard() {
   const { user } = useAuth();
@@ -147,6 +151,7 @@ export function StudentDataTable() {
   const { showAlert } = useAlert();
 
   const [students, setStudents] = useState<Student[]>([]);
+  console.log("Students state:", students);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -155,6 +160,12 @@ export function StudentDataTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [limit, setLimit] = useState(10);
+  const [selectedBatchId, setSelectedBatchId] = useState<string | number | "">(
+    "",
+  );
+  const [batches, setBatches] = useState<
+    Array<{ value: string | number; label: string; disabled?: boolean }>
+  >([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedData, setSelectedData] = useState<RegistrationData | null>(
     null,
@@ -168,6 +179,38 @@ export function StudentDataTable() {
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  // Fetch registration batches for filter select
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        const res = await fetch(`/api/registrations/batches`, {
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const opts = (data || []).map(
+          (b: {
+            id: number;
+            name: string;
+            title: string;
+            isActive: number;
+          }) => ({
+            value: b.id,
+            label: b.name || b.title || `Gelombang ${b.id}`,
+            disabled: Number(b.isActive) === 0,
+          }),
+        );
+        setBatches(opts);
+      } catch (err) {
+        console.error("Failed to fetch batches:", err);
+      }
+    };
+    fetchBatches();
+  }, []);
 
   const fetchStudents = async (
     page: number,
@@ -185,13 +228,19 @@ export function StudentDataTable() {
       if (search) {
         params.append("search", search);
       }
+      if (selectedBatchId) {
+        params.append("batch_id", String(selectedBatchId));
+      }
 
-      const response = await fetch(`/api/students?${params.toString()}`, {
-        headers: {
-          "Content-Type": "application/json",
-          ...getAuthHeader(),
+      const response = await fetch(
+        `/api/dashboard/students?${params.toString()}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
         },
-      });
+      );
 
       const data = await response.json();
 
@@ -203,8 +252,9 @@ export function StudentDataTable() {
         }
         return;
       }
-
-      setStudents(data.data);
+      const transformed = transformRecentRegistrations(data || []);
+      console.log("Transformed students data:", transformed);
+      setStudents(transformed);
       setMeta(data.meta);
     } catch (error) {
       console.error("Failed to fetch students:", error);
@@ -216,7 +266,7 @@ export function StudentDataTable() {
 
   useEffect(() => {
     fetchStudents(currentPage, debouncedSearchTerm, limit);
-  }, [currentPage, debouncedSearchTerm, limit]);
+  }, [currentPage, debouncedSearchTerm, limit, selectedBatchId]);
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
@@ -288,7 +338,15 @@ export function StudentDataTable() {
       key: "registrationId",
       sorter: true,
       align: "center",
-      width: 200,
+      width: 120,
+    },
+    {
+      title: "Gelombang Pendaftaran",
+      dataIndex: "registrationBatchId",
+      key: "registrationBatchId",
+      sorter: true,
+      align: "center",
+      width: 120,
     },
     {
       title: "Waktu Pendaftaran",
@@ -345,17 +403,31 @@ export function StudentDataTable() {
             </h3>
           </div>
           {/* Search Filter */}
-          <div className="relative w-full sm:w-100">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FaMagnifyingGlass className="text-lg text-gray-400" />
+          <div className="w-fit flex flex-row gap-3">
+            <div className="w-48">
+              <SelectInput
+                value={selectedBatchId}
+                onChange={(e) => {
+                  setSelectedBatchId(e.target.value);
+                  setCurrentPage(1);
+                }}
+                options={[{ value: "", label: "Semua Gelombang" }, ...batches]}
+                placeholder="Pilih Gelombang"
+                className="w-48"
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Cari Nama / nomor pendaftaran / atau asal sekolah..."
-              value={searchTerm}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="block max-sm:placeholder:text-xs w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
+            <div className="relative w-full sm:w-100">
+              <div className="absolute inset-y-0 left-0 pl-3 pb-2 flex items-center pointer-events-none">
+                <FaMagnifyingGlass className="text-lg text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Cari Nama / nomor pendaftaran / atau asal sekolah..."
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="block max-sm:placeholder:text-xs w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+            </div>
           </div>
         </div>
       </div>

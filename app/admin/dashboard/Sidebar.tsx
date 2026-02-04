@@ -49,13 +49,8 @@ const sidebarItems = [
       },
       {
         icon: FiFileText,
-        label: "Syarat Pendaftaran",
-        href: "/admin/informasi/syarat-pendaftaran",
-      },
-      {
-        icon: FiCalendar,
-        label: "Periode Pendaftaran",
-        href: "/admin/informasi/periode-pendaftaran",
+        label: "Syarat & Periode Pendaftaran",
+        href: "/admin/informasi/syarat-periode-pendaftaran",
       },
       {
         icon: FiPhone,

@@ -13,7 +13,7 @@ export const TextButton: React.FC<{
     | "outline-warning"
     | "outline-info"
     | "danger"
-    // | "detail"
+    | "icon"
     | "ghost";
   className?: string;
   onClick?: () => void;
@@ -83,7 +83,11 @@ export const TextButton: React.FC<{
       loadingStyle = "border-yellow-600 border-t-yellow-600/30";
       break;
     case "ghost":
-      defaultStyle = "border bg-transparent text-white border-white";
+      defaultStyle = "border bg-transparent border-white";
+      loadingStyle = "border-primary border-t-primary/30";
+      break;
+    case "icon":
+      defaultStyle = "w-fit h-fit";
       loadingStyle = "border-primary border-t-primary/30";
       break;
   }
@@ -91,8 +95,8 @@ export const TextButton: React.FC<{
     <button
       type={isSubmit ? "submit" : "button"}
       onClick={onClick}
-      disabled={disabled}
-      className={`${width === "full" ? "w-full" : width === "half" ? "w-1/2" : width === "fit" ? "w-fit" : ""} ${defaultStyle} ${className ?? ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""} flex flex-row items-center max-sm:text-xs justify-center gap-2 ${hoverEffect ? "hover:scale-105 transition-transform duration-200 ease-in-out" : ""} h-fit py-2 sm:py-2 px-3 sm:px-4 text-sm sm:text-base rounded-sm font-medium`}
+      disabled={disabled || isLoading}
+      className={`${width === "full" ? "w-full" : width === "half" ? "w-1/2" : width === "fit" ? "w-fit" : ""} ${defaultStyle} ${className ?? ""} ${disabled ? "opacity-50 cursor-not-allowed" : ""} flex flex-row items-center max-sm:text-xs justify-center gap-2 ${hoverEffect ? "hover:scale-105 transition-transform duration-200 ease-in-out" : ""} h-fit ${variant === "icon" ? "p-2" : "py-2 sm:py-2 px-3 sm:px-4"} text-sm sm:text-base rounded-sm font-medium`}
     >
       {isLoading ? (
         <div

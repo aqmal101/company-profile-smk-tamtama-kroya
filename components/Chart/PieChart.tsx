@@ -34,10 +34,23 @@ export default function PieChart({ data }: { data: DataPoint[] }) {
 
     const values = data.map((d: DataPoint) => Number(d.count ?? 0));
 
-    const colorPalette = ["#004820", "#1a5a36", "#669179", "#99b6a6"];
+    const getColorByLabel = (title: string) => {
+      switch (title) {
+        case "TKR":
+          return "#FF0000";
+        case "DKV":
+          return "#2369D1";
+        case "TITL":
+          return "#4D4FA4";
+        case "TP":
+          return "#5DB1F6";
+        default:
+          return "#FF0000";
+      }
+    };
 
-    const backgroundColors = labels.map(
-      (_, i) => colorPalette[i % colorPalette.length],
+    const backgroundColors = labels.map((label) =>
+      getColorByLabel(String(label)),
     );
 
     if (chartRef.current) {
@@ -67,7 +80,7 @@ export default function PieChart({ data }: { data: DataPoint[] }) {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: true, position: "left" },
+          legend: { display: true, position: "bottom" },
           tooltip: { enabled: true },
           title: { display: false },
         },

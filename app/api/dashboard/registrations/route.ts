@@ -101,3 +101,103 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return NextResponse.json(
+        { success: false, message: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    const body = await request.json();
+    const registrationId = id || body?.id || body?.registrationId;
+
+    if (!registrationId) {
+      return NextResponse.json(
+        { success: false, message: "Missing registration id" },
+        { status: 400 },
+      );
+    }
+
+    const apiResponse = await fetch(
+      `${API_BASE_URL}/backoffice/registrations/${registrationId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authHeader,
+        },
+        body: JSON.stringify(body),
+      },
+    );
+
+    const apiData = await apiResponse.json();
+
+    return NextResponse.json(apiData, { status: apiResponse.status });
+  } catch (error) {
+    console.error("Registration PUT error:", error);
+    return NextResponse.json(
+      { success: false, message: "Terjadi kesalahan server" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const authHeader = request.headers.get("Authorization");
+    if (!authHeader) {
+      return NextResponse.json(
+        { success: false, message: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    // allow id in body as fallback
+    let registrationId = id;
+    if (!registrationId) {
+      try {
+        const body = await request.json();
+        registrationId = body?.id || body?.registrationId;
+      } catch (e) {
+        // ignore parse error
+      }
+    }
+
+    if (!registrationId) {
+      return NextResponse.json(
+        { success: false, message: "Missing registration id" },
+        { status: 400 },
+      );
+    }
+
+    const apiResponse = await fetch(
+      `${API_BASE_URL}/backoffice/registrations/${registrationId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authHeader,
+        },
+      },
+    );
+
+    const apiData = await apiResponse.json();
+    return NextResponse.json(apiData, { status: apiResponse.status });
+  } catch (error) {
+    console.error("Registration DELETE error:", error);
+    return NextResponse.json(
+      { success: false, message: "Terjadi kesalahan server" },
+      { status: 500 },
+    );
+  }
+}
