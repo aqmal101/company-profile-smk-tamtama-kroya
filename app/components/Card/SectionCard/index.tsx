@@ -5,8 +5,9 @@ interface SectionCardProps {
   children: React.ReactNode;
   leftButton?: React.ReactNode;
   isCancelButton?: boolean;
-  handleSaveChanges: () => void;
+  handleSaveChanges?: () => void;
   isLoading?: boolean;
+  className?: string;
 }
 
 export const SectionCard = ({
@@ -16,9 +17,10 @@ export const SectionCard = ({
   isCancelButton = false,
   handleSaveChanges,
   isLoading = false,
+  className = "w-1/2",
 }: SectionCardProps) => {
   return (
-    <div className="w-1/2 shadow-lg rounded-md">
+    <div className={`${className} shadow-lg rounded-md`}>
       {title && (
         <div className="w-full h-fit border-b border-b-gray-400 px-4">
           <h3 className="font-semibold text-gray-800 py-3">{title}</h3>
@@ -26,8 +28,11 @@ export const SectionCard = ({
       )}
       <div className="w-full h-fit">
         {isLoading ? (
-          <div className="p-2">
-            <div className="w-full h-68 animate-pulse bg-gray-300 rounded-md"></div>
+          <div className="p-2 space-y-4">
+            <div className="w-full h-12 animate-pulse bg-gray-300 rounded-md"></div>
+            <div className="w-full h-12 animate-pulse bg-gray-300 rounded-md"></div>
+            <div className="w-full h-12 animate-pulse bg-gray-300 rounded-md"></div>
+            <div className="w-full h-12 animate-pulse bg-gray-300 rounded-md"></div>
           </div>
         ) : (
           children

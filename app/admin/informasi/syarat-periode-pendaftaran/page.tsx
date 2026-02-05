@@ -187,17 +187,8 @@ export default function SyaratPeriodePendaftaranPage() {
   const [isActive, setIsActive] = useState<number>(0);
   const [batchOrder, setBatchOrder] = useState<number>(0);
   const [batchPhotoUrl, setBatchPhotoUrl] = useState<string>("");
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [loadingBatch, setLoadingBatch] = useState(false);
   const [savingBatch, setSavingBatch] = useState(false);
-
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setPhotoFile(file);
-      setBatchPhotoUrl(URL.createObjectURL(file));
-    }
-  };
 
   const handleSaveChanges = () => {
     showAlert({
@@ -291,6 +282,7 @@ export default function SyaratPeriodePendaftaranPage() {
         />
 
         <SectionCard
+          className="w-full"
           title="Syarat Pendaftaran"
           handleSaveChanges={handleSaveChanges}
           leftButton={
@@ -413,9 +405,10 @@ export default function SyaratPeriodePendaftaranPage() {
             </BaseModal>
           </div>
         </SectionCard>
-        <div className="h-5"></div>
+        <div className="h-5" />
         <TitleSection title="Edit Gelombang Pendaftaran" />
         <SectionCard
+          className="w-full"
           title="Data Gelombang"
           isLoading={loadingBatch || savingBatch}
           // onClick={handleSaveBatch}

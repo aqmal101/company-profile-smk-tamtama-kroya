@@ -41,7 +41,7 @@ export const RequirementCard = ({
       {/* Toggle Active */}
       <button
         onClick={() => onToggle?.(id, !isActive)}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
           isActive ? "bg-primary" : "bg-gray-300"
         }`}
       >
@@ -54,7 +54,7 @@ export const RequirementCard = ({
 
       {/* Label Input */}
 
-      <div className="w-8/10">
+      <div className="w-full">
         <input
           placeholder="Masukkan syarat pendaftaran"
           className={`w-full h-10 px-3 py-2 border border-gray-300 rounded ${

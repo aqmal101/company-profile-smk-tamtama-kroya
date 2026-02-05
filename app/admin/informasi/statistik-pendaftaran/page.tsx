@@ -5,28 +5,128 @@ import StatsMajorCard from "@/components/Card/StatsCard/StatCardMajors";
 import { PaginationMeta } from "@/components/Dashboard/Pagination";
 import { Student } from "@/components/Dashboard/StudentsTable";
 import SelectInput from "@/components/InputForm/SelectInput";
+import { BaseModal } from "@/components/Modal/BaseModal";
+import { ModalPreviewData } from "@/components/Modal/PreviewDataModal";
 import ReusableTable, { Column } from "@/components/Table/ReusableTable";
 import { TitleSection } from "@/components/TitleSection/index";
 import { useAlert } from "@/components/ui/alert";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { getAuthHeader } from "@/utils/auth";
 import { RegistrationData } from "@/utils/registrationTypes";
-import { transformRecentRegistrations } from "@/utils/transformRegistrationData";
+import {
+  transformFromApiFormat,
+  transformRecentRegistrations,
+} from "@/utils/transformRegistrationData";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { LuEye, LuPen, LuTrash2 } from "react-icons/lu";
 
 export default function AdminStatisticPage() {
+  const { showAlert } = useAlert();
+
   const [students, setStudents] = useState<Student[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [limit, setLimit] = useState(10);
+  const [selectedBatchId, setSelectedBatchId] = useState<string | number | "">(
+    "",
+  );
+  const [batches, setBatches] = useState<
+    Array<{ value: string | number; label: string; disabled?: boolean }>
+  >([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedData, setSelectedData] = useState<RegistrationData | null>(
     null,
   );
+
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 750); // 750ms debounce
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const confirmDelete = (registrationId: number) => {
+    setDeletingId(registrationId);
+    setDeleteModalOpen(true);
+  };
+
+  const performDelete = async () => {
+    if (!deletingId) return;
+    setIsDeleting(true);
+    try {
+      const response = await fetch(
+        `/api/dashboard/registrations?id=${deletingId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
+        },
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        showAlert({
+          title: "Berhasil",
+          description: data.message || "Data Siswa berhasil dihapus.",
+          variant: "success",
+        });
+        fetchStudents(currentPage, "", limit);
+      } else {
+        showAlert({
+          title: "Gagal",
+          description: data.message || "Gagal menghapus data siswa.",
+          variant: "error",
+        });
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      showAlert({
+        title: "Gagal",
+        description: "Terjadi kesalahan saat menghapus data siswa.",
+        variant: "error",
+      });
+    } finally {
+      setIsDeleting(false);
+      setDeleteModalOpen(false);
+      setDeletingId(null);
+    }
+  };
+
+  const router = useRouter();
+  const [isRouting, setIsRouting] = useState(false);
+
+  const handleRouteDetail = async (registrationId: number) => {
+    setIsRouting(true);
+    try {
+      // short delay to show loader before navigation
+      await new Promise((resolve) => setTimeout(resolve, 750));
+      router.push(`/admin/ppdb/data-calon-murid/${registrationId}/edit`);
+    } finally {
+      // component may unmount on navigation; this is safe
+      setIsRouting(false);
+    }
+  };
+
+  const loadingStates = isLoading || isRouting || loadingDetail;
 
   const fetchStudents = async (
     page: number,
@@ -44,9 +144,12 @@ export default function AdminStatisticPage() {
       if (search) {
         params.append("search", search);
       }
+      if (selectedBatchId) {
+        params.append("batch_id", String(selectedBatchId));
+      }
 
       const response = await fetch(
-        `/api/admin/recent-registrations?${params.toString()}`,
+        `/api/dashboard/students?${params.toString()}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -65,18 +168,9 @@ export default function AdminStatisticPage() {
         }
         return;
       }
-
-      try {
-        const transformed = transformRecentRegistrations(
-          data.data || data || [],
-        );
-        console.log("Transformed data:", transformed);
-        setStudents(transformed);
-      } catch (transformError) {
-        console.error("Error during transformation:", transformError);
-        setError("Gagal memproses data siswa");
-        return;
-      }
+      const transformed = transformRecentRegistrations(data || []);
+      console.log("Transformed students data:", transformed);
+      setStudents(transformed);
       setMeta(data.meta);
     } catch (error) {
       console.error("Failed to fetch students:", error);
@@ -87,9 +181,13 @@ export default function AdminStatisticPage() {
   };
 
   useEffect(() => {
-    fetchStudents(currentPage, "", limit);
-  }, [currentPage, limit]);
+    fetchStudents(currentPage, debouncedSearchTerm, limit);
+  }, [currentPage, debouncedSearchTerm, limit]);
 
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1); // Reset to first page when searching
+  };
   const statsData = [
     {
       title: "Total Pendaftar",
@@ -113,6 +211,49 @@ export default function AdminStatisticPage() {
       amount: 120,
     },
   ];
+
+  const handleDetailClick = async (registrationId: number) => {
+    setLoadingDetail(true);
+    console.log("Fetching details for registration ID:", registrationId);
+    try {
+      const response = await fetch(
+        `/api/dashboard/students/${registrationId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const transformedData = transformFromApiFormat(data);
+        setSelectedData(transformedData);
+        setIsModalOpen(true);
+        setLoadingDetail(false);
+      } else {
+        const errorData = await response.json();
+        showAlert({
+          title: "Terjadi Kesalahan",
+          description:
+            errorData.message || "Gagal mengambil data detail pendaftaran",
+          variant: "error",
+        });
+        setIsModalOpen(false);
+        setLoadingDetail(false);
+      }
+    } catch (error) {
+      console.error("Failed to fetch registration details:", error);
+      showAlert({
+        title: "Terjadi Kesalahan",
+        description: "Terjadi kesalahan saat mengambil data detail",
+        variant: "error",
+      });
+      setIsModalOpen(false);
+      setLoadingDetail(false);
+    }
+  };
 
   const columns: Column<Student>[] = [
     {
@@ -186,27 +327,45 @@ export default function AdminStatisticPage() {
       width: 240,
       render: (value) => (
         <div className="flex justify-center gap-4">
-          <TextButton
-            icon={<LuEye className="text-xl" />}
-            isLoading={loadingDetail}
-            variant="outline-warning"
-            className="w-fit py-1 px-2! border-2"
-            disabled={loadingDetail}
-          />
-          <TextButton
-            icon={<LuPen className="text-xl" />}
-            isLoading={loadingDetail}
-            variant="outline-info"
-            className="w-fit py-1 px-2! text-xs border-2 border-blue-500"
-            disabled={loadingDetail}
-          />
-          <TextButton
-            icon={<LuTrash2 className="text-xl" />}
-            isLoading={loadingDetail}
-            variant="outline-danger"
-            className="w-fit py-1 px-2! border-2"
-            disabled={loadingDetail}
-          />
+          <Tooltip>
+            <TooltipTrigger>
+              <TextButton
+                icon={<LuEye className="text-xl" />}
+                isLoading={loadingStates}
+                variant="outline-warning"
+                className="w-fit py-1 px-2! border-2"
+                disabled={loadingStates}
+                onClick={() => handleDetailClick(Number(value))}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="top">Detail Data Murid</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger>
+              <TextButton
+                icon={<LuPen className="text-xl" />}
+                isLoading={loadingStates}
+                variant="outline-info"
+                className="w-fit py-1 px-2! text-xs border-2 border-blue-500"
+                disabled={loadingStates}
+                onClick={() => handleRouteDetail(Number(value))}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="top">Edit Data Murid</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger>
+              <TextButton
+                icon={<LuTrash2 className="text-xl" />}
+                isLoading={loadingStates}
+                variant="outline-danger"
+                className="w-fit py-1 px-2! border-2"
+                disabled={loadingStates}
+                onClick={() => confirmDelete(Number(value))}
+              />
+            </TooltipTrigger>
+            <TooltipContent side="top">Hapus Data Murid</TooltipContent>
+          </Tooltip>
         </div>
       ),
       // width: 120,
@@ -247,17 +406,34 @@ export default function AdminStatisticPage() {
                 />
               </div>
               {/* Search Filter */}
-              <div className="relative w-full sm:w-100 mb-2">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaMagnifyingGlass className="text-lg text-gray-400" />
+              <div className="w-fit flex flex-row gap-3">
+                <div className="w-48">
+                  <SelectInput
+                    value={selectedBatchId}
+                    onChange={(e) => {
+                      setSelectedBatchId(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    options={[
+                      { value: "", label: "Semua Gelombang" },
+                      ...batches,
+                    ]}
+                    placeholder="Pilih Gelombang"
+                    className="w-48"
+                  />
                 </div>
-                <input
-                  type="text"
-                  placeholder="Cari Nama / nomor pendaftaran / atau asal sekolah..."
-                  // value={""}
-                  // onChange={(e) => handleSearchChange(e.target.value)}
-                  className="block max-sm:placeholder:text-xs w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
+                <div className="relative w-full sm:w-100">
+                  <div className="absolute inset-y-0 left-0 pl-3 pb-2 flex items-center pointer-events-none">
+                    <FaMagnifyingGlass className="text-lg text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Cari Nama / nomor pendaftaran / atau asal sekolah..."
+                    value={searchTerm}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    className="block max-sm:placeholder:text-xs w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
               </div>
             </div>
             <ReusableTable
@@ -268,8 +444,54 @@ export default function AdminStatisticPage() {
               rowKey="id"
               serverSidePagination={true}
               tableLayout="fixed"
-              scroll={{ y: 400 }}
+              pagination={{
+                current: currentPage,
+                pageSize: limit,
+                total: meta?.total || 0,
+                showSizeChanger: true,
+                pageSizeOptions: [5, 10, 25, 50, 100],
+                onChange: (page, pageSize) => {
+                  setCurrentPage(page);
+                  setLimit(pageSize);
+                },
+                onShowSizeChange: (current, size) => {
+                  setCurrentPage(1);
+                  setLimit(size);
+                },
+              }}
+              scroll={{ y: 600 }}
             />
+            <ModalPreviewData
+              title="Detail Data Pendaftaran Murid"
+              footer={null}
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              data={selectedData || undefined}
+            />
+            <BaseModal
+              isOpen={deleteModalOpen}
+              onClose={() => setDeleteModalOpen(false)}
+              title="Konfirmasi Hapus"
+              footer={
+                <div className="flex justify-end gap-2">
+                  <TextButton
+                    variant="outline"
+                    text="Batal"
+                    isLoading={isDeleting}
+                    onClick={() => setDeleteModalOpen(false)}
+                  />
+                  <TextButton
+                    text={"Hapus"}
+                    variant="danger"
+                    onClick={performDelete}
+                    isLoading={isDeleting}
+                  />
+                </div>
+              }
+            >
+              <p>Anda yakin ingin menghapus siswa ini?</p>
+              <p>Aksi tidak dapat dibatalkan.</p>
+            </BaseModal>
           </div>
         </div>
       </div>

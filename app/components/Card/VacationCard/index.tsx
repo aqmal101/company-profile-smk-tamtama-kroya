@@ -23,7 +23,6 @@ export default function VacationCard({
   item: VacationItem;
   index: number;
 }) {
-  console.log("Rendering VacationCard:", item.isPopular);
   return (
     <div
       key={index}

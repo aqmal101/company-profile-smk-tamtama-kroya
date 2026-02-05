@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.error("Recent registrations fetch error:", error);
+    console.error("Recent registrationscss fetch error:", error);
     return NextResponse.json(
       {
         error: "Terjadi kesalahan server",
