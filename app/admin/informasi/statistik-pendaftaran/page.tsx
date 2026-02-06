@@ -24,14 +24,19 @@ import {
   transformRecentRegistrations,
 } from "@/utils/transformRegistrationData";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { LuEye, LuPen, LuTrash2 } from "react-icons/lu";
 
 export default function AdminStatisticPage() {
   const { showAlert } = useAlert();
 
-  const [majorDistribution, setMajorDistribution] = useState<MajorData[]>([]);
+  const [majorDistribution, setMajorDistribution] = useState<MajorData[]>([
+    { major: "TKR", count: 0 },
+    { major: "DKV", count: 0 },
+    { major: "TITL", count: 0 },
+    { major: "TP", count: 0 },
+  ]);
 
   console.log("Major Distribution Data:", majorDistribution);
   const [students, setStudents] = useState<Student[]>([]);
@@ -46,6 +51,7 @@ export default function AdminStatisticPage() {
   const [selectedBatchId, setSelectedBatchId] = useState<string | number | "">(
     "",
   );
+  const [selectAuthored, setSelectedAuthor] = useState<string | "">("");
   const [batches, setBatches] = useState<
     Array<{ value: string | number; label: string; disabled?: boolean }>
   >([]);
@@ -162,89 +168,68 @@ export default function AdminStatisticPage() {
 
   const loadingStates = isLoading || isRouting || loadingDetail;
 
-  const fetchStudents = async (
-    page: number,
-    search: string = "",
-    pageLimit: number = 10,
-  ) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: pageLimit.toString(),
-      });
+  const fetchStudents = useCallback(
+    async (page: number, search: string = "", pageLimit: number = 10) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: pageLimit.toString(),
+        });
 
-      if (search) {
-        params.append("search", search);
-      }
-      if (selectedBatchId) {
-        params.append("batch_id", String(selectedBatchId));
-      }
-
-      const response = await fetch(
-        `/api/dashboard/students?${params.toString()}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            ...getAuthHeader(),
-          },
-        },
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.error === "E_UNAUTHORIZED_ACCESS") {
-          setError("Anda tidak memiliki akses. Silakan login kembali.");
-        } else {
-          setError(data.message || "Gagal mengambil data siswa");
+        if (search) {
+          params.append("search", search);
         }
-        return;
+
+        if (selectedBatchId) {
+          params.append("batch_id", String(selectedBatchId));
+        }
+        if (selectAuthored) {
+          params.append("authored", selectAuthored);
+        }
+
+        const response = await fetch(
+          `/api/dashboard/students?${params.toString()}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              ...getAuthHeader(),
+            },
+          },
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (data.error === "E_UNAUTHORIZED_ACCESS") {
+            setError("Anda tidak memiliki akses. Silakan login kembali.");
+          } else {
+            setError(data.message || "Gagal mengambil data siswa");
+          }
+          return;
+        }
+        const transformed = transformRecentRegistrations(data || []);
+        setStudents(transformed);
+        setMeta(data.meta);
+      } catch (error) {
+        console.error("Failed to fetch students:", error);
+        setError("Terjadi kesalahan saat mengambil data siswa");
+      } finally {
+        setIsLoading(false);
       }
-      const transformed = transformRecentRegistrations(data || []);
-      setStudents(transformed);
-      setMeta(data.meta);
-    } catch (error) {
-      console.error("Failed to fetch students:", error);
-      setError("Terjadi kesalahan saat mengambil data siswa");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [selectedBatchId, selectAuthored],
+  );
 
   useEffect(() => {
     fetchStudents(currentPage, debouncedSearchTerm, limit);
-  }, [currentPage, debouncedSearchTerm, limit]);
+  }, [currentPage, debouncedSearchTerm, fetchStudents, limit]);
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
     setCurrentPage(1); // Reset to first page when searching
   };
-
-  // const statsData = [
-  //   {
-  //     title: "Total Pendaftar",
-  //     amount: 1120,
-  //     isFirstUnique: true,
-  //   },
-  //   {
-  //     title: "Jurusan TKR",
-  //     amount: 120,
-  //   },
-  //   {
-  //     title: "Jurusan DKV",
-  //     amount: 80,
-  //   },
-  //   {
-  //     title: "Jurusan TITL",
-  //     amount: 90,
-  //   },
-  //   {
-  //     title: "Jurusan TP",
-  //     amount: 120,
-  //   },
-  // ];
 
   const handleDetailClick = async (registrationId: number) => {
     setLoadingDetail(true);
@@ -430,10 +415,15 @@ export default function AdminStatisticPage() {
                   isMandatory
                 />
                 <SelectInput
+                  value={selectAuthored}
+                  onChange={(e) => {
+                    setSelectedAuthor(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   options={[
-                    { value: "1", label: "Semua Jenis Pendaftaran" },
-                    { value: "2", label: "Mandiri" },
-                    { value: "3", label: "Oleh Guru" },
+                    { value: "", label: "Semua Jenis Pendaftaran" },
+                    { value: "true", label: "Oleh Guru" },
+                    { value: "false", label: "Mandiri" },
                   ]}
                   placeholder={"Pilih Jenis Pendaftaran "}
                   isMandatory

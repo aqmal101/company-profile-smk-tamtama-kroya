@@ -70,14 +70,9 @@ export default function StatsMajorCard({
             >
               {item.major}
             </div>
-            <div className="w-full flex justify-between items-center">
+            <div className="w-full h-fit flex flex-row justify-between">
               <div
                 className={`p-2 rounded-md ${item.isFirstUnique && idx === 0 ? "bg-primary border text-white" : "shadow-sm"} `}
-                // style={
-                //   item.isFirstUnique && idx === 0
-                //     ? {}
-                //     : { borderColor: color + "0.3" }
-                // }
               >
                 {Icon ? (
                   <Icon
@@ -87,15 +82,15 @@ export default function StatsMajorCard({
                 ) : null}
               </div>
               <div
-                className="text-3xl font-bold"
+                className="text-3xl font-bold flex flex-row items-end justify-end gap-2"
                 style={idx === 0 ? {} : { color: textColor }}
               >
                 {isLoading ? (
-                  <div className="h-8 w-8 bg-gray-200 animate-pulse rounded mt-1"></div>
+                  <div className="h-8 w-8 bg-gray-200 animate-pulse rounded" />
                 ) : (
                   item.count
-                )}{" "}
-                <span className="text-xs font-semibold">Anak</span>
+                )}
+                <span className="text-xs font-semibold mb-1">Anak</span>
               </div>
             </div>
           </div>

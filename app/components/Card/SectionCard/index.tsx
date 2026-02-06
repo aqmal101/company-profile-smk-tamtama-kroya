@@ -4,6 +4,9 @@ interface SectionCardProps {
   title?: string;
   children: React.ReactNode;
   leftButton?: React.ReactNode;
+  saveButtonText?: string;
+  saveButtonIcon?: React.ReactNode;
+  saveButtonDisabled?: boolean;
   isCancelButton?: boolean;
   handleSaveChanges?: () => void;
   isLoading?: boolean;
@@ -14,6 +17,9 @@ export const SectionCard = ({
   title = "",
   children,
   leftButton,
+  saveButtonText = "Simpan Perubahan",
+  saveButtonIcon = null,
+  saveButtonDisabled = false,
   isCancelButton = false,
   handleSaveChanges,
   isLoading = false,
@@ -38,7 +44,7 @@ export const SectionCard = ({
           children
         )}
       </div>
-      <div className="p-4 border-t border-gray-200 flex justify-between items-center">
+      <div className="p-4 border-t border-gray-200 flex justify-end gap-6 items-center">
         {isCancelButton ? (
           <TextButton
             variant="primary"
@@ -51,8 +57,10 @@ export const SectionCard = ({
 
         <TextButton
           isLoading={isLoading}
+          disabled={saveButtonDisabled}
           variant="primary"
-          text="Simpan Perubahan"
+          icon={saveButtonIcon}
+          text={saveButtonText}
           onClick={handleSaveChanges}
         />
       </div>

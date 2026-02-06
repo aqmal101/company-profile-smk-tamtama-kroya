@@ -17,6 +17,10 @@ interface BenefitCardProps {
   isEditable?: boolean;
   onChange?: (id: string, updated: Partial<BenefitItem>) => void;
   onDelete?: (id: string) => void;
+  onDragStart?: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
+  onDragOver?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDrop?: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
+  index?: number;
 }
 
 export const BenefitCard: React.FC<BenefitCardProps> = ({
@@ -24,8 +28,14 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
   isEditable = true,
   onChange,
   onDelete,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  index = 0,
 }) => {
   const [local, setLocal] = useState<BenefitItem>(item);
+
+  const canEdit = !item.isActive;
 
   const handleUpdate = (patch: Partial<BenefitItem>) => {
     const updated = { ...local, ...patch };
@@ -34,16 +44,27 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
   };
 
   return (
-    <div className="flex items-center gap-3 py-2 px-2 hover:bg-gray-50 transition-colors rounded-md">
+    <div
+      draggable
+      onDragStart={(e) => onDragStart?.(e, index)}
+      onDragOver={(e) => onDragOver?.(e)}
+      onDrop={(e) => onDrop?.(e, index)}
+      className={`flex items-center gap-3 py-2 px-2 rounded-md transition-all ${
+        item.isActive
+          ? "cursor-not-allowed bg-gray-100"
+          : "cursor-move hover:bg-gray-50"
+      }`}
+    >
       {/* Title input */}
       <div className="w-3/12">
         <input
           value={local.title}
           onChange={(e) => handleUpdate({ title: e.target.value })}
           placeholder="Nama jalur / prestasi"
+          disabled={!canEdit}
           className={`w-full h-10 px-3 py-2 border border-gray-300 rounded ${
-            !local.isActive ? "text-gray-400" : "text-gray-700"
-          } ${isEditable ? "cursor-text hover:border-primary" : ""}`}
+            !local.isActive ? "text-gray-700" : "text-gray-400 bg-gray-50"
+          } ${canEdit ? "cursor-text hover:border-primary" : "cursor-not-allowed opacity-60"} disabled:cursor-not-allowed`}
         />
       </div>
 
@@ -53,28 +74,15 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
           value={local.benefit}
           onChange={(e) => handleUpdate({ benefit: e.target.value })}
           placeholder="Masukkan benefit"
+          disabled={!canEdit}
           className={`w-full h-10 px-3 py-2 border border-gray-300 rounded ${
-            !local.isActive ? "text-gray-400" : "text-gray-700"
-          } ${isEditable ? "cursor-text hover:border-primary" : ""}`}
-        />
-      </div>
-
-      {/* Order / sort input */}
-      <div className="w-20 flex items-center gap-2">
-        <input
-          type="number"
-          min={1}
-          value={local.order}
-          onChange={(e) => handleUpdate({ order: Number(e.target.value || 0) })}
-          className="w-full h-10 px-2 py-1 border border-gray-300 rounded text-center"
+            !local.isActive ? "text-gray-700" : "text-gray-400 bg-gray-50"
+          } ${canEdit ? "cursor-text hover:border-primary" : "cursor-not-allowed opacity-60"} disabled:cursor-not-allowed`}
         />
       </div>
 
       {/* Toggle */}
       <div className="flex items-center gap-2 w-36 justify-end">
-        <div className="text-sm text-gray-500">
-          {local.isActive ? "Aktif" : "Non-aktif"}
-        </div>
         <button
           onClick={() => handleUpdate({ isActive: !local.isActive })}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
@@ -88,15 +96,6 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
             }`}
           />
         </button>
-
-        {/* Delete */}
-        <button
-          onClick={() => onDelete?.(item.id)}
-          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
-          aria-label="Delete benefit"
-        >
-          <LuTrash2 size={18} />
-        </button>
       </div>
     </div>
   );
@@ -106,33 +105,57 @@ interface BenefitListProps {
   title: string;
   items: BenefitItem[];
   onChange: (items: BenefitItem[]) => void;
-  addLabel?: string;
 }
 
 export const BenefitList: React.FC<BenefitListProps> = ({
   title,
   items,
   onChange,
-  addLabel = "Tambah Prestasi",
 }) => {
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
   const handleItemChange = (id: string, patch: Partial<BenefitItem>) => {
     const next = items.map((it) => (it.id === id ? { ...it, ...patch } : it));
     onChange(next);
   };
 
-  const handleAdd = () => {
-    const newItem: BenefitItem = {
-      id: Date.now().toString(),
-      title: "",
-      benefit: "",
-      order: items.length + 1,
-      isActive: true,
-    };
-    onChange([...items, newItem]);
-  };
-
   const handleDelete = (id: string) => {
     onChange(items.filter((i) => i.id !== id));
+  };
+
+  const handleDragStart = (
+    e: React.DragEvent<HTMLDivElement>,
+    index: number,
+  ) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (
+    e: React.DragEvent<HTMLDivElement>,
+    dropIndex: number,
+  ) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) return;
+
+    const newItems = [...items];
+    const draggedItem = newItems[draggedIndex];
+    newItems.splice(draggedIndex, 1);
+    newItems.splice(dropIndex, 0, draggedItem);
+
+    // Update order values
+    const reorderedItems = newItems.map((item, idx) => ({
+      ...item,
+      order: idx + 1,
+    }));
+
+    onChange(reorderedItems);
+    setDraggedIndex(null);
   };
 
   return (
@@ -144,28 +167,23 @@ export const BenefitList: React.FC<BenefitListProps> = ({
       <div className="flex items-center gap-3 py-2 px-2 bg-gray-50 rounded-md">
         <div className="w-3/12 text-gray-600 font-medium">Jalur / Nama</div>
         <div className="flex-1 text-gray-600 font-medium">Benefit</div>
-        <div className="w-20 text-gray-600 font-medium">Urutan</div>
+        {/* <div className="w-20 text-gray-600 font-medium">Urutan</div> */}
         <div className="w-36 text-gray-600 font-medium text-right">Status</div>
       </div>
 
       <div className="space-y-1">
-        {items.map((it) => (
+        {items.map((it, index) => (
           <BenefitCard
             key={it.id}
             item={it}
+            index={index}
             onChange={handleItemChange}
             onDelete={handleDelete}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
           />
         ))}
-      </div>
-
-      <div>
-        <TextButton
-          icon={<LuPlus size={16} />}
-          variant="primary"
-          text={addLabel}
-          onClick={handleAdd}
-        />
       </div>
     </div>
   );
