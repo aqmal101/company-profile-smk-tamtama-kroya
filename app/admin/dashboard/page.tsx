@@ -504,7 +504,7 @@ export default function AdminDashboardPage() {
             columns={columns}
             dataSource={students}
             loading={isLoading}
-            error={error}
+            error={error || undefined}
             emptyText="Data Tidak Ada"
             rowKey="id"
             serverSidePagination={true}
