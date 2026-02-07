@@ -1,8 +1,6 @@
 "use client";
 
-import { LuTrash2, LuPlus } from "react-icons/lu";
 import React, { useState } from "react";
-import { TextButton } from "@/components/Buttons/TextButton";
 
 export interface BenefitItem {
   id: string;
@@ -25,9 +23,9 @@ interface BenefitCardProps {
 
 export const BenefitCard: React.FC<BenefitCardProps> = ({
   item,
-  isEditable = true,
+  // isEditable = true,
   onChange,
-  onDelete,
+  // onDelete,
   onDragStart,
   onDragOver,
   onDrop,
@@ -82,7 +80,10 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
       </div>
 
       {/* Toggle */}
-      <div className="flex items-center gap-2 w-36 justify-end">
+      <div className="flex items-center gap-4 w-36 justify-end">
+        <div className="text-black text-sm">
+          {local.isActive ? "Aktif" : "Tidak Aktif"}
+        </div>
         <button
           onClick={() => handleUpdate({ isActive: !local.isActive })}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
@@ -161,13 +162,14 @@ export const BenefitList: React.FC<BenefitListProps> = ({
   return (
     <div className="p-4 space-y-2 w-full">
       {title && (
-        <div className="text-sm text-gray-500 mb-1 font-semibold">{title}</div>
+        <div className="text-base text-gray-500 mb-2 font-semibold">
+          {title}
+        </div>
       )}
 
       <div className="flex items-center gap-3 py-2 px-2 bg-gray-50 rounded-md">
         <div className="w-3/12 text-gray-600 font-medium">Jalur / Nama</div>
         <div className="flex-1 text-gray-600 font-medium">Benefit</div>
-        {/* <div className="w-20 text-gray-600 font-medium">Urutan</div> */}
         <div className="w-36 text-gray-600 font-medium text-right">Status</div>
       </div>
 

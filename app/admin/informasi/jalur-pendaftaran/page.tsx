@@ -68,7 +68,7 @@ export default function AdminRegistrationPathPage() {
   const activeTabData = tabs.find((tab) => tab.id === activeTab);
   const activePath = pathByTab[activeTab];
   const activePhotoDraft = photoDrafts[activeTab];
-  const activePhotoUrl = activePhotoDraft?.previewUrl || activePath?.photoUrl;
+  const activePhotoUrl = activePath?.photoUrl;
   const [akademik, setAkademik] = useState<BenefitItem[]>([
     {
       id: "a1",
@@ -415,56 +415,6 @@ export default function AdminRegistrationPathPage() {
     }
   };
 
-  const handleDeletePhoto = async () => {
-    const activePathId = pathByTab[activeTab]?.id;
-    const hasDraft = Boolean(activePhotoDraft?.file);
-    const hasPhoto = Boolean(activePath?.photoUrl);
-
-    if (!activePathId) {
-      showAlert({
-        title: "Gagal",
-        description: "Jalur pendaftaran tidak ditemukan",
-        variant: "error",
-      });
-      return;
-    }
-
-    if (hasDraft) {
-      // Only remove local preview/draft
-      if (activePhotoDraft?.previewUrl) {
-        URL.revokeObjectURL(activePhotoDraft.previewUrl);
-      }
-      setPhotoDrafts((prev) => {
-        const next = { ...prev };
-        delete next[activeTab];
-        return next;
-      });
-
-      showAlert({
-        title: "Berhasil",
-        description: "Preview foto berhasil dihapus",
-        variant: "success",
-      });
-      return;
-    }
-
-    if (hasPhoto && !hasDraft) {
-      showAlert({
-        title: "Tidak dapat menghapus",
-        description:
-          "Foto sudah disimpan di server dan tidak dapat dihapus dari UI ini. Unggah foto pengganti jika ingin mengganti gambar, atau hubungi administrator untuk menghapus.",
-        variant: "warning",
-      });
-      return;
-    }
-
-    showAlert({
-      title: "Tidak ada foto",
-      description: "Tidak ada foto yang bisa dihapus",
-      variant: "warning",
-    });
-  };
-
   return (
     <div className="w-full min-h-[calc(100vh-4px)] bg-gray-100 p-4">
       <div className="h-full w-full bg-white rounded-md drop-shadow-sm p-6">
@@ -488,11 +438,6 @@ export default function AdminRegistrationPathPage() {
         >
           <div className="space-y-6">
             <div className="border border-blue-200 rounded-md">
-              <div className="p-3 bg-white rounded-t-md">
-                <div className="font-medium text-gray-700">
-                  Jalur Prestasi (Akademik)
-                </div>
-              </div>
               <BenefitList
                 title="Prestasi Akademik"
                 items={akademik}
@@ -501,11 +446,6 @@ export default function AdminRegistrationPathPage() {
             </div>
 
             <div className="border border-gray-200 rounded-md">
-              <div className="p-3 bg-white rounded-t-md">
-                <div className="font-medium text-gray-700">
-                  Jalur Non-Akademik
-                </div>
-              </div>
               <BenefitList
                 title="Prestasi Non-Akademik"
                 items={nonAkademik}
@@ -561,17 +501,12 @@ export default function AdminRegistrationPathPage() {
                   <div className="h-fit w-fit justify-center items-center flex flex-col gap-3">
                     {activePhotoDraft?.previewUrl ? (
                       <>
-                        <Image
+                        <img
                           src={activePhotoDraft.previewUrl}
                           alt="Preview"
                           className="w-48 h-32 object-cover rounded-md shadow-sm"
                         />
                         <div className="flex gap-2 mt-2">
-                          {/* <TextButton
-                            variant="outline"
-                            text="Hapus Preview"
-                            onClick={() => setDraftFile(null)}
-                          /> */}
                           <TextButton
                             variant="primary"
                             text="Pilih Foto Lain"
