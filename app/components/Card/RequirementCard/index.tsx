@@ -1,8 +1,8 @@
 "use client";
 
 import { LuTrash2 } from "react-icons/lu";
-import { useState } from "react";
-import { InputText } from "@/components/InputForm/TextInput";
+import { useState, useEffect } from "react";
+// import { InputText } from "@/components/InputForm/TextInput";
 import Toggle from "@/components/ui/toggle";
 
 interface RequirementCardProps {
@@ -10,6 +10,7 @@ interface RequirementCardProps {
   label: string;
   isActive: boolean;
   isRequired: boolean;
+  isLoading?: boolean;
   onToggle?: (id: string, isActive: boolean) => void;
   onRequiredChange?: (id: string, isRequired: boolean) => void;
   onLabelChange?: (id: string, label: string) => void;
@@ -24,10 +25,29 @@ export const RequirementCard = ({
   isRequired,
   onToggle,
   onRequiredChange,
+  onLabelChange,
   onDelete,
+  isLoading,
   isEditable = false,
 }: RequirementCardProps) => {
   const [localLabel, setLocalLabel] = useState(label);
+
+  // Update localLabel when label prop changes
+  useEffect(() => {
+    setLocalLabel(label);
+  }, [label]);
+
+  const handleLabelBlur = () => {
+    if (localLabel !== label) {
+      onLabelChange?.(id, localLabel);
+    }
+  };
+
+  const handleLabelKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleLabelBlur();
+    }
+  };
 
   return (
     <div className="flex items-center gap-3 py-2 px-2 hover:bg-gray-50 transition-colors group">
@@ -67,6 +87,9 @@ export const RequirementCard = ({
           } ${!isActive ? "text-gray-400" : "text-gray-700"}`}
           value={localLabel}
           onChange={(e) => setLocalLabel(e.target.value)}
+          onBlur={handleLabelBlur}
+          onKeyDown={handleLabelKeyDown}
+          disabled={isLoading}
         />
       </div>
 

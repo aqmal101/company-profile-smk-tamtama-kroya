@@ -94,7 +94,7 @@ export default function SyaratPeriodePendaftaranPage() {
 
   const handleAddRequirement = () => {
     const newRequirement: Requirement = {
-      id: Date.now().toString(),
+      id: "new-" + Date.now().toString(),
       label: "",
       isActive: true,
       isRequired: false,
@@ -195,12 +195,113 @@ export default function SyaratPeriodePendaftaranPage() {
   const [loadingBatch, setLoadingBatch] = useState(false);
   const [savingBatch, setSavingBatch] = useState(false);
 
-  const handleSaveChanges = () => {
-    showAlert({
-      title: "Perubahan Disimpan",
-      description: "Perubahan syarat pendaftaran telah disimpan.",
-      variant: "info",
-    });
+  const [savingRequirements, setSavingRequirements] = useState(false);
+
+  const handleSaveChanges = async () => {
+    if (savingRequirements) return;
+    setSavingRequirements(true);
+    try {
+      type ReqOut = {
+        id?: number;
+        name: string;
+        isActive: number;
+        order?: number;
+      };
+      const payload = {
+        requirements: requirements.map((r, idx): ReqOut => {
+          const reqOut: ReqOut = {
+            name: r.label.trim() || `Syarat ${idx + 1}`,
+            isActive: r.isActive ? 1 : 0,
+            order: idx,
+          };
+          // Only include id for existing items (not new- prefixed)
+          if (!r.id.startsWith("new-")) {
+            reqOut.id = Number(r.id);
+          }
+          // For new items, omit id entirely
+          return reqOut;
+        }),
+      };
+
+      const res = await fetch(`/api/backoffice/registration-requirements`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data: {
+        id: number;
+        name: string;
+        isActive: number;
+        order?: number;
+      }[] = await res.json();
+      if (!res.ok) {
+        const errMsg =
+          (data && (data as unknown as { message?: string }).message) ||
+          "Gagal menyimpan perubahan";
+        showAlert({ title: "Gagal", description: errMsg, variant: "error" });
+        return;
+      }
+
+      const mapped: Requirement[] = (data || []).map((r) => ({
+        id: String(r.id),
+        label: r.name || "",
+        isActive: Number(r.isActive) === 1,
+        isRequired: Number(r.isActive) === 1,
+      }));
+
+      setRequirements(mapped);
+      showAlert({
+        title: "Berhasil",
+        description: "Perubahan syarat pendaftaran telah disimpan.",
+        variant: "success",
+      });
+
+      // Refetch to ensure latest data
+      try {
+        const refreshRes = await fetch(
+          `/api/backoffice/registration-requirements`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              ...getAuthHeader(),
+            },
+          },
+        );
+        if (refreshRes.ok) {
+          type ReqResp = {
+            id: number;
+            name: string;
+            isActive: number;
+            order?: number;
+          };
+          const freshData: ReqResp[] = await refreshRes.json();
+          const freshMapped: Requirement[] = (freshData || []).map(
+            (r: ReqResp) => ({
+              id: String(r.id),
+              label: r.name || "",
+              isActive: Number(r.isActive) === 1,
+              isRequired: Number(r.isActive) === 1,
+            }),
+          );
+          setRequirements(freshMapped);
+        }
+      } catch (refreshErr) {
+        console.error("Failed to refetch after save:", refreshErr);
+      }
+    } catch (err) {
+      console.error("Failed to save requirements:", err);
+      showAlert({
+        title: "Error",
+        description: "Terjadi kesalahan saat menyimpan syarat pendaftaran",
+        variant: "error",
+      });
+    } finally {
+      setSavingRequirements(false);
+    }
   };
 
   const handleSaveBatch = async () => {
@@ -288,10 +389,12 @@ export default function SyaratPeriodePendaftaranPage() {
 
         <SectionCard
           className="w-full"
+          isLoading={savingRequirements}
           title="Syarat Pendaftaran"
           handleSaveChanges={handleSaveChanges}
           leftButton={
             <TextButton
+              isLoading={savingRequirements}
               variant="outline"
               icon={<LuPlus size={18} />}
               text="Tambah Syarat"
@@ -329,6 +432,7 @@ export default function SyaratPeriodePendaftaranPage() {
               </div>
 
               <TextButton
+                isLoading={savingRequirements}
                 icon={<LuTrash2 className="text-xl text-red-600 px-0" />}
                 variant="icon"
                 onClick={() => setDeleteAllModalOpen(true)}
@@ -342,6 +446,7 @@ export default function SyaratPeriodePendaftaranPage() {
                 label={req.label}
                 isActive={req.isActive}
                 isRequired={req.isRequired}
+                isLoading={savingRequirements}
                 onToggle={handleToggle}
                 onRequiredChange={handleRequiredChange}
                 onLabelChange={handleLabelChange}

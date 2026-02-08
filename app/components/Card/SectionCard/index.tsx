@@ -47,6 +47,7 @@ export const SectionCard = ({
       <div className="p-4 h-fit border-t border-gray-300 flex justify-end items-center gap-6">
         {isCancelButton ? (
           <TextButton
+            isLoading={isLoading}
             variant="primary"
             text="Simpan Perubahan"
             onClick={handleSaveChanges}
