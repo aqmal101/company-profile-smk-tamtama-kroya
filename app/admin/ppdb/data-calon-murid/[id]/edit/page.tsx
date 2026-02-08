@@ -76,7 +76,7 @@ export default function EditDataCalonMuridPage() {
                   ? "Laki-laki"
                   : "Perempuan",
               agama: result.studentDetail?.religion || "",
-              adaKip: result.studentDetail?.isKipRecipient || false,
+              adaKip: result.studentDetail?.isKipRecipient === 1 ? true : false,
               nomorKip: result.studentDetail?.kipNumber || "",
               nomorWhatsapp: result.studentDetail?.phoneNumber || "",
             },
