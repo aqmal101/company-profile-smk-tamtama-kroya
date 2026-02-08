@@ -24,44 +24,48 @@ interface Requirement {
 export default function SyaratPeriodePendaftaranPage() {
   const { showAlert } = useAlert();
 
-  const [requirements, setRequirements] = useState<Requirement[]>([
-    {
-      id: "2",
-      label: "Mengisi fomulir.",
-      isActive: true,
-      isRequired: true,
-    },
-    {
-      id: "3",
-      label: "Foto Copy Ijazah",
-      isActive: true,
-      isRequired: true,
-    },
-    {
-      id: "4",
-      label: "Foto Copy KK dan Akta Kelahiran",
-      isActive: true,
-      isRequired: true,
-    },
-    {
-      id: "5",
-      label: "Foto Copy KTP Orang Tua",
-      isActive: true,
-      isRequired: true,
-    },
-    {
-      id: "6",
-      label: "Pas foto 3x4 Berwarna (3 lembar)",
-      isActive: true,
-      isRequired: true,
-    },
-    {
-      id: "7",
-      label: "Sertifikat TKA (Tes Kemampuan Akademik)",
-      isActive: true,
-      isRequired: true,
-    },
-  ]);
+  const [requirements, setRequirements] = useState<Requirement[]>([]);
+
+  // Fetch registration requirements from backoffice API
+  useEffect(() => {
+    type ReqResp = {
+      id: number;
+      name: string;
+      isActive: number;
+      order?: number;
+    };
+
+    const fetchRequirements = async () => {
+      try {
+        const res = await fetch(`/api/backoffice/registration-requirements`, {
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
+        });
+        if (!res.ok) {
+          console.error(
+            "Failed to fetch registration requirements, status:",
+            res.status,
+          );
+          return;
+        }
+        const data: ReqResp[] = await res.json();
+        const mapped: Requirement[] = (data || []).map((r: ReqResp) => ({
+          id: String(r.id),
+          label: r.name || "",
+          isActive: Number(r.isActive) === 1,
+          // default: mark required when active
+          isRequired: Number(r.isActive) === 1,
+        }));
+        setRequirements(mapped);
+      } catch (err) {
+        console.error("Failed to fetch registration requirements:", err);
+      }
+    };
+
+    fetchRequirements();
+  }, []);
 
   const [selectAllModalOpen, setSelectAllModalOpen] = useState(false);
   const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false);
@@ -186,6 +190,7 @@ export default function SyaratPeriodePendaftaranPage() {
   const [dateEnd, setDateEnd] = useState("");
   const [isActive, setIsActive] = useState<number>(0);
   const [batchOrder, setBatchOrder] = useState<number>(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [batchPhotoUrl, setBatchPhotoUrl] = useState<string>("");
   const [loadingBatch, setLoadingBatch] = useState(false);
   const [savingBatch, setSavingBatch] = useState(false);
