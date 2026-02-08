@@ -1,6 +1,6 @@
 "use client";
 
-import { LuTrash2 } from "react-icons/lu";
+import { LuTrash2, LuGripVertical } from "react-icons/lu";
 import { useState, useEffect } from "react";
 // import { InputText } from "@/components/InputForm/TextInput";
 import Toggle from "@/components/ui/toggle";
@@ -16,6 +16,10 @@ interface RequirementCardProps {
   onLabelChange?: (id: string, label: string) => void;
   onDelete?: (id: string) => void;
   isEditable?: boolean;
+  onDragStart?: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
+  onDragOver?: (e: React.DragEvent<HTMLDivElement>) => void;
+  onDrop?: (e: React.DragEvent<HTMLDivElement>, index: number) => void;
+  index?: number;
 }
 
 export const RequirementCard = ({
@@ -29,6 +33,10 @@ export const RequirementCard = ({
   onDelete,
   isLoading,
   isEditable = false,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  index = 0,
 }: RequirementCardProps) => {
   const [localLabel, setLocalLabel] = useState(label);
 
@@ -49,14 +57,32 @@ export const RequirementCard = ({
     }
   };
 
+  const canEdit = !isActive;
+
   return (
-    <div className="flex items-center gap-3 py-2 px-2 hover:bg-gray-50 transition-colors group">
+    <div
+      draggable={!isActive}
+      onDragStart={(e) => onDragStart?.(e, index)}
+      onDragOver={(e) => onDragOver?.(e)}
+      onDrop={(e) => onDrop?.(e, index)}
+      className={`flex items-center gap-3 py-2 px-2 rounded-md transition-all ${
+        isActive
+          ? "cursor-not-allowed bg-gray-100"
+          : "cursor-move hover:bg-gray-50"
+      }`}
+    >
+      {/* Drag Handle */}
+      {!isActive && (
+        <LuGripVertical size={18} className="text-gray-400 cursor-move" />
+      )}
+
       {/* Checkbox Required */}
       <input
         type="checkbox"
         checked={isRequired}
         onChange={(e) => onRequiredChange?.(id, e.target.checked)}
-        className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+        disabled={!canEdit}
+        className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary disabled:cursor-not-allowed"
       />
 
       {/* Toggle Active */}
@@ -64,39 +90,33 @@ export const RequirementCard = ({
         enabled={isActive}
         onChange={(enabled) => onToggle?.(id, enabled)}
       />
-      {/* <button
-        onClick={() => onToggle?.(id, !isActive)}
-        className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-          isActive ? "bg-primary" : "bg-gray-300"
-        }`}
-      >
-        <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-            isActive ? "translate-x-6" : "translate-x-1"
-          }`}
-        />
-      </button> */}
 
       {/* Label Input */}
-
       <div className="w-full">
         <input
           placeholder="Masukkan syarat pendaftaran"
           className={`w-full h-10 px-3 py-2 border border-gray-300 rounded ${
-            isEditable ? "cursor-pointer hover:border-primary" : ""
-          } ${!isActive ? "text-gray-400" : "text-gray-700"}`}
+            isEditable && canEdit ? "cursor-pointer hover:border-primary" : ""
+          } ${!isActive ? "text-gray-700" : "text-gray-400 bg-gray-50"} ${
+            !canEdit ? "cursor-not-allowed opacity-60" : ""
+          }`}
           value={localLabel}
           onChange={(e) => setLocalLabel(e.target.value)}
           onBlur={handleLabelBlur}
           onKeyDown={handleLabelKeyDown}
-          disabled={isLoading}
+          disabled={isLoading || !canEdit}
         />
       </div>
 
       {/* Delete Button */}
       <button
         onClick={() => onDelete?.(id)}
-        className=" p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-all"
+        disabled={!canEdit}
+        className={`p-2 rounded transition-all ${
+          canEdit
+            ? "text-gray-400 hover:text-red-500 hover:bg-red-50"
+            : "text-gray-300 cursor-not-allowed"
+        }`}
         aria-label="Delete requirement"
       >
         <LuTrash2 size={18} />

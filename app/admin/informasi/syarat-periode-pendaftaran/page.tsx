@@ -26,6 +26,8 @@ export default function SyaratPeriodePendaftaranPage() {
 
   const [requirements, setRequirements] = useState<Requirement[]>([]);
 
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
   // Fetch registration requirements from backoffice API
   useEffect(() => {
     type ReqResp = {
@@ -67,7 +69,6 @@ export default function SyaratPeriodePendaftaranPage() {
     fetchRequirements();
   }, []);
 
-  const [selectAllModalOpen, setSelectAllModalOpen] = useState(false);
   const [deleteAllModalOpen, setDeleteAllModalOpen] = useState(false);
 
   const handleToggle = (id: string, isActive: boolean) => {
@@ -100,6 +101,35 @@ export default function SyaratPeriodePendaftaranPage() {
       isRequired: false,
     };
     setRequirements((prev) => [...prev, newRequirement]);
+  };
+
+  const handleDragStart = (
+    e: React.DragEvent<HTMLDivElement>,
+    index: number,
+  ) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (
+    e: React.DragEvent<HTMLDivElement>,
+    dropIndex: number,
+  ) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) return;
+
+    const newRequirements = [...requirements];
+    const draggedItem = newRequirements[draggedIndex];
+    newRequirements.splice(draggedIndex, 1);
+    newRequirements.splice(dropIndex, 0, draggedItem);
+
+    setRequirements(newRequirements);
+    setDraggedIndex(null);
   };
 
   const [batches, setBatches] = useState<
@@ -405,32 +435,28 @@ export default function SyaratPeriodePendaftaranPage() {
           <div className="p-4 space-y-1  w-full">
             {/* Header: select-all checkbox, column titles, delete all */}
             <div className="flex items-center gap-3 py-2 px-2 bg-gray-50 rounded-md">
+              <div className="w-6"></div> {/* Space for drag handle */}
               <input
                 type="checkbox"
                 checked={
                   requirements.length > 0 &&
-                  requirements.every((r) => r.isRequired)
+                  requirements.every((r) => r.isActive)
                 }
                 onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectAllModalOpen(true);
-                  } else {
-                    setRequirements((prev) =>
-                      prev.map((r) => ({ ...r, isRequired: false })),
-                    );
-                  }
+                  const newActive = e.target.checked;
+                  setRequirements((prev) =>
+                    prev.map((r) => ({ ...r, isActive: newActive })),
+                  );
                 }}
                 className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
-                aria-label="Pilih semua sebagai wajib"
+                aria-label="Aktifkan semua syarat"
               />
-
               <div className="w-16 text-base text-gray-600 font-medium">
                 Aktif
               </div>
               <div className="flex-1 text-base text-primary font-medium">
                 Nama Syarat
               </div>
-
               <TextButton
                 isLoading={savingRequirements}
                 icon={<LuTrash2 className="text-xl text-red-600 px-0" />}
@@ -439,7 +465,7 @@ export default function SyaratPeriodePendaftaranPage() {
               />
             </div>
 
-            {requirements.map((req) => (
+            {requirements.map((req, index) => (
               <RequirementCard
                 key={req.id}
                 id={req.id}
@@ -452,39 +478,12 @@ export default function SyaratPeriodePendaftaranPage() {
                 onLabelChange={handleLabelChange}
                 onDelete={handleDelete}
                 isEditable={true}
+                index={index}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
               />
             ))}
-
-            {/* Modals */}
-            <BaseModal
-              hiddenOverlay={true}
-              isOpen={selectAllModalOpen}
-              onClose={() => setSelectAllModalOpen(false)}
-              title="Konfirmasi"
-              footer={
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => setSelectAllModalOpen(false)}
-                    className="px-4 py-2 rounded-md"
-                  >
-                    Batal
-                  </button>
-                  <button
-                    onClick={() => {
-                      setRequirements((prev) =>
-                        prev.map((r) => ({ ...r, isRequired: true })),
-                      );
-                      setSelectAllModalOpen(false);
-                    }}
-                    className="px-4 py-2 bg-primary text-white rounded-md"
-                  >
-                    Ya, tandai semua
-                  </button>
-                </div>
-              }
-            >
-              <p>Anda yakin ingin menandai semua syarat sebagai wajib?</p>
-            </BaseModal>
 
             <BaseModal
               hiddenOverlay={true}

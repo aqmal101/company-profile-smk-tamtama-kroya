@@ -2,7 +2,7 @@
 
 import Toggle from "@/components/ui/toggle";
 import React, { useState } from "react";
-import { LuTrash2 } from "react-icons/lu";
+import { LuGripVertical, LuTrash2 } from "react-icons/lu";
 
 export interface BenefitItem {
   id: string;
@@ -82,7 +82,7 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
       </div>
 
       {/* Toggle */}
-      <div className="flex items-center w-32 flex-row justify-end">
+      <div className="flex items-center w-48 flex-row justify-end">
         <Toggle
           enabled={local.isActive}
           onChange={(enabled) => handleUpdate({ isActive: enabled })}
@@ -90,6 +90,11 @@ export const BenefitCard: React.FC<BenefitCardProps> = ({
         <div className="text-black text-xs text-center w-20">
           {local.isActive ? "Aktif" : "Tidak Aktif"}
         </div>
+        {/* Drag Handle */}
+        {!local.isActive && (
+          <LuGripVertical size={18} className="text-gray-400 cursor-move" />
+        )}
+
         {/* <button
           onClick={() => onDelete?.(item.id)}
           disabled={!canEdit}

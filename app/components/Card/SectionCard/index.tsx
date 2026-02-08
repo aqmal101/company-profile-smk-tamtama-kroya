@@ -1,4 +1,5 @@
 import { TextButton } from "@/components/Buttons/TextButton";
+import { useRef, useEffect, useState } from "react";
 
 interface SectionCardProps {
   title?: string;
@@ -25,6 +26,24 @@ export const SectionCard = ({
   isLoading = false,
   className = "w-1/2",
 }: SectionCardProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [lastHeight, setLastHeight] = useState(200); // default height
+
+  useEffect(() => {
+    if (!isLoading && containerRef.current) {
+      setLastHeight(containerRef.current.offsetHeight);
+    }
+  }, [isLoading, children]);
+
+  const rowHeight = 50; // estimated height per row
+  const numRows = Math.ceil(lastHeight / rowHeight);
+
+  const skeletonRows = Array.from({ length: numRows }, (_, i) => (
+    <div
+      key={i}
+      className="w-full h-12 animate-pulse bg-gray-300 rounded-md"
+    ></div>
+  ));
   return (
     <div className={`${className} shadow-lg rounded-md`}>
       {title && (
@@ -34,14 +53,9 @@ export const SectionCard = ({
       )}
       <div className="w-full h-fit">
         {isLoading ? (
-          <div className="p-2 space-y-4">
-            <div className="w-full h-12 animate-pulse bg-gray-300 rounded-md"></div>
-            <div className="w-full h-12 animate-pulse bg-gray-300 rounded-md"></div>
-            <div className="w-full h-12 animate-pulse bg-gray-300 rounded-md"></div>
-            <div className="w-full h-12 animate-pulse bg-gray-300 rounded-md"></div>
-          </div>
+          <div className="p-2 space-y-4">{skeletonRows}</div>
         ) : (
-          children
+          <div ref={containerRef}>{children}</div>
         )}
       </div>
       <div className="p-4 h-fit border-t border-gray-300 flex justify-end items-center gap-6">
