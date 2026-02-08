@@ -2,7 +2,7 @@ import React from "react";
 
 export type TextButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   text?: string;
-  variant:
+  variant?:
     | "primary"
     | "accent"
     | "secondary"
@@ -25,7 +25,7 @@ export const TextButton = React.forwardRef<HTMLButtonElement, TextButtonProps>(
   (
     {
       text,
-      variant,
+      variant = "primary",
       className,
       onClick,
       width,

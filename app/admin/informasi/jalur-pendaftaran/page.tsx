@@ -6,8 +6,9 @@ import { TitleSection } from "@/components/TitleSection/index";
 import { BenefitList, BenefitItem } from "@/components/Card/BenefitCard";
 import { useAlert } from "@/components/ui/alert";
 import { getAuthHeader } from "@/utils/auth";
-import { useEffect, useRef, useState } from "react";
-import { LuPlus, LuTrash2, LuUpload } from "react-icons/lu";
+import { useEffect, useState } from "react";
+import { LuTrash2, LuUpload } from "react-icons/lu";
+import DragDropFile from "@/components/Upload/DragDropFile";
 
 interface PathTabProps {
   id: string;
@@ -61,7 +62,6 @@ export default function AdminRegistrationPathPage() {
     pathByTab: Record<string, ApiRegistrationPath | null>;
   } | null>(null);
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { showAlert } = useAlert();
 
   const activeTabData = tabs.find((tab) => tab.id === activeTab);
@@ -272,12 +272,6 @@ export default function AdminRegistrationPathPage() {
     setPhotoDrafts({});
   };
 
-  const [isDragOver, setIsDragOver] = useState(false);
-
-  const handlePickPhoto = () => {
-    fileInputRef.current?.click();
-  };
-
   const setDraftFile = (file: File | null) => {
     setPhotoDrafts((prev) => {
       const next = { ...prev };
@@ -294,52 +288,6 @@ export default function AdminRegistrationPathPage() {
       next[activeTab] = { file, previewUrl: URL.createObjectURL(file) };
       return next;
     });
-  };
-
-  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      showAlert({
-        title: "Format tidak didukung",
-        description: "Hanya file gambar (PNG/JPG) yang diterima",
-        variant: "warning",
-      });
-      event.target.value = "";
-      return;
-    }
-
-    setDraftFile(file);
-
-    event.target.value = "";
-  };
-
-  const handleDropAreaDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  const handleDropAreaDragLeave = () => {
-    setIsDragOver(false);
-  };
-
-  const handleDropAreaDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      showAlert({
-        title: "Format tidak didukung",
-        description: "Hanya file gambar (PNG/JPG) yang diterima",
-        variant: "warning",
-      });
-      return;
-    }
-
-    setDraftFile(file);
   };
 
   const handleUploadPhoto = async () => {
@@ -414,6 +362,11 @@ export default function AdminRegistrationPathPage() {
     }
   };
 
+  function removeFile(e?: React.MouseEvent) {
+    e?.stopPropagation();
+    setDraftFile(null);
+  }
+
   return (
     <div className="w-full min-h-[calc(100vh-4px)] bg-gray-100 p-4">
       <div className="h-full w-full bg-white rounded-md drop-shadow-sm p-6">
@@ -456,7 +409,7 @@ export default function AdminRegistrationPathPage() {
         <SectionCard
           title="Foto Jalur Pendaftaran (Landing Page)"
           className="w-full"
-          saveButtonText="Unggah Gambar"
+          saveButtonText="Unggah Foto"
           saveButtonIcon={<LuUpload />}
           handleSaveChanges={handleUploadPhoto}
           isLoading={isLoadingPaths || isUploadingPhoto}
@@ -465,10 +418,13 @@ export default function AdminRegistrationPathPage() {
             <TextButton
               variant="outline-danger"
               icon={<LuTrash2 />}
-              className={` ${activePhotoDraft?.previewUrl ? "opacity-100" : "opacity-0"}`}
+              className={`${activePhotoDraft?.previewUrl ? "opacity-100" : "opacity-0"}`}
               isLoading={isUploadingPhoto}
-              text="Hapus Gambar"
-              onClick={() => setDraftFile(null)}
+              text="Hapus Foto"
+              onClick={(e) => {
+                e.stopPropagation();
+                removeFile();
+              }}
             />
           }
         >
@@ -490,62 +446,27 @@ export default function AdminRegistrationPathPage() {
                     </button>
                   ))}
                 </div>
-                <div
-                  onDragOver={handleDropAreaDragOver}
-                  onDragEnter={handleDropAreaDragOver}
-                  onDragLeave={handleDropAreaDragLeave}
-                  onDrop={handleDropAreaDrop}
-                  className={`w-full h-full flex flex-col border-2 border-dashed rounded-xl justify-center items-center border-primary bg-gray-100 ${isDragOver ? "bg-green-50 border-green-300" : ""}`}
-                >
-                  <div className="h-fit w-fit justify-center items-center flex flex-col gap-3">
-                    {activePhotoDraft?.previewUrl ? (
-                      <>
-                        <img
-                          src={activePhotoDraft.previewUrl}
-                          alt="Preview"
-                          className="w-48 h-32 object-cover rounded-md shadow-sm"
-                        />
-                        <div className="flex gap-2 mt-2">
-                          <TextButton
-                            variant="primary"
-                            text="Pilih Foto Lain"
-                            onClick={handlePickPhoto}
-                          />
-                          <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/png,image/jpeg"
-                            className="hidden"
-                            onChange={handlePhotoChange}
-                          />
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <LuUpload className="text-primary mx-auto my-auto text-6xl" />
-                        <TextButton
-                          variant="primary"
-                          text="Pilih Foto"
-                          className="py-1! rounded-md!"
-                          onClick={handlePickPhoto}
-                        />
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/png,image/jpeg"
-                          className="hidden"
-                          onChange={handlePhotoChange}
-                        />
-                        <div className="flex flex-col items-center">
-                          <div>Seret dan Lepas sebuah foto</div>
-                          <div className="text-xs text-gray-600 h-fit ">
-                            <span className="text-red-500">*</span> Rekomendasi
-                            Jenis File Foto: PNG, JPG
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
+                <div className="w-full h-full">
+                  <DragDropFile
+                    className="h-full"
+                    accept="image/png,image/jpeg"
+                    previewUrl={activePhotoDraft?.previewUrl ?? activePhotoUrl}
+                    initialFile={activePhotoDraft?.file ?? null}
+                    onFile={(file) => setDraftFile(file)}
+                    onRemove={() => setDraftFile(null)}
+                    onValidate={(file) => {
+                      if (!file.type.startsWith("image/")) {
+                        showAlert({
+                          title: "Format tidak didukung",
+                          description:
+                            "Hanya file gambar (PNG/JPG) yang diterima",
+                          variant: "warning",
+                        });
+                        return "Format tidak didukung";
+                      }
+                      return null;
+                    }}
+                  />
                 </div>
                 <div className="text-xs text-gray-600 h-fit ">
                   <span className="text-red-500">*</span> Foto akan langsung
