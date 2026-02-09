@@ -51,6 +51,11 @@ export const getHandleFromUrl = (url: string) => {
     const digits = toDigits(s);
     return digits.length >= 10 && digits.length <= 15;
   };
+    export const isValidWhatsappNumber = (s: string) => {
+      const trimmed = String(s || "").trim();
+      if (!trimmed.startsWith("08")) return false;
+      return isValidPhoneNumber(trimmed);
+    };
   export const isValidUrl = (s: string) => {
     try {
       if (!s) return true; // allow empty

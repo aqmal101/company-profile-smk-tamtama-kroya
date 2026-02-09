@@ -20,6 +20,7 @@ import {
   isNonEmpty,
   isValidEmail,
   isValidPhoneNumber,
+  isValidWhatsappNumber,
   isValidUrl,
 } from "@/lib/stringFormat";
 import { TextButton } from "@/components/Buttons/TextButton";
@@ -85,7 +86,10 @@ export default function KontakMediaPage() {
         number: z
           .string()
           .min(1, "Nomor Whatsapp wajib diisi")
-          .refine(isValidPhoneNumber, "Nomor Whatsapp tidak valid"),
+          .refine(
+            isValidWhatsappNumber,
+            "Nomor Whatsapp harus diawali 08 dan valid",
+          ),
         name: z.string().optional(),
         isActive: z.boolean().optional(),
       }),
@@ -430,7 +434,7 @@ export default function KontakMediaPage() {
     try {
       const whatsappPayload = {
         whatsappNumbers: (form.whatsappNumbers || []).map((w: any) => ({
-          name: w.name || "",
+          name: w.name || w.label || "",
           label: w.label || "",
           number: String((w.number || "").replace(/\D/g, "")),
           isActive: !!w.isActive,
