@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import DragDropFile from "@/components/Upload/DragDropFile";
 import { TitleSection } from "@/components/TitleSection/index";
 import { SectionCard } from "@/components/Card/SectionCard";
@@ -23,6 +23,7 @@ import {
   isValidUrl,
 } from "@/lib/stringFormat";
 import { TextButton } from "@/components/Buttons/TextButton";
+import * as z from "zod";
 
 export default function KontakMediaPage() {
   const { showAlert } = useAlert();
@@ -31,6 +32,23 @@ export default function KontakMediaPage() {
   const [savingBrochure, setSavingBrochure] = useState(false);
   const [savingSocial, setSavingSocial] = useState(false);
   const [deletingBrochure, setDeletingBrochure] = useState(false);
+  const [contactErrors, setContactErrors] = useState<{
+    phone?: string;
+    email?: string;
+    website?: string;
+    address?: string;
+  }>({});
+  const [socialErrors, setSocialErrors] = useState<{
+    tiktok?: string;
+    youtube?: string;
+    facebook?: string;
+  }>({});
+  const [instagramErrors, setInstagramErrors] = useState<
+    Record<number, string>
+  >({});
+  const [whatsappErrors, setWhatsappErrors] = useState<
+    Record<number, { label?: string; number?: string }>
+  >({});
 
   const [original, setOriginal] = useState<any>(null);
   const [form, setForm] = useState<any>(null);
@@ -39,6 +57,103 @@ export default function KontakMediaPage() {
   const [backFile, setBackFile] = useState<File | null>(null);
 
   const MAX_WHATSAPP = 5;
+
+  const contactSchema = useMemo(
+    () =>
+      z.object({
+        phone: z
+          .string()
+          .min(1, "Nomor telepon wajib diisi")
+          .refine(isValidPhoneNumber, "Nomor telepon tidak valid"),
+        email: z
+          .string()
+          .min(1, "Email wajib diisi")
+          .refine(isValidEmail, "Format email tidak valid"),
+        website: z
+          .string()
+          .min(1, "Website wajib diisi")
+          .refine(isValidUrl, "Format website tidak valid"),
+        address: z.string().min(1, "Alamat wajib diisi"),
+      }),
+    [],
+  );
+
+  const whatsappItemSchema = useMemo(
+    () =>
+      z.object({
+        label: z.string().min(1, "Label Whatsapp wajib diisi"),
+        number: z
+          .string()
+          .min(1, "Nomor Whatsapp wajib diisi")
+          .refine(isValidPhoneNumber, "Nomor Whatsapp tidak valid"),
+        name: z.string().optional(),
+        isActive: z.boolean().optional(),
+      }),
+    [],
+  );
+
+  const instagramItemSchema = useMemo(
+    () =>
+      z.object({
+        url: z
+          .string()
+          .min(1, "URL Instagram wajib diisi")
+          .refine(isValidUrl, "Format URL Instagram tidak valid"),
+        isActive: z.boolean().optional(),
+      }),
+    [],
+  );
+
+  const socialSchema = useMemo(
+    () =>
+      z
+        .object({
+          tiktok: z.object({
+            url: z.string().optional(),
+            isActive: z.boolean().optional(),
+          }),
+          youtube: z.object({
+            url: z.string().optional(),
+            isActive: z.boolean().optional(),
+          }),
+          facebook: z.object({
+            url: z.string().optional(),
+            isActive: z.boolean().optional(),
+          }),
+          instagram: z.array(instagramItemSchema),
+        })
+        .superRefine((value, ctx) => {
+          const validateSingle = (
+            key: "tiktok" | "youtube" | "facebook",
+            label: string,
+          ) => {
+            const url = value[key].url || "";
+            const active = !!value[key].isActive;
+            if (active || isNonEmpty(url)) {
+              if (!isNonEmpty(url)) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  path: [key, "url"],
+                  message: `URL ${label} wajib diisi`,
+                });
+                return;
+              }
+              if (!isValidUrl(url)) {
+                ctx.addIssue({
+                  code: z.ZodIssueCode.custom,
+                  path: [key, "url"],
+                  message: `Format URL ${label} tidak valid`,
+                });
+              }
+            }
+          };
+
+          validateSingle("tiktok", "TikTok");
+          validateSingle("youtube", "Youtube");
+          validateSingle("facebook", "Facebook");
+        }),
+    [instagramItemSchema],
+  );
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -131,6 +246,63 @@ export default function KontakMediaPage() {
     setBackFile(null);
   };
 
+  const clearContactErrors = () => setContactErrors({});
+  const clearSocialErrors = () => {
+    setSocialErrors({});
+    setInstagramErrors({});
+    setWhatsappErrors({});
+  };
+
+  const resetContact = () => {
+    if (!original) return;
+    setForm((p: any) => ({
+      ...p,
+      email: original.email || "",
+      phone: original.phone || "",
+      website: original.website || "",
+      address: original.address || "",
+    }));
+  };
+
+  const resetSocial = () => {
+    if (!original) return;
+    setForm((p: any) => ({
+      ...p,
+      whatsappNumbers: (original.whatsappNumbers || []).map((w: any) => ({
+        ...w,
+        isActive: typeof w.isActive === "boolean" ? w.isActive : true,
+      })),
+      socialMedia: {
+        tiktok: {
+          ...(original.socialMedia?.tiktok || { url: "", isActive: false }),
+        },
+        youtube: {
+          ...(original.socialMedia?.youtube || { url: "", isActive: false }),
+        },
+        facebook: {
+          ...(original.socialMedia?.facebook || { url: "", isActive: false }),
+        },
+        instagram: Array.isArray(original.socialMedia?.instagram)
+          ? original.socialMedia.instagram.map((i: any) => ({
+              ...(i || {}),
+              isActive: typeof i.isActive === "boolean" ? i.isActive : true,
+            }))
+          : [],
+      },
+    }));
+  };
+
+  const resetBrochure = () => {
+    if (!original) return;
+    setForm((p: any) => ({
+      ...p,
+      brochureFrontUrl: original.brochureFrontUrl || null,
+      brochureBackUrl: original.brochureBackUrl || null,
+    }));
+    setFrontFile(null);
+    setBackFile(null);
+  };
+
   // Whatsapp helpers
   const addWhatsapp = () => {
     if (!form) return;
@@ -189,110 +361,65 @@ export default function KontakMediaPage() {
   const handleSaveSocial = async () => {
     if (!form) return;
 
-    for (const [idx, w] of (form.whatsappNumbers || []).entries()) {
-      if (!isNonEmpty(w.label)) {
-        showAlert({
-          title: "Gagal",
-          description: `Label Whatsapp #${idx + 1} wajib diisi`,
-          variant: "error",
-        });
-        return;
-      }
-      if (!isNonEmpty(w.number)) {
-        showAlert({
-          title: "Gagal",
-          description: `Nomor Whatsapp #${idx + 1} wajib diisi`,
-          variant: "error",
-        });
-        return;
-      }
-      if (!isValidPhoneNumber(w.number)) {
-        showAlert({
-          title: "Gagal",
-          description: `Nomor Whatsapp #${idx + 1} tidak valid`,
-          variant: "error",
-        });
-        return;
-      }
-    }
+    clearSocialErrors();
 
-    for (const [idx, inst] of (form.socialMedia.instagram || []).entries()) {
-      if (!isNonEmpty(inst.url)) {
-        showAlert({
-          title: "Gagal",
-          description: `URL Instagram #${idx + 1} wajib diisi`,
-          variant: "error",
-        });
-        return;
+    const whatsappCheck = z
+      .array(whatsappItemSchema)
+      .max(MAX_WHATSAPP, `Maksimal ${MAX_WHATSAPP} nomor Whatsapp`)
+      .safeParse(form.whatsappNumbers || []);
+    const socialCheck = socialSchema.safeParse({
+      tiktok: form.socialMedia.tiktok,
+      youtube: form.socialMedia.youtube,
+      facebook: form.socialMedia.facebook,
+      instagram: form.socialMedia.instagram || [],
+    });
+
+    if (!whatsappCheck.success || !socialCheck.success) {
+      const nextWhatsappErrors: Record<
+        number,
+        { label?: string; number?: string }
+      > = {};
+      const nextInstagramErrors: Record<number, string> = {};
+      const nextSocialErrors: {
+        tiktok?: string;
+        youtube?: string;
+        facebook?: string;
+      } = {};
+
+      if (!whatsappCheck.success) {
+        for (const issue of whatsappCheck.error.issues) {
+          const [idx, field] = issue.path;
+          if (typeof idx === "number") {
+            nextWhatsappErrors[idx] = {
+              ...nextWhatsappErrors[idx],
+              [String(field)]: issue.message,
+            };
+          }
+        }
       }
-      if (!isValidUrl(inst.url)) {
-        showAlert({
-          title: "Gagal",
-          description: `Format URL Instagram #${idx + 1} tidak valid`,
-          variant: "error",
-        });
-        return;
+
+      if (!socialCheck.success) {
+        for (const issue of socialCheck.error.issues) {
+          const [root, idx] = issue.path;
+          if (root === "instagram" && typeof idx === "number") {
+            nextInstagramErrors[idx] = issue.message;
+          } else if (
+            root === "tiktok" ||
+            root === "youtube" ||
+            root === "facebook"
+          ) {
+            nextSocialErrors[root] = issue.message;
+          }
+        }
       }
-    }
 
-    const tiktokUrl = form.socialMedia.tiktok.url || "";
-    if (
-      (form.socialMedia.tiktok.isActive || isNonEmpty(tiktokUrl)) &&
-      !isNonEmpty(tiktokUrl)
-    ) {
-      showAlert({
-        title: "Gagal",
-        description: "URL TikTok wajib diisi",
-        variant: "error",
-      });
-      return;
-    }
-    if (isNonEmpty(tiktokUrl) && !isValidUrl(tiktokUrl)) {
-      showAlert({
-        title: "Gagal",
-        description: "Format URL TikTok tidak valid",
-        variant: "error",
-      });
-      return;
-    }
+      setWhatsappErrors(nextWhatsappErrors);
+      setInstagramErrors(nextInstagramErrors);
+      setSocialErrors(nextSocialErrors);
 
-    const youtubeUrl = form.socialMedia.youtube.url || "";
-    if (
-      (form.socialMedia.youtube.isActive || isNonEmpty(youtubeUrl)) &&
-      !isNonEmpty(youtubeUrl)
-    ) {
       showAlert({
         title: "Gagal",
-        description: "URL Youtube wajib diisi",
-        variant: "error",
-      });
-      return;
-    }
-    if (isNonEmpty(youtubeUrl) && !isValidUrl(youtubeUrl)) {
-      showAlert({
-        title: "Gagal",
-        description: "Format URL Youtube tidak valid",
-        variant: "error",
-      });
-      return;
-    }
-
-    const facebookUrl = form.socialMedia.facebook.url || "";
-    if (
-      (form.socialMedia.facebook.isActive || isNonEmpty(facebookUrl)) &&
-      !isNonEmpty(facebookUrl)
-    ) {
-      showAlert({
-        title: "Gagal",
-        description: "URL Facebook wajib diisi",
-        variant: "error",
-      });
-      return;
-    }
-    if (isNonEmpty(facebookUrl) && !isValidUrl(facebookUrl)) {
-      showAlert({
-        title: "Gagal",
-        description: "Format URL Facebook tidak valid",
+        description: "Periksa input yang bertanda merah",
         variant: "error",
       });
       return;
@@ -491,60 +618,31 @@ export default function KontakMediaPage() {
   const handleSaveContact = async () => {
     if (!form) return;
 
-    if (!isNonEmpty(form.phone)) {
-      showAlert({
-        title: "Gagal",
-        description: "Nomor telepon wajib diisi",
-        variant: "error",
-      });
-      return;
-    }
-    if (!isValidPhoneNumber(form.phone)) {
-      showAlert({
-        title: "Gagal",
-        description: "Nomor telepon tidak valid",
-        variant: "error",
-      });
-      return;
-    }
-    if (!isNonEmpty(form.email)) {
-      showAlert({
-        title: "Gagal",
-        description: "Email wajib diisi",
-        variant: "error",
-      });
-      return;
-    }
-    if (!isNonEmpty(form.website)) {
-      showAlert({
-        title: "Gagal",
-        description: "Website wajib diisi",
-        variant: "error",
-      });
-      return;
-    }
-    if (!isNonEmpty(form.address)) {
-      showAlert({
-        title: "Gagal",
-        description: "Alamat wajib diisi",
-        variant: "error",
-      });
-      return;
-    }
+    clearContactErrors();
 
-    // Basic validation
-    if (form.email && !isValidEmail(form.email)) {
+    const contactCheck = contactSchema.safeParse({
+      phone: form.phone || "",
+      email: form.email || "",
+      website: form.website || "",
+      address: form.address || "",
+    });
+    if (!contactCheck.success) {
+      const nextErrors: {
+        phone?: string;
+        email?: string;
+        website?: string;
+        address?: string;
+      } = {};
+      for (const issue of contactCheck.error.issues) {
+        const [field] = issue.path;
+        if (typeof field === "string") {
+          nextErrors[field as keyof typeof nextErrors] = issue.message;
+        }
+      }
+      setContactErrors(nextErrors);
       showAlert({
         title: "Gagal",
-        description: "Format email tidak valid",
-        variant: "error",
-      });
-      return;
-    }
-    if (form.website && !isValidUrl(form.website)) {
-      showAlert({
-        title: "Gagal",
-        description: "Format website tidak valid",
+        description: "Periksa input yang bertanda merah",
         variant: "error",
       });
       return;
@@ -623,6 +721,14 @@ export default function KontakMediaPage() {
               isLoading={savingContact || !form}
               title="Kontak Resmi Sekolah"
               className="w-full border border-gray-400"
+              leftButton={
+                <TextButton
+                  variant="outline"
+                  text="Batal"
+                  disabled={savingContact || loading}
+                  onClick={resetContact}
+                />
+              }
             >
               <div className="w-full p-3">
                 <div>
@@ -631,10 +737,19 @@ export default function KontakMediaPage() {
                     label="Telephone"
                     placeholder="Masukkan Nomor Telephone Sekolah"
                     value={form.phone}
-                    onChange={(e) =>
-                      setForm((p: any) => ({ ...p, phone: e.target.value }))
-                    }
+                    onChange={(e) => {
+                      setForm((p: any) => ({ ...p, phone: e.target.value }));
+                      setContactErrors((prev) => ({
+                        ...prev,
+                        phone: undefined,
+                      }));
+                    }}
                   />
+                  {contactErrors.phone && (
+                    <p className="text-xs text-red-500 -mt-1 mb-2">
+                      {contactErrors.phone}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <InputText
@@ -642,10 +757,19 @@ export default function KontakMediaPage() {
                     label="Email"
                     placeholder="Masukkan Email Sekolah"
                     value={form.email}
-                    onChange={(e) =>
-                      setForm((p: any) => ({ ...p, email: e.target.value }))
-                    }
+                    onChange={(e) => {
+                      setForm((p: any) => ({ ...p, email: e.target.value }));
+                      setContactErrors((prev) => ({
+                        ...prev,
+                        email: undefined,
+                      }));
+                    }}
                   />
+                  {contactErrors.email && (
+                    <p className="text-xs text-red-500 -mt-1 mb-2">
+                      {contactErrors.email}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <InputText
@@ -653,21 +777,39 @@ export default function KontakMediaPage() {
                     label="Website"
                     placeholder="Masukkan Website Sekolah"
                     value={form.website}
-                    onChange={(e) =>
-                      setForm((p: any) => ({ ...p, website: e.target.value }))
-                    }
+                    onChange={(e) => {
+                      setForm((p: any) => ({ ...p, website: e.target.value }));
+                      setContactErrors((prev) => ({
+                        ...prev,
+                        website: undefined,
+                      }));
+                    }}
                   />
+                  {contactErrors.website && (
+                    <p className="text-xs text-red-500 -mt-1 mb-2">
+                      {contactErrors.website}
+                    </p>
+                  )}
                 </div>
                 <div className="col-span-2">
                   <InputTextArea
                     placeholder="Masukkan Alamat Lengkap Sekolah"
                     value={form.address}
-                    onChange={(e) =>
-                      setForm((p: any) => ({ ...p, address: e.target.value }))
-                    }
+                    onChange={(e) => {
+                      setForm((p: any) => ({ ...p, address: e.target.value }));
+                      setContactErrors((prev) => ({
+                        ...prev,
+                        address: undefined,
+                      }));
+                    }}
                     label={"Alamat Lengkap"}
                     name={"address"}
                   />
+                  {contactErrors.address && (
+                    <p className="text-xs text-red-500 -mt-1 mb-2">
+                      {contactErrors.address}
+                    </p>
+                  )}
                 </div>
               </div>
             </SectionCard>
@@ -677,7 +819,14 @@ export default function KontakMediaPage() {
               className="mt-6 border border-gray-400"
               handleSaveChanges={handleSaveBrochure}
               isLoading={savingBrochure || !form}
-              leftButton={null}
+              leftButton={
+                <TextButton
+                  variant="outline"
+                  text="Batal"
+                  disabled={savingBrochure || deletingBrochure || loading}
+                  onClick={resetBrochure}
+                />
+              }
             >
               <div className="grid grid-cols-1 gap-6 p-3">
                 <div>
@@ -840,6 +989,14 @@ export default function KontakMediaPage() {
               maxRow={14}
               isLoading={savingSocial || loading}
               handleSaveChanges={handleSaveSocial}
+              leftButton={
+                <TextButton
+                  variant="outline"
+                  text="Batal"
+                  disabled={savingSocial || loading}
+                  onClick={resetSocial}
+                />
+              }
             >
               <div className="grid grid-cols-1 gap-6 p-3">
                 <SocialMediaListField
@@ -863,124 +1020,171 @@ export default function KontakMediaPage() {
                     }))
                   }
                   renderInputs={(inst: any, idx: number, disabled) => (
-                    <input
-                      className="flex-1 border border-gray-400 rounded p-2"
-                      value={inst.url || ""}
-                      onChange={(e) =>
-                        setForm((p: any) => ({
-                          ...p,
-                          socialMedia: {
-                            ...p.socialMedia,
-                            instagram: p.socialMedia.instagram.map(
-                              (it: any, i: number) =>
-                                i === idx ? { ...it, url: e.target.value } : it,
-                            ),
-                          },
-                        }))
-                      }
-                      disabled={disabled}
-                    />
+                    <div className="flex-1">
+                      <input
+                        className="w-full border border-gray-400 rounded p-2"
+                        value={inst.url || ""}
+                        onChange={(e) => {
+                          setForm((p: any) => ({
+                            ...p,
+                            socialMedia: {
+                              ...p.socialMedia,
+                              instagram: p.socialMedia.instagram.map(
+                                (it: any, i: number) =>
+                                  i === idx
+                                    ? { ...it, url: e.target.value }
+                                    : it,
+                              ),
+                            },
+                          }));
+                          setInstagramErrors((prev) => {
+                            const next = { ...prev };
+                            delete next[idx];
+                            return next;
+                          });
+                        }}
+                        disabled={disabled}
+                      />
+                      {instagramErrors[idx] && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {instagramErrors[idx]}
+                        </p>
+                      )}
+                    </div>
                   )}
                 />
 
                 <div>
                   <div className="space-y-6 mt-8">
-                    <SocialMediaSingleField
-                      label="TikTok"
-                      iconSrc="/sosmed/tiktok.svg"
-                      iconAlt="tiktok"
-                      iconSize={24}
-                      value={form.socialMedia.tiktok.url || ""}
-                      isActive={!!form.socialMedia.tiktok.isActive}
-                      onChange={(value) =>
-                        setForm((p: any) => ({
-                          ...p,
-                          socialMedia: {
-                            ...p.socialMedia,
-                            tiktok: {
-                              ...p.socialMedia.tiktok,
-                              url: value,
+                    <div>
+                      <SocialMediaSingleField
+                        label="TikTok"
+                        iconSrc="/sosmed/tiktok.svg"
+                        iconAlt="tiktok"
+                        iconSize={24}
+                        value={form.socialMedia.tiktok.url || ""}
+                        isActive={!!form.socialMedia.tiktok.isActive}
+                        onChange={(value) => {
+                          setForm((p: any) => ({
+                            ...p,
+                            socialMedia: {
+                              ...p.socialMedia,
+                              tiktok: {
+                                ...p.socialMedia.tiktok,
+                                url: value,
+                              },
                             },
-                          },
-                        }))
-                      }
-                      onToggle={(val) =>
-                        setForm((p: any) => ({
-                          ...p,
-                          socialMedia: {
-                            ...p.socialMedia,
-                            tiktok: {
-                              ...p.socialMedia.tiktok,
-                              isActive: val,
+                          }));
+                          setSocialErrors((prev) => ({
+                            ...prev,
+                            tiktok: undefined,
+                          }));
+                        }}
+                        onToggle={(val) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            socialMedia: {
+                              ...p.socialMedia,
+                              tiktok: {
+                                ...p.socialMedia.tiktok,
+                                isActive: val,
+                              },
                             },
-                          },
-                        }))
-                      }
-                    />
+                          }))
+                        }
+                      />
+                      {socialErrors.tiktok && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {socialErrors.tiktok}
+                        </p>
+                      )}
+                    </div>
 
-                    <SocialMediaSingleField
-                      label="Youtube"
-                      iconSrc="/sosmed/youtube.svg"
-                      iconAlt="youtube"
-                      value={form.socialMedia.youtube.url || ""}
-                      isActive={!!form.socialMedia.youtube.isActive}
-                      onChange={(value) =>
-                        setForm((p: any) => ({
-                          ...p,
-                          socialMedia: {
-                            ...p.socialMedia,
-                            youtube: {
-                              ...p.socialMedia.youtube,
-                              url: value,
+                    <div>
+                      <SocialMediaSingleField
+                        label="Youtube"
+                        iconSrc="/sosmed/youtube.svg"
+                        iconAlt="youtube"
+                        value={form.socialMedia.youtube.url || ""}
+                        isActive={!!form.socialMedia.youtube.isActive}
+                        onChange={(value) => {
+                          setForm((p: any) => ({
+                            ...p,
+                            socialMedia: {
+                              ...p.socialMedia,
+                              youtube: {
+                                ...p.socialMedia.youtube,
+                                url: value,
+                              },
                             },
-                          },
-                        }))
-                      }
-                      onToggle={(val) =>
-                        setForm((p: any) => ({
-                          ...p,
-                          socialMedia: {
-                            ...p.socialMedia,
-                            youtube: {
-                              ...p.socialMedia.youtube,
-                              isActive: val,
+                          }));
+                          setSocialErrors((prev) => ({
+                            ...prev,
+                            youtube: undefined,
+                          }));
+                        }}
+                        onToggle={(val) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            socialMedia: {
+                              ...p.socialMedia,
+                              youtube: {
+                                ...p.socialMedia.youtube,
+                                isActive: val,
+                              },
                             },
-                          },
-                        }))
-                      }
-                    />
+                          }))
+                        }
+                      />
+                      {socialErrors.youtube && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {socialErrors.youtube}
+                        </p>
+                      )}
+                    </div>
 
-                    <SocialMediaSingleField
-                      label="Facebook"
-                      iconSrc="/sosmed/facebook.svg"
-                      iconAlt="Facebook"
-                      value={form.socialMedia.facebook.url || ""}
-                      isActive={!!form.socialMedia.facebook.isActive}
-                      onChange={(value) =>
-                        setForm((p: any) => ({
-                          ...p,
-                          socialMedia: {
-                            ...p.socialMedia,
-                            facebook: {
-                              ...p.socialMedia.facebook,
-                              url: value,
+                    <div>
+                      <SocialMediaSingleField
+                        label="Facebook"
+                        iconSrc="/sosmed/facebook.svg"
+                        iconAlt="Facebook"
+                        value={form.socialMedia.facebook.url || ""}
+                        isActive={!!form.socialMedia.facebook.isActive}
+                        onChange={(value) => {
+                          setForm((p: any) => ({
+                            ...p,
+                            socialMedia: {
+                              ...p.socialMedia,
+                              facebook: {
+                                ...p.socialMedia.facebook,
+                                url: value,
+                              },
                             },
-                          },
-                        }))
-                      }
-                      onToggle={(val) =>
-                        setForm((p: any) => ({
-                          ...p,
-                          socialMedia: {
-                            ...p.socialMedia,
-                            facebook: {
-                              ...p.socialMedia.facebook,
-                              isActive: val,
+                          }));
+                          setSocialErrors((prev) => ({
+                            ...prev,
+                            facebook: undefined,
+                          }));
+                        }}
+                        onToggle={(val) =>
+                          setForm((p: any) => ({
+                            ...p,
+                            socialMedia: {
+                              ...p.socialMedia,
+                              facebook: {
+                                ...p.socialMedia.facebook,
+                                isActive: val,
+                              },
                             },
-                          },
-                        }))
-                      }
-                    />
+                          }))
+                        }
+                      />
+                      {socialErrors.facebook && (
+                        <p className="text-xs text-red-500 mt-1">
+                          {socialErrors.facebook}
+                        </p>
+                      )}
+                    </div>
 
                     <div className="mt-6">
                       <SocialMediaListField
@@ -1004,43 +1208,65 @@ export default function KontakMediaPage() {
                         }
                         renderInputs={(w: any, idx: number, disabled) => (
                           <div className="w-full h-fit justify-start flex flex-row items-end gap-3">
-                            <InputText
-                              placeholder="Nama admin"
-                              disabled={disabled}
-                              value={w.label || ""}
-                              onChange={(e) =>
-                                setForm((p: any) => ({
-                                  ...p,
-                                  whatsappNumbers: p.whatsappNumbers.map(
-                                    (it: any, i: number) =>
-                                      i === idx
-                                        ? { ...it, label: e.target.value }
-                                        : it,
-                                  ),
-                                }))
-                              }
-                              label={""}
-                              name={""}
-                            />
-                            <InputNumber
-                              limit={15}
-                              disabled={disabled}
-                              placeholder="Nomor Whatsapp"
-                              value={w.number || ""}
-                              onChange={(e) =>
-                                setForm((p: any) => ({
-                                  ...p,
-                                  whatsappNumbers: p.whatsappNumbers.map(
-                                    (it: any, i: number) =>
-                                      i === idx
-                                        ? { ...it, number: e.target.value }
-                                        : it,
-                                  ),
-                                }))
-                              }
-                              label={""}
-                              name={""}
-                            />
+                            <div className="w-40">
+                              <InputText
+                                placeholder="Nama admin"
+                                disabled={disabled}
+                                value={w.label || ""}
+                                onChange={(e) => {
+                                  setForm((p: any) => ({
+                                    ...p,
+                                    whatsappNumbers: p.whatsappNumbers.map(
+                                      (it: any, i: number) =>
+                                        i === idx
+                                          ? { ...it, label: e.target.value }
+                                          : it,
+                                    ),
+                                  }));
+                                  setWhatsappErrors((prev) => ({
+                                    ...prev,
+                                    [idx]: { ...prev[idx], label: undefined },
+                                  }));
+                                }}
+                                label={""}
+                                name={""}
+                              />
+                              {whatsappErrors[idx]?.label && (
+                                <p className="text-xs text-red-500 -mt-1">
+                                  {whatsappErrors[idx]?.label}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <InputNumber
+                                limit={15}
+                                disabled={disabled}
+                                placeholder="Nomor Whatsapp"
+                                value={w.number || ""}
+                                onChange={(e) => {
+                                  setForm((p: any) => ({
+                                    ...p,
+                                    whatsappNumbers: p.whatsappNumbers.map(
+                                      (it: any, i: number) =>
+                                        i === idx
+                                          ? { ...it, number: e.target.value }
+                                          : it,
+                                    ),
+                                  }));
+                                  setWhatsappErrors((prev) => ({
+                                    ...prev,
+                                    [idx]: { ...prev[idx], number: undefined },
+                                  }));
+                                }}
+                                label={""}
+                                name={""}
+                              />
+                              {whatsappErrors[idx]?.number && (
+                                <p className="text-xs text-red-500 -mt-1">
+                                  {whatsappErrors[idx]?.number}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         )}
                       />
