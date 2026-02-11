@@ -37,7 +37,7 @@ const parseJsonResponse = async (res: Response) => {
 };
 
 const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3333";
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
 
 export default function KontakMediaPage() {
   const { showAlert } = useAlert();
@@ -230,41 +230,6 @@ export default function KontakMediaPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  const resetToOriginal = () => {
-    if (!original) return;
-    setForm({
-      email: original.email || "",
-      phone: original.phone || "",
-      website: original.website || "",
-      address: original.address || "",
-      whatsappNumbers: (original.whatsappNumbers || []).map((w: any) => ({
-        ...w,
-        isActive: typeof w.isActive === "boolean" ? w.isActive : true,
-      })),
-      socialMedia: {
-        tiktok: {
-          ...(original.socialMedia?.tiktok || { url: "", isActive: false }),
-        },
-        youtube: {
-          ...(original.socialMedia?.youtube || { url: "", isActive: false }),
-        },
-        facebook: {
-          ...(original.socialMedia?.facebook || { url: "", isActive: false }),
-        },
-        instagram: Array.isArray(original.socialMedia?.instagram)
-          ? original.socialMedia.instagram.map((i: any) => ({
-              ...(i || {}),
-              isActive: typeof i.isActive === "boolean" ? i.isActive : true,
-            }))
-          : [],
-      },
-      brochureFrontUrl: original.brochureFrontUrl || null,
-      brochureBackUrl: original.brochureBackUrl || null,
-    });
-    setFrontFile(null);
-    setBackFile(null);
-  };
 
   const clearContactErrors = () => setContactErrors({});
   const clearSocialErrors = () => {
@@ -581,8 +546,16 @@ export default function KontakMediaPage() {
 
       const data = await parseJsonResponse(uploadRes);
       if (!uploadRes.ok) {
+        const backendErrors = Array.isArray(data?.errors)
+          ? data.errors
+              .map((err: { message?: string }) => err?.message)
+              .filter(Boolean)
+          : [];
+        const backendMessage = backendErrors.length
+          ? backendErrors.join("\n")
+          : data?.message;
         const rawMessage =
-          data?.error || data?.message || "Gagal mengunggah brosur";
+          backendMessage || data?.error || "Gagal mengunggah brosur";
         const safeMessage =
           typeof rawMessage === "string" && rawMessage.includes("<html")
             ? "Gagal mengunggah brosur. Coba lagi beberapa saat."
@@ -595,10 +568,15 @@ export default function KontakMediaPage() {
         brochureFrontUrl: data.brochureFrontUrl ?? p.brochureFrontUrl ?? null,
         brochureBackUrl: data.brochureBackUrl ?? p.brochureBackUrl ?? null,
       }));
+      setOriginal((o: any) => ({
+        ...o,
+        brochureFrontUrl: data.brochureFrontUrl ?? o?.brochureFrontUrl ?? null,
+        brochureBackUrl: data.brochureBackUrl ?? o?.brochureBackUrl ?? null,
+      }));
 
       // clear local files after successful upload
-      setFrontFile(null);
-      setBackFile(null);
+      if (frontFile) setFrontFile(null);
+      if (backFile) setBackFile(null);
 
       showAlert({
         title: "Berhasil",

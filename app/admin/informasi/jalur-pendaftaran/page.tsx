@@ -287,20 +287,20 @@ export default function AdminRegistrationPathPage() {
     setPhotoDrafts({});
   };
 
-  const setDraftFile = (file: File | null) => {
+  const setDraftFile = (tabId: string, file: File | null) => {
     setPhotoDrafts((prev) => {
       const next = { ...prev };
-      const existing = next[activeTab];
+      const existing = next[tabId];
       if (existing?.previewUrl) {
         URL.revokeObjectURL(existing.previewUrl);
       }
 
       if (!file) {
-        delete next[activeTab];
+        delete next[tabId];
         return next;
       }
 
-      next[activeTab] = { file, previewUrl: URL.createObjectURL(file) };
+      next[tabId] = { file, previewUrl: URL.createObjectURL(file) };
       return next;
     });
   };
@@ -343,8 +343,16 @@ export default function AdminRegistrationPathPage() {
 
       const data = await parseJsonResponse(response);
       if (!response.ok) {
+        const backendErrors = Array.isArray(data?.errors)
+          ? data.errors
+              .map((err: { message?: string }) => err?.message)
+              .filter(Boolean)
+          : [];
+        const backendMessage = backendErrors.length
+          ? backendErrors.join("\n")
+          : data?.message;
         const rawMessage =
-          data?.error || data?.message || "Terjadi kesalahan saat mengunggah";
+          backendMessage || data?.error || "Terjadi kesalahan saat mengunggah";
         const safeMessage =
           typeof rawMessage === "string" && rawMessage.includes("<html")
             ? "Gagal mengunggah foto. Coba lagi beberapa saat."
@@ -385,7 +393,7 @@ export default function AdminRegistrationPathPage() {
 
   function removeFile(e?: React.MouseEvent) {
     e?.stopPropagation();
-    setDraftFile(null);
+    setDraftFile(activeTab, null);
   }
 
   return (
@@ -457,10 +465,15 @@ export default function AdminRegistrationPathPage() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
+                      disabled={isLoadingPaths || isUploadingPhoto}
                       className={`w-full px-4 sm:px-8 py-2 text-sm rounded-full ${index === 0 ? "rounded-l-full rounded-r-none " : "rounded-l-none rounded-r-full"} font-semibold transition-all duration-300 text-sm ${
                         activeTab === tab.id
                           ? "bg-[#1B5E20] text-white shadow-lg"
                           : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      } ${
+                        isLoadingPaths || isUploadingPhoto
+                          ? "opacity-60 cursor-not-allowed"
+                          : ""
                       }`}
                     >
                       {tab.label}
@@ -470,11 +483,11 @@ export default function AdminRegistrationPathPage() {
                 <div className="w-full h-full">
                   <DragDropFile
                     className="h-full"
-                    accept="image/png,image/jpeg"
+                    accept="image/png,image/jpeg,image/jpg"
                     previewUrl={activePhotoDraft?.previewUrl ?? activePhotoUrl}
                     initialFile={activePhotoDraft?.file ?? null}
-                    onFile={(file) => setDraftFile(file)}
-                    onRemove={() => setDraftFile(null)}
+                    onFile={(file) => setDraftFile(activeTab, file)}
+                    onRemove={() => setDraftFile(activeTab, null)}
                     onValidate={(file) => {
                       if (file.size > MAX_PHOTO_BYTES) {
                         showAlert({
@@ -484,7 +497,8 @@ export default function AdminRegistrationPathPage() {
                         });
                         return `Ukuran file maksimal ${MAX_PHOTO_MB}MB`;
                       }
-                      if (!file.type.startsWith("image/")) {
+                      const allowedTypes = ["image/png", "image/jpeg"];
+                      if (!allowedTypes.includes(file.type)) {
                         showAlert({
                           title: "Format tidak didukung",
                           description:
