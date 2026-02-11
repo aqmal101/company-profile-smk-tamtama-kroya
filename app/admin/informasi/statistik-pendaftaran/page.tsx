@@ -26,7 +26,6 @@ import {
 } from "@/utils/transformRegistrationData";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { FaMagnifyingGlass } from "react-icons/fa6";
 import { LuEye, LuPen, LuTrash2 } from "react-icons/lu";
 
 export default function AdminStatisticPage() {
@@ -174,6 +173,10 @@ export default function AdminStatisticPage() {
     try {
       // short delay to show loader before navigation
       await new Promise((resolve) => setTimeout(resolve, 750));
+      sessionStorage.setItem(
+        "returnUrl",
+        window.location.pathname + window.location.search,
+      );
       router.push(`/admin/ppdb/data-calon-murid/${registrationId}/edit`);
     } finally {
       // component may unmount on navigation; this is safe
@@ -333,7 +336,6 @@ export default function AdminStatisticPage() {
 
   const handleDetailClick = async (registrationId: number) => {
     setLoadingDetail(true);
-    console.log("Fetching details for registration ID:", registrationId);
     try {
       const response = await fetch(
         `/api/dashboard/students/${registrationId}`,

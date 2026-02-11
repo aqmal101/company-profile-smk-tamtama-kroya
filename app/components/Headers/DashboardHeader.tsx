@@ -10,6 +10,7 @@ import { TextButton } from "../Buttons/TextButton";
 import { useAuth } from "../AuthGuard";
 import { ConfirmationAlert } from "@/components/Modal/ConfirmationAlert";
 import { getAcademicYear } from "@/lib/getAcademicYear";
+import UserIcon from "../Icon/UserIcon";
 
 export const NavItems = [
   { label: "DASHBOARD", href: "/dashboard" },
@@ -189,15 +190,7 @@ export const Header: React.FC = () => {
                     </p>
                   </div>
                 }
-                leftIcon={
-                  <Image
-                    src="https://github.com/shadcn.png"
-                    alt="User Avatar"
-                    width={30}
-                    height={30}
-                    className="rounded-full"
-                  />
-                }
+                leftIcon={<UserIcon />}
               >
                 <TextButton
                   hoverEffect={false}

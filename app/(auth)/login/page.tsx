@@ -131,7 +131,6 @@ export default function LoginPage() {
     return (
       <div className="fixed inset-0 bg-white w-screen px-6 flex flex-col items-center justify-center min-h-100">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-gray-600 mt-4">Memeriksa sesi...</p>
       </div>
     );
   }

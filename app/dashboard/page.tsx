@@ -24,6 +24,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/id";
 import SelectInput from "@/components/InputForm/SelectInput";
 import { Student } from "@/components/Dashboard";
+import Search from "@/components/Filter/Search";
 
 export function GreetingCard() {
   const { user } = useAuth();
@@ -427,29 +428,15 @@ export function StudentDataTable() {
                 className="w-48"
               />
             </div>
-            <div className="relative w-full sm:w-100">
-              <div className="absolute inset-y-0 left-0 pl-3 pb-2 flex items-center pointer-events-none">
-                <FaMagnifyingGlass className="text-lg text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Cari Nama / nomor pendaftaran / atau asal sekolah..."
-                value={searchTerm}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="block max-sm:placeholder:text-xs w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              />
-            </div>
+            <Search
+              className="w-full sm:w-100"
+              searchTerm={searchTerm}
+              handleSearchChange={setSearchTerm}
+            />
           </div>
         </div>
       </div>
 
-      {/* {error ? (
-        <div className="p-6">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-            <p className="text-red-600">{error}</p>
-          </div>
-        </div>
-      ) : ( */}
       <ReusableTable
         columns={columns}
         dataSource={students}

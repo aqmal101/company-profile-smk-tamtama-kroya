@@ -11,6 +11,7 @@ import { useAuth } from "@/components/AuthGuard";
 import { ConfirmationAlert } from "@/components/Modal/ConfirmationAlert";
 import { FiColumns, FiSidebar } from "react-icons/fi";
 import { getAcademicYear } from "@/lib/getAcademicYear";
+import UserIcon from "@/components/Icon/UserIcon";
 
 interface AdminHeaderProps {
   collapsed: boolean;
@@ -99,11 +100,7 @@ export default function AdminHeader({
                   </p>
                 </div>
               }
-              leftIcon={
-                <div className="w-10 h-10 bg-gray-300 rounded-full flex justify-center items-center">
-                  <LuUser className="text-2xl" />
-                </div>
-              }
+              leftIcon={<UserIcon />}
               width="max-w-fit"
               color="bg-white"
               textColor="text-gray-900"

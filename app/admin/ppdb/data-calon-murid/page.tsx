@@ -135,6 +135,10 @@ export default function AdminProspectiveStudentPage() {
     try {
       // short delay to show loader before navigation
       await new Promise((resolve) => setTimeout(resolve, 750));
+      sessionStorage.setItem(
+        "returnUrl",
+        window.location.pathname + window.location.search,
+      );
       router.push(`/admin/ppdb/data-calon-murid/${registrationId}/edit`);
     } finally {
       // component may unmount on navigation; this is safe

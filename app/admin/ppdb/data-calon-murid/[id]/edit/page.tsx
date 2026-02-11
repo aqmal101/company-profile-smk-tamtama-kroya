@@ -40,6 +40,15 @@ export default function EditDataCalonMuridPage() {
   const [saving, setSaving] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
+  const getReturnUrl = () =>
+    sessionStorage.getItem("returnUrl") || "/admin/ppdb/data-calon-murid";
+
+  const handleReturn = () => {
+    const returnUrl = getReturnUrl();
+    sessionStorage.removeItem("returnUrl");
+    router.replace(returnUrl);
+  };
+
   useEffect(() => {
     setActiveTab(tabsData[0]);
     setIsHydrated(true);
@@ -204,7 +213,7 @@ export default function EditDataCalonMuridPage() {
           description: "Data berhasil diperbarui",
           variant: "success",
         });
-        router.push("/admin/informasi/statistik-pendaftaran");
+        handleReturn();
       } else {
         const errorData = await response.json();
         showAlert({
@@ -238,13 +247,14 @@ export default function EditDataCalonMuridPage() {
       case "Biodata Siswa":
         return (
           <BiodataSiswa
-            onPrev={() => router.back()}
+            onPrev={handleReturn}
             onNext={handleNextBiodataSiswa}
             onCancel={() => {}}
             initialData={registrationData.biodataSiswa}
             onValidationError={handleValidationError}
             skipNikCheck={true}
             nikReadOnly={true}
+            isTeacherMode={true}
           />
         );
       case "Biodata Orang Tua":
@@ -255,6 +265,7 @@ export default function EditDataCalonMuridPage() {
             onCancel={() => {}}
             initialData={registrationData.biodataOrangTua}
             onValidationError={handleValidationError}
+            isTeacherMode={true}
           />
         );
       case "Biodata Wali":
@@ -265,6 +276,7 @@ export default function EditDataCalonMuridPage() {
             onCancel={() => {}}
             initialData={registrationData.biodataWali}
             onValidationError={handleValidationError}
+            isTeacherMode={true}
           />
         );
       case "Pilih Jurusan":
@@ -275,6 +287,7 @@ export default function EditDataCalonMuridPage() {
             onCancel={() => {}}
             initialData={registrationData.pilihJurusan}
             onValidationError={handleValidationError}
+            isTeacherMode={true}
           />
         );
       case "Simpan":
@@ -309,7 +322,7 @@ export default function EditDataCalonMuridPage() {
     return (
       <div className="w-full h-[calc(100vh-4px)] bg-gray-100 p-4">
         <div className="h-full flex items-center justify-center">
-          <div>Loading...</div>
+          <div>Memuat...</div>
         </div>
       </div>
     );
