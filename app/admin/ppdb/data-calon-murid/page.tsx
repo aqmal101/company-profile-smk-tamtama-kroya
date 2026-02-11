@@ -238,6 +238,22 @@ export default function AdminProspectiveStudentPage() {
   useEffect(() => {
     let cancelled = false;
 
+    const loadCachedOptions = () => {
+      if (cancelled) return;
+      try {
+        const cachedBatches = localStorage.getItem("filterOptions.batches");
+        const cachedYears = localStorage.getItem("filterOptions.years");
+        const cachedReg = localStorage.getItem("filterOptions.regTypes");
+        const cachedMajors = localStorage.getItem("filterOptions.majors");
+        if (cachedMajors) setMajors(JSON.parse(cachedMajors));
+        if (cachedBatches) setBatches(JSON.parse(cachedBatches));
+        if (cachedYears) setYearsOptions(JSON.parse(cachedYears));
+        if (cachedReg) setRegistrationTypeOptions(JSON.parse(cachedReg));
+      } catch (e) {
+        console.error("Failed to load cached filter options", e);
+      }
+    };
+
     const loadOptions = async () => {
       try {
         const res = await fetch(`/api/filters/options`, {
@@ -247,7 +263,11 @@ export default function AdminProspectiveStudentPage() {
           },
         });
 
-        if (!res.ok) throw new Error("Failed to fetch options");
+        if (!res.ok) {
+          console.error("Failed to fetch options", res.status);
+          loadCachedOptions();
+          return;
+        }
 
         const data = await res.json();
 
@@ -281,6 +301,10 @@ export default function AdminProspectiveStudentPage() {
         // Cache to localStorage as fallback when network fails
         try {
           localStorage.setItem(
+            "filterOptions.majors",
+            JSON.stringify(majorOpts),
+          );
+          localStorage.setItem(
             "filterOptions.batches",
             JSON.stringify(batchOpts),
           );
@@ -300,17 +324,7 @@ export default function AdminProspectiveStudentPage() {
           "Failed to load filter options, falling back to cache",
           err,
         );
-        // fallback to cached options
-        try {
-          const cachedBatches = localStorage.getItem("filterOptions.batches");
-          const cachedYears = localStorage.getItem("filterOptions.years");
-          const cachedReg = localStorage.getItem("filterOptions.regTypes");
-          if (cachedBatches) setBatches(JSON.parse(cachedBatches));
-          if (cachedYears) setYearsOptions(JSON.parse(cachedYears));
-          if (cachedReg) setRegistrationTypeOptions(JSON.parse(cachedReg));
-        } catch (e) {
-          console.error("Failed to load cached filter options", e);
-        }
+        loadCachedOptions();
       }
     };
 
@@ -488,13 +502,13 @@ export default function AdminProspectiveStudentPage() {
         />
         <div className="w-full h-fit bg-white rounded-md drop-shadow-sm">
           <div className="p-6 max-sm:p-2 border-b border-gray-200">
-            <div className="flex flex-col items-stretch lg:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex w-auto flex-wrap flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-3">
               <Search
-                className="max-w-md w-md mb-2"
+                className="w-full mb-2 lg:max-w-sm lg:w-full"
                 searchTerm={searchTerm}
                 handleSearchChange={handleSearchChange}
               />
-              <div className="flex flex-col sm:flex-row gap-3 sm:items-center w-full sm:w-auto">
+              <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:w-auto lg:items-center">
                 <SelectInput
                   value={selectedYearId}
                   onChange={(e) => {
@@ -507,10 +521,10 @@ export default function AdminProspectiveStudentPage() {
                   ]}
                   placeholder={"Pilih Tahun Ajaran "}
                   isMandatory
-                  className="w-full sm:w-48"
+                  className="w-full lg:w-48"
                 />
                 <SelectInput
-                  className="w-full sm:w-56"
+                  className="w-full lg:w-56"
                   value={selectAuthored}
                   onChange={(e) => {
                     setSelectedAuthor(e.target.value as "" | "true" | "false");
@@ -539,7 +553,7 @@ export default function AdminProspectiveStudentPage() {
                     ...batches,
                   ]}
                   placeholder="Pilih Gelombang"
-                  className="w-full sm:w-48"
+                  className="w-full lg:w-44"
                 />
                 <SelectInput
                   value={selectedMajor}
@@ -549,15 +563,15 @@ export default function AdminProspectiveStudentPage() {
                   }}
                   options={[{ value: "", label: "Semua Jurusan" }, ...majors]}
                   placeholder="Pilih Jurusan"
-                  className="w-full sm:w-48"
+                  className="w-full lg:w-38"
                 />
                 <TextButton
                   variant="outline"
                   text="Reset Filter"
                   disabled={loadingStates}
+                  className="w-full font-normal px-2! sm:col-span-2 lg:w-auto mb-2 shrink-0"
                   isLoading={loadingStates}
-                  icon={<IoMdRefresh className="text-lg" />}
-                  className="mb-2 font-normal"
+                  icon={<IoMdRefresh className="text-lg shrink-0" />}
                   onClick={handleResetFilters}
                 />
               </div>

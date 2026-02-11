@@ -34,15 +34,30 @@ export async function GET(req: Request) {
       },
     });
 
-    let majors = [];
+    const mockMajors = [
+      { name: 'Desain Komunikasi Visual', abbreviation: 'DKV' },
+      { name: 'Teknik Permesinan', abbreviation: 'TP' },
+      { name: 'Teknik Instalasi Tenaga Listrik', abbreviation: 'TITL' },
+      { name: 'Teknik Kendaraan Ringan', abbreviation: 'TKR' },      
+    ];
+
+    let majors = mockMajors;
     let batches = [];
     let academicYears = [];
 
-    if (batchesRes.ok || majorsRes.ok || academicYearsRes.ok) {
+    if (batchesRes.ok) {
       batches = await batchesRes.json();
+    }
+
+    if (majorsRes.ok) {
       majors = await majorsRes.json();
+    }
+
+    if (academicYearsRes.ok) {
       academicYears = await academicYearsRes.json();
-    } else {
+    }
+
+    if (!batchesRes.ok) {
       // fallback to calling the raw batches endpoint
       const fallback = await fetch(`${origin}/api/registrations/batches`, {
         cache: 'force-cache',
