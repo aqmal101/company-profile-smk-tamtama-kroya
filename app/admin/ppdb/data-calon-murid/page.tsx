@@ -503,11 +503,6 @@ export default function AdminProspectiveStudentPage() {
         <div className="w-full h-fit bg-white rounded-md drop-shadow-sm">
           <div className="p-6 max-sm:p-2 border-b border-gray-200">
             <div className="flex w-auto flex-wrap flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-3">
-              <Search
-                className="w-full mb-2 lg:max-w-sm lg:w-full"
-                searchTerm={searchTerm}
-                handleSearchChange={handleSearchChange}
-              />
               <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:w-auto lg:items-center">
                 <SelectInput
                   value={selectedYearId}
@@ -565,16 +560,21 @@ export default function AdminProspectiveStudentPage() {
                   placeholder="Pilih Jurusan"
                   className="w-full lg:w-38"
                 />
-                <TextButton
-                  variant="outline"
-                  text="Reset Filter"
-                  disabled={loadingStates}
-                  className="w-full font-normal px-2! sm:col-span-2 lg:w-auto mb-2 shrink-0"
-                  isLoading={loadingStates}
-                  icon={<IoMdRefresh className="text-lg shrink-0" />}
-                  onClick={handleResetFilters}
-                />
               </div>
+              <TextButton
+                variant="outline"
+                text="Reset Filter"
+                disabled={loadingStates}
+                className="w-full font-normal px-2! sm:col-span-2 lg:w-auto mb-2 shrink-0"
+                isLoading={loadingStates}
+                icon={<IoMdRefresh className="text-lg shrink-0" />}
+                onClick={handleResetFilters}
+              />
+              <Search
+                className="w-full mb-2 lg:max-w-sm lg:w-full"
+                searchTerm={searchTerm}
+                handleSearchChange={handleSearchChange}
+              />
             </div>
             <ReusableTable
               columns={columns}
