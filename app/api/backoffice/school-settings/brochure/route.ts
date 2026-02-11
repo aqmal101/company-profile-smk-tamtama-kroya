@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3333";
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+const MAX_FILE_LABEL = "10MB";
 
 async function parseResponseBody(response: Response) {
   const text = await response.text();
@@ -11,6 +13,13 @@ async function parseResponseBody(response: Response) {
   } catch {
     return { message: text };
   }
+}
+
+function getOversizeError(file: unknown) {
+  if (file instanceof File && file.size > MAX_FILE_BYTES) {
+    return `Ukuran file maksimal ${MAX_FILE_LABEL}`;
+  }
+  return null;
 }
 
 // Note: For real backend we expect an endpoint for uploading brochure files.
@@ -23,6 +32,13 @@ export async function POST(request: NextRequest) {
     // If proxying to real backend
     if (process.env.BACKEND_URL && authHeader) {
       const formData = await request.formData();
+      const frontFile = formData.get("brochureFront");
+      const backFile = formData.get("brochureBack");
+      const oversizeError =
+        getOversizeError(frontFile) || getOversizeError(backFile);
+      if (oversizeError) {
+        return NextResponse.json({ error: oversizeError }, { status: 413 });
+      }
       const backendResponse = await fetch(
         `${API_BASE_URL}/backoffice/school-settings/brochure`,
         {
@@ -48,6 +64,11 @@ export async function POST(request: NextRequest) {
     const form = await request.formData();
     const front = form.get("brochureFront");
     const back = form.get("brochureBack");
+
+    const oversizeError = getOversizeError(front) || getOversizeError(back);
+    if (oversizeError) {
+      return NextResponse.json({ error: oversizeError }, { status: 413 });
+    }
 
     const result: any = {};
 

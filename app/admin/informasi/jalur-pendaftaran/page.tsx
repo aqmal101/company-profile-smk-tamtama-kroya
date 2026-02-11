@@ -43,6 +43,8 @@ interface ApiRegistrationPath {
 }
 
 export default function AdminRegistrationPathPage() {
+  const MAX_PHOTO_MB = 10;
+  const MAX_PHOTO_BYTES = MAX_PHOTO_MB * 1024 * 1024;
   const [activeTab, setActiveTab] = useState(tabs[0]?.id || "");
   const [isLoadingPaths, setIsLoadingPaths] = useState(true);
   const [isSavingPaths, setIsSavingPaths] = useState(false);
@@ -455,6 +457,14 @@ export default function AdminRegistrationPathPage() {
                     onFile={(file) => setDraftFile(file)}
                     onRemove={() => setDraftFile(null)}
                     onValidate={(file) => {
+                      if (file.size > MAX_PHOTO_BYTES) {
+                        showAlert({
+                          title: "Ukuran terlalu besar",
+                          description: `Ukuran file maksimal ${MAX_PHOTO_MB}MB`,
+                          variant: "warning",
+                        });
+                        return `Ukuran file maksimal ${MAX_PHOTO_MB}MB`;
+                      }
                       if (!file.type.startsWith("image/")) {
                         showAlert({
                           title: "Format tidak didukung",
@@ -471,6 +481,9 @@ export default function AdminRegistrationPathPage() {
                 <div className="text-xs text-gray-600 h-fit ">
                   <span className="text-red-500">*</span> Foto akan langsung
                   digunakan di halaman Landing Page
+                </div>
+                <div className="text-xs text-gray-600 h-fit">
+                  Maksimum {MAX_PHOTO_MB}MB per file.
                 </div>
               </div>
               <div className="w-full h-full flex flex-col items-center justify-center">

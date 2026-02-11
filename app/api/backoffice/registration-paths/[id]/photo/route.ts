@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3000";
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+const MAX_FILE_LABEL = "10MB";
 
 export async function POST(
   request: NextRequest,
@@ -33,6 +35,13 @@ export async function POST(
       return NextResponse.json(
         { error: "File foto tidak ditemukan" },
         { status: 400 }
+      );
+    }
+
+    if (photoFile.size > MAX_FILE_BYTES) {
+      return NextResponse.json(
+        { error: `Ukuran file maksimal ${MAX_FILE_LABEL}` },
+        { status: 413 }
       );
     }
 

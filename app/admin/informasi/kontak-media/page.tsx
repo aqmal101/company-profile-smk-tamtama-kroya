@@ -69,6 +69,8 @@ export default function KontakMediaPage() {
 
   const MAX_WHATSAPP = 5;
   const MAX_INSTAGRAM = 5;
+  const MAX_BROCHURE_MB = 10;
+  const MAX_BROCHURE_BYTES = MAX_BROCHURE_MB * 1024 * 1024;
 
   const contactSchema = useMemo(
     () =>
@@ -373,6 +375,31 @@ export default function KontakMediaPage() {
     }));
   };
 
+  const validateBrochureFile = useCallback(
+    (file: File) => {
+      if (file.size > MAX_BROCHURE_BYTES) {
+        showAlert({
+          title: "Ukuran terlalu besar",
+          description: `Ukuran file maksimal ${MAX_BROCHURE_MB}MB`,
+          variant: "warning",
+        });
+        return `Ukuran file maksimal ${MAX_BROCHURE_MB}MB`;
+      }
+
+      if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
+        showAlert({
+          title: "Format tidak didukung",
+          description: "Hanya file PDF atau gambar (PNG/JPG) yang diterima",
+          variant: "warning",
+        });
+        return "Format tidak didukung";
+      }
+
+      return null;
+    },
+    [MAX_BROCHURE_BYTES, MAX_BROCHURE_MB, showAlert],
+  );
+
   const handleSaveSocial = async () => {
     if (!form) return;
 
@@ -551,7 +578,13 @@ export default function KontakMediaPage() {
 
       const data = await parseJsonResponse(uploadRes);
       if (!uploadRes.ok) {
-        throw new Error(data?.message || "Gagal mengunggah brosur");
+        const rawMessage =
+          data?.error || data?.message || "Gagal mengunggah brosur";
+        const safeMessage =
+          typeof rawMessage === "string" && rawMessage.includes("<html")
+            ? "Gagal mengunggah brosur. Coba lagi beberapa saat."
+            : rawMessage;
+        throw new Error(safeMessage);
       }
 
       setForm((p: any) => ({
@@ -853,32 +886,20 @@ export default function KontakMediaPage() {
                   <label className="font-medium">Brosur Depan</label>
                   <div className="border rounded p-4 mt-2">
                     <DragDropFile
-                      accept="application/pdf,image/*"
+                      accept="image/png,image/jpeg"
                       previewUrl={form.brochureFrontUrl}
                       initialFile={frontFile}
                       onFile={(file) => setFrontFile(file)}
-                      onValidate={(file) => {
-                        if (
-                          !file.type.startsWith("image/") &&
-                          file.type !== "application/pdf"
-                        ) {
-                          showAlert({
-                            title: "Format tidak didukung",
-                            description:
-                              "Hanya file PDF atau gambar (PNG/JPG) yang diterima",
-                            variant: "warning",
-                          });
-                          return "Format tidak didukung";
-                        }
-
-                        return null;
-                      }}
+                      onValidate={validateBrochureFile}
                       onRemove={async () => {
                         await handleDeleteBrochure("front");
                       }}
                       label="Brosur Depan"
                       description="PDF / Image"
                     />
+                    <p className="text-xs text-gray-600 mt-2">
+                      Maksimum 10MB per file.
+                    </p>
                     <div className="mt-3 flex justify-end">
                       <TextButton
                         isLoading={deletingBrochure}
@@ -895,32 +916,20 @@ export default function KontakMediaPage() {
                   <label className="font-medium">Brosur Belakang</label>
                   <div className="border rounded p-4 mt-2">
                     <DragDropFile
-                      accept="application/pdf,image/*"
+                      accept="image/png,image/jpeg"
                       previewUrl={form.brochureBackUrl}
                       initialFile={backFile}
                       onFile={(file) => setBackFile(file)}
-                      onValidate={(file) => {
-                        if (
-                          !file.type.startsWith("image/") &&
-                          file.type !== "application/pdf"
-                        ) {
-                          showAlert({
-                            title: "Format tidak didukung",
-                            description:
-                              "Hanya file PDF atau gambar (PNG/JPG) yang diterima",
-                            variant: "warning",
-                          });
-                          return "Format tidak didukung";
-                        }
-
-                        return null;
-                      }}
+                      onValidate={validateBrochureFile}
                       onRemove={async () => {
                         await handleDeleteBrochure("back");
                       }}
                       label="Brosur Belakang"
                       description="PDF / Image"
                     />
+                    <p className="text-xs text-gray-600 mt-2">
+                      Maksimum 10MB per file.
+                    </p>
                     <div className="mt-3 flex justify-end">
                       <TextButton
                         variant="outline-danger"
