@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { LuLogOut, LuUser } from "react-icons/lu";
+import { LuLogOut } from "react-icons/lu";
 import Dropdown from "@/components/Dropdown";
 import { useAlert } from "@/components/ui/alert";
 import { TextButton } from "@/components/Buttons/TextButton";
@@ -11,7 +11,7 @@ import { useAuth } from "@/components/AuthGuard";
 import { ConfirmationAlert } from "@/components/Modal/ConfirmationAlert";
 import { FiColumns, FiSidebar } from "react-icons/fi";
 import { getAcademicYear } from "@/lib/getAcademicYear";
-import UserIcon from "@/components/Icon/UserIcon";
+import { UserIcon } from "@/components/Icon/UserIcon";
 
 interface AdminHeaderProps {
   collapsed: boolean;

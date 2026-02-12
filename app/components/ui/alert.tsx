@@ -109,12 +109,35 @@ const fieldTranslations: Record<string, string> = {
   "studentDetail.phoneNumber": "Nomor Telepon",
   "studentDetail.email": "Email",
   majorChoiceCode: "Kode Jurusan",
+  // Teacher account fields
+  fullName: "Nama Lengkap",
+  username: "Username",
+  password: "Password",
+  schoolLessonIds: "Mata Pelajaran",
+  photoUrl: "Foto Profil",
 };
 
 // Translation for common validation messages
-const translateErrorMessage = (message: string, field: string): string => {
+const translateErrorMessage = (message: string): string => {
   const translations: Record<string, string> = {
-    // Specific field validations
+    // AdonisJS Unique validation (database.unique rule)
+    "has already been taken": "sudah terdaftar atau digunakan sebelumnya",
+    E_UNIQUE_VIOLATION: "sudah terdaftar atau digunakan sebelumnya",
+
+    // AdonisJS Required validation
+    "field is required": "wajib diisi",
+    "is required": "wajib diisi",
+
+    // AdonisJS Email validation
+    "must be a valid email": "harus berupa email yang valid",
+    "field must be a valid email": "harus berupa email yang valid",
+
+    // AdonisJS MinLength/MaxLength
+    "must be at least": "minimal harus",
+    "minimum length is": "panjang minimal adalah",
+    "must not be more than": "tidak boleh lebih dari",
+
+    // Student specific validations (legacy)
     "The nisn field must be 10 characters long":
       "NISN harus terdiri dari 10 karakter",
     "the nik has already been taken": "NIK sudah terdaftar",
@@ -140,8 +163,6 @@ const translateErrorMessage = (message: string, field: string): string => {
     "must be a datetime value": "harus berupa tanggal yang valid",
     "must be a valid email address": "harus berupa alamat email yang valid",
     "is invalid": "tidak valid",
-    "is required": "wajib diisi",
-    "must be a valid email": "harus berupa email yang valid",
     "must be a valid phone number": "harus berupa nomor telepon yang valid",
     "The selected": "Yang dipilih",
   };
@@ -215,7 +236,7 @@ export const Alert: React.FC<AlertProps> = ({
                   {fieldTranslations[error.field] || error.field}:
                 </span>
                 <span className="text-sm pl-2">
-                  {translateErrorMessage(error.message, error.field)}
+                  {translateErrorMessage(error.message)}
                 </span>
               </div>
             ))}

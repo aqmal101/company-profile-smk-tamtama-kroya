@@ -316,7 +316,7 @@ export default function AdminProspectiveStudentPage() {
             "filterOptions.regTypes",
             JSON.stringify(data.registrationTypes || []),
           );
-        } catch (e) {
+        } catch {
           /* ignore localStorage errors */
         }
       } catch (err) {

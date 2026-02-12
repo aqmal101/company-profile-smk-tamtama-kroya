@@ -1,9 +1,11 @@
+"use client";
+
 import { TextButton } from "@/components/Buttons/TextButton";
 import { useRef, useEffect, useState } from "react";
 
 interface SectionCardProps {
   title?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   leftButton?: React.ReactNode;
   saveButtonText?: string;
   saveButtonIcon?: React.ReactNode;

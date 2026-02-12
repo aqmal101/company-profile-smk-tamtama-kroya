@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
-import { LuInbox } from "react-icons/lu";
+import { LuInbox, LuRefreshCcw } from "react-icons/lu";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
+import { TextButton } from "../Buttons/TextButton";
 
 export interface Column<T = unknown> {
   title: string;
@@ -74,7 +75,6 @@ export default function ReusableTable<T extends object = any>({
     if (typeof rowKey === "function") {
       return rowKey(record, index);
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const val = (record as any)[rowKey];
     return val !== undefined && val !== null ? String(val) : index.toString();
   };
@@ -146,8 +146,14 @@ export default function ReusableTable<T extends object = any>({
 
     return (
       <div className="py-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+        <div className="bg-red-50 w-full flex flex-row justify-center items-center gap-4 border border-red-200 rounded-lg p-4 text-center">
           <p className="text-red-600">{error}</p>
+          <TextButton
+            variant="outline"
+            text="Muat Ulang"
+            icon={<LuRefreshCcw />}
+            onClick={() => window.location.reload()}
+          />
         </div>
       </div>
     );

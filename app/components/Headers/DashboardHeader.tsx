@@ -10,7 +10,7 @@ import { TextButton } from "../Buttons/TextButton";
 import { useAuth } from "../AuthGuard";
 import { ConfirmationAlert } from "@/components/Modal/ConfirmationAlert";
 import { getAcademicYear } from "@/lib/getAcademicYear";
-import UserIcon from "../Icon/UserIcon";
+import { UserIcon } from "../Icon/UserIcon";
 
 export const NavItems = [
   { label: "DASHBOARD", href: "/dashboard" },

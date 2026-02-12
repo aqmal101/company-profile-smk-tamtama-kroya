@@ -93,7 +93,7 @@ export async function GET(req: Request) {
         },
       },
     );
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'failed_to_fetch' }, { status: 500 });
   }
 }
