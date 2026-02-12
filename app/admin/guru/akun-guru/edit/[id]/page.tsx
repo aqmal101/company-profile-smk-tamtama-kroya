@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { TextButton } from "@/components/Buttons/TextButton";
 import { TitleSection } from "@/components/TitleSection";
@@ -28,9 +28,31 @@ interface SchoolLesson {
   abbreviation: string;
 }
 
-export default function AdminAddTeacherAccountPage() {
+interface TeacherData {
+  id: number;
+  fullName: string;
+  username: string;
+  photoUrl: string | null;
+  schoolLessons: Array<{
+    id: number;
+    name: string;
+    abbreviation: string;
+  }>;
+}
+
+interface TeacherUpdatePayload {
+  fullName: string;
+  username: string;
+  schoolLessonIds: number[];
+  password?: string;
+  photoUrl?: string;
+}
+
+export default function AdminEditTeacherAccountPage() {
   const router = useRouter();
+  const params = useParams();
   const { showAlert } = useAlert();
+  const teacherId = params.id as string;
 
   const [schoolLessons, setSchoolLessons] = useState<SchoolLesson[]>([]);
   const [selectedLessons, setSelectedLessons] = useState<number[]>([]);
@@ -38,11 +60,12 @@ export default function AdminAddTeacherAccountPage() {
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingLessons, setIsLoadingLessons] = useState(true);
+  const [isLoadingTeacher, setIsLoadingTeacher] = useState(true);
 
   const TeacherSchema = z.object({
     fullName: z.string().min(1, "Nama Lengkap harus diisi"),
     username: z.string().min(1, "Username harus diisi"),
-    password: z.string().min(6, "Password minimal 6 karakter"),
+    password: z.string().optional(),
   });
 
   const form = useForm<z.infer<typeof TeacherSchema>>({
@@ -53,6 +76,48 @@ export default function AdminAddTeacherAccountPage() {
       password: "",
     },
   });
+
+  // Fetch teacher data
+  const fetchTeacherData = useCallback(async () => {
+    setIsLoadingTeacher(true);
+    try {
+      const response = await fetch(`/api/backoffice/teachers/${teacherId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch teacher data");
+
+      const data: TeacherData = await response.json();
+
+      // Set form values
+      form.reset({
+        fullName: data.fullName,
+        username: data.username,
+        password: "",
+      });
+
+      // Set selected lessons
+      const lessonIds = data.schoolLessons.map((lesson) => lesson.id);
+      setSelectedLessons(lessonIds);
+
+      // Set photo preview if exists
+      if (data.photoUrl) {
+        setPhotoPreview(data.photoUrl);
+      }
+    } catch (error) {
+      console.error("Error fetching teacher data:", error);
+      showAlert({
+        title: "Gagal",
+        description: "Gagal memuat data guru",
+        variant: "error",
+      });
+    } finally {
+      setIsLoadingTeacher(false);
+    }
+  }, [teacherId, form, showAlert]);
 
   // Fetch school lessons
   const fetchSchoolLessons = useCallback(async () => {
@@ -83,7 +148,8 @@ export default function AdminAddTeacherAccountPage() {
 
   useEffect(() => {
     fetchSchoolLessons();
-  }, [fetchSchoolLessons]);
+    fetchTeacherData();
+  }, [fetchSchoolLessons, fetchTeacherData]);
 
   const handlePhotoChange = (file: File | null) => {
     if (!file) {
@@ -142,21 +208,12 @@ export default function AdminAddTeacherAccountPage() {
       return;
     }
 
-    if (!photoFile) {
-      showAlert({
-        title: "Validasi",
-        description: "Foto profil harus diunggah",
-        variant: "error",
-      });
-      return;
-    }
-
     setIsLoading(true);
 
     try {
       let photoUrl: string | null = null;
 
-      // Upload photo
+      // Upload photo if new photo is selected
       if (photoFile) {
         photoUrl = await uploadPhoto(photoFile);
         if (!photoUrl) {
@@ -165,20 +222,31 @@ export default function AdminAddTeacherAccountPage() {
         }
       }
 
-      // Create teacher account
-      const response = await fetch("/api/backoffice/teachers", {
-        method: "POST",
+      // Prepare update payload
+      const updatePayload: TeacherUpdatePayload = {
+        fullName: values.fullName,
+        username: values.username,
+        schoolLessonIds: selectedLessons,
+      };
+
+      // Only include password if provided
+      if (values.password && values.password.length > 0) {
+        updatePayload.password = values.password;
+      }
+
+      // Only include photoUrl if new photo was uploaded
+      if (photoUrl) {
+        updatePayload.photoUrl = photoUrl;
+      }
+
+      // Update teacher account
+      const response = await fetch(`/api/backoffice/teachers/${teacherId}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           ...getAuthHeader(),
         },
-        body: JSON.stringify({
-          fullName: values.fullName,
-          username: values.username,
-          password: values.password,
-          schoolLessonIds: selectedLessons,
-          photoUrl: photoUrl,
-        }),
+        body: JSON.stringify(updatePayload),
       });
 
       if (!response.ok) {
@@ -199,27 +267,27 @@ export default function AdminAddTeacherAccountPage() {
               errorData.message || "Periksa kembali data yang dimasukkan",
             variant: "error",
             errors: translatedErrors,
-            autoDismissMs: undefined, // Don't auto-dismiss for validation errors
+            autoDismissMs: undefined,
           });
           setIsLoading(false);
           return;
         }
 
-        throw new Error(errorData.message || "Gagal membuat akun guru");
+        throw new Error(errorData.message || "Gagal mengupdate akun guru");
       }
 
       showAlert({
         title: "Berhasil",
-        description: "Akun guru berhasil dibuat",
+        description: "Akun guru berhasil diupdate",
         variant: "success",
       });
       router.push("/admin/guru/akun-guru");
     } catch (error) {
-      console.error("Error creating teacher:", error);
+      console.error("Error updating teacher:", error);
       showAlert({
         title: "Gagal",
         description:
-          error instanceof Error ? error.message : "Gagal membuat akun guru",
+          error instanceof Error ? error.message : "Gagal mengupdate akun guru",
         variant: "error",
       });
     } finally {
@@ -227,12 +295,24 @@ export default function AdminAddTeacherAccountPage() {
     }
   };
 
+  if (isLoadingTeacher) {
+    return (
+      <div className="w-full min-h-[calc(100vh-4px)] bg-gray-100 p-4">
+        <div className="h-full">
+          <div className="flex justify-center items-center h-64">
+            <p className="text-gray-500">Memuat data guru...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full min-h-[calc(100vh-4px)] bg-gray-100 p-4">
       <div className="h-full">
         <TitleSection
-          title="Tambah Akun Guru"
-          subtitle="Buat akun baru untuk guru agar dapat mengakses sistem sesuai mata pelajaran yang diampu."
+          title="Edit Akun Guru"
+          subtitle="Perbarui informasi akun guru. Kosongkan password jika tidak ingin mengubahnya."
         />
         <div className="w-full bg-white">
           <Form {...form}>
@@ -269,8 +349,8 @@ export default function AdminAddTeacherAccountPage() {
                           {...field}
                           label="Password"
                           type="password"
-                          placeholder="Masukkan Password"
-                          isMandatory
+                          placeholder="Kosongkan jika tidak ingin mengubah"
+                          isMandatory={false}
                           error={form.formState.errors.password?.message}
                         />
                       </FormControl>
@@ -324,7 +404,7 @@ export default function AdminAddTeacherAccountPage() {
                   onFileRemove={handlePhotoRemove}
                   disabled={isLoading}
                   label="Foto Profil"
-                  isMandatory={true}
+                  isMandatory={false}
                 />
               </div>
 
@@ -340,7 +420,7 @@ export default function AdminAddTeacherAccountPage() {
                 </Link>
                 <TextButton
                   variant="primary"
-                  text="Buat Akun"
+                  text="Simpan Perubahan"
                   className="px-8 py-2 w-fit"
                   isSubmit
                   isLoading={isLoading}

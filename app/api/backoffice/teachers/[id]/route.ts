@@ -1,41 +1,8 @@
-import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
-interface StudentDetail {
-  nisn: string;
-  nik: string;
-  fullName: string;
-  placeOfBirth: string;
-  dateOfBirth: string;
-  gender: number;
-  religion: string;
-  schoolOriginNpsn: string;
-  address: string;
-  phoneNumber: string;
-  email: string;
-  isKipRecipient: boolean;
-  kipNumber?: string;
-}
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-interface ParentDetail {
-  fatherName: string;
-  fatherLivingStatus: string;
-  motherName: string;
-  motherLivingStatus: string;
-  parentAddress: string;
-  guardianName: string;
-  guardianPhoneNumber: string;
-  guardianAddress: string;
-}
-
-interface RegistrationPayload {
-  studentDetail: StudentDetail;
-  parentDetail: ParentDetail;
-  majorChoiceCode: string;
-}
-
-const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3333";
-
+// GET /api/backoffice/teachers/[id] - Get single teacher
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -44,41 +11,47 @@ export async function GET(
     const authHeader = request.headers.get("Authorization");
     const { id } = await params;
 
+    if (!authHeader) {
+      return NextResponse.json(
+        { message: "Authorization header is required" },
+        { status: 401 }
+      );
+    }
+
     if (!id || isNaN(Number(id))) {
       return NextResponse.json(
-        { error: "Invalid registration ID" },
+        { message: "Invalid teacher ID" },
         { status: 400 }
       );
     }
 
-    const response = await fetch(`${API_BASE_URL}/backoffice/registrations/${id}`, {
+    const url = `${BACKEND_URL}/backoffice/teachers/${id}`;
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: authHeader || "",
+        Authorization: authHeader,
       },
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      const errorData = await response.json();
-      return NextResponse.json(
-        { error: errorData.message || "Failed to fetch registration details" },
-        { status: response.status }
-      );
+      return NextResponse.json(data, { status: response.status });
     }
 
-    const data = await response.json();
-    return NextResponse.json(data);
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.error("Error fetching registration:", error);
+    console.error("Error fetching teacher:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { message: "Internal server error" },
       { status: 500 }
     );
   }
 }
 
-export async function PUT(
+// PATCH /api/backoffice/teachers/[id] - Update teacher
+export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -86,68 +59,93 @@ export async function PUT(
     const authHeader = request.headers.get("Authorization");
     const { id } = await params;
 
+    if (!authHeader) {
+      return NextResponse.json(
+        { message: "Authorization header is required" },
+        { status: 401 }
+      );
+    }
+
     if (!id || isNaN(Number(id))) {
       return NextResponse.json(
-        { error: "Invalid registration ID" },
+        { message: "Invalid teacher ID" },
         { status: 400 }
       );
     }
 
-    const body: Partial<RegistrationPayload> = await request.json();
-
-    // Set default values for optional fields if not provided
-    const defaultValues: Partial<RegistrationPayload> = {
-      studentDetail: {
-        nisn: body.studentDetail?.nisn || "",
-        nik: body.studentDetail?.nik || "",
-        fullName: body.studentDetail?.fullName || "",
-        placeOfBirth: body.studentDetail?.placeOfBirth || "",
-        dateOfBirth: body.studentDetail?.dateOfBirth || "",
-        gender: body.studentDetail?.gender ?? 1,
-        religion: body.studentDetail?.religion || "",
-        schoolOriginNpsn: body.studentDetail?.schoolOriginNpsn || "",
-        address: body.studentDetail?.address || "",
-        phoneNumber: body.studentDetail?.phoneNumber || "",
-        email: body.studentDetail?.email || "",
-        isKipRecipient: body.studentDetail?.isKipRecipient ?? false,
-        kipNumber: body.studentDetail?.kipNumber || "",
-      },
-      parentDetail: {
-        fatherName: body.parentDetail?.fatherName || "",
-        fatherLivingStatus: body.parentDetail?.fatherLivingStatus || "",
-        motherName: body.parentDetail?.motherName || "",
-        motherLivingStatus: body.parentDetail?.motherLivingStatus || "",
-        parentAddress: body.parentDetail?.parentAddress || "",
-        guardianName: body.parentDetail?.guardianName || "",
-        guardianPhoneNumber: body.parentDetail?.guardianPhoneNumber || "",
-        guardianAddress: body.parentDetail?.guardianAddress || "",
-      },
-      majorChoiceCode: body.majorChoiceCode || "",
-    };
-
-    const response = await fetch(`${API_BASE_URL}/backoffice/registrations/${id}`, {
-      method: "PUT",
+    const body = await request.json();
+    const url = `${BACKEND_URL}/backoffice/teachers/${id}`;
+    
+    const response = await fetch(url, {
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        Authorization: authHeader || "",
+        Authorization: authHeader,
       },
-      body: JSON.stringify(defaultValues),
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return NextResponse.json(data, { status: response.status });
+    }
+
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    console.error("Error updating teacher:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/backoffice/teachers/[id] - Delete teacher
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const authHeader = request.headers.get("Authorization");
+    const { id } = await params;
+
+    if (!authHeader) {
+      return NextResponse.json(
+        { message: "Authorization header is required" },
+        { status: 401 }
+      );
+    }
+
+    if (!id || isNaN(Number(id))) {
+      return NextResponse.json(
+        { message: "Invalid teacher ID" },
+        { status: 400 }
+      );
+    }
+
+    const url = `${BACKEND_URL}/backoffice/teachers/${id}`;
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+      },
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      return NextResponse.json(
-        { error: errorData.message || "Failed to update registration" },
-        { status: response.status }
-      );
+      const data = await response.json();
+      return NextResponse.json(data, { status: response.status });
     }
-    
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error("Error updating registration:", error);
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      { message: "Teacher deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting teacher:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
       { status: 500 }
     );
   }

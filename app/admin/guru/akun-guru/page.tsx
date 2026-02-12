@@ -17,11 +17,42 @@ import { transformTeacherData } from "@/utils/trasformTeacherData";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { LuEye, LuPen, LuPlus, LuTrash2 } from "react-icons/lu";
+import { useRouter } from "next/navigation";
+import { useAlert } from "@/components/ui/alert";
+import { BaseModal } from "@/components/Modal/BaseModal";
+import Image from "next/image";
+import { BsDot } from "react-icons/bs";
+
+interface TeacherDetail {
+  id: number;
+  fullName: string;
+  username: string;
+  role: string;
+  photoUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  schoolLessons: Array<{
+    id: number;
+    name: string;
+    abbreviation: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+}
 
 export default function AdminTeacherAccountPage() {
+  const router = useRouter();
+  const { showAlert } = useAlert();
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedTeacher, setSelectedTeacher] = useState<TeacherDetail | null>(
+    null,
+  );
+  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -47,8 +78,6 @@ export default function AdminTeacherAccountPage() {
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
-
-  const loadingStates = isLoading;
 
   const fetchTeachers = useCallback(
     async (page: number, search: string = "", pageLimit: number = 10) => {
@@ -131,83 +160,101 @@ export default function AdminTeacherAccountPage() {
     setCurrentPage(1); // Reset to first page when searching
   };
 
-  // Fetch filter options (years, batches, registration types) from server endpoint with caching
-  useEffect(() => {
-    let cancelled = false;
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(`/api/backoffice/teachers/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+      });
 
-    const loadOptions = async () => {
-      try {
-        const res = await fetch(`/api/filters/options`, {
-          headers: {
-            "Content-Type": "application/json",
-            ...getAuthHeader(),
-          },
-        });
-
-        if (!res.ok) {
-          console.error("Failed to fetch options", res.status);
-          return;
-        }
-
-        const data = await res.json();
-
-        // Normalize batches to option shape
-        const batchOpts = (data.batches || []).map(
-          (b: {
-            id: number;
-            name: string;
-            title: string;
-            isActive: number;
-          }) => ({
-            value: b.id,
-            label: b.name || b.title || `Gelombang ${b.id}`,
-            disabled: Number(b.isActive) === 0,
-          }),
-        );
-        const majorOpts = (data.majors || []).map(
-          (b: { name: string; abbreviation: string }) => ({
-            value: b.abbreviation,
-            label: `Jurusan ${b.abbreviation}`,
-          }),
-        );
-
-        if (cancelled) return;
-
-        // Cache to localStorage as fallback when network fails
-        try {
-          localStorage.setItem(
-            "filterOptions.majors",
-            JSON.stringify(majorOpts),
-          );
-          localStorage.setItem(
-            "filterOptions.batches",
-            JSON.stringify(batchOpts),
-          );
-          localStorage.setItem(
-            "filterOptions.years",
-            JSON.stringify(data.years || []),
-          );
-          localStorage.setItem(
-            "filterOptions.regTypes",
-            JSON.stringify(data.registrationTypes || []),
-          );
-        } catch {
-          /* ignore localStorage errors */
-        }
-      } catch (err) {
-        console.error(
-          "Failed to load filter options, falling back to cache",
-          err,
-        );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Gagal menghapus akun guru");
       }
-    };
 
-    loadOptions();
+      showAlert({
+        title: "Berhasil",
+        description: "Akun guru berhasil dihapus",
+        variant: "success",
+      });
 
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+      // Refresh the list
+      fetchTeachers(currentPage, debouncedSearchTerm, limit);
+    } catch (error) {
+      console.error("Error deleting teacher:", error);
+      showAlert({
+        title: "Gagal",
+        description:
+          error instanceof Error ? error.message : "Gagal menghapus akun guru",
+        variant: "error",
+      });
+    }
+  };
+
+  const openDeleteModal = (id: number) => {
+    setDeleteTargetId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setDeleteTargetId(null);
+  };
+
+  const confirmDelete = async () => {
+    if (deleteTargetId == null) return;
+    await handleDelete(deleteTargetId);
+    closeDeleteModal();
+  };
+
+  const handleDetailClick = async (id: number) => {
+    setIsLoadingDetail(true);
+    try {
+      const response = await fetch(`/api/backoffice/teachers/${id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal mengambil detail guru");
+      }
+
+      const data: TeacherDetail = await response.json();
+      setSelectedTeacher(data);
+      setIsDetailModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching teacher detail:", error);
+      showAlert({
+        title: "Gagal",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Gagal mengambil detail guru",
+        variant: "error",
+      });
+      setIsDetailModalOpen(false);
+    } finally {
+      setIsLoadingDetail(false);
+    }
+  };
+
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedTeacher(null);
+  };
+
+  const handleEditFromModal = () => {
+    if (selectedTeacher) {
+      router.push(`/admin/guru/akun-guru/edit/${selectedTeacher.id}`);
+    }
+  };
+
+  const loadingStates = isLoading || isLoadingDetail;
 
   const columns: Column<Teacher>[] = [
     {
@@ -261,11 +308,11 @@ export default function AdminTeacherAccountPage() {
     },
     {
       title: "Aksi",
-      dataIndex: "registrationId",
+      dataIndex: "id",
       key: "actions",
       align: "center",
       width: 200,
-      render: () => (
+      render: (value) => (
         <div className="flex justify-center gap-4">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -275,7 +322,7 @@ export default function AdminTeacherAccountPage() {
                 variant="outline-warning"
                 className="w-fit py-1 px-2! border-2"
                 disabled={loadingStates}
-                // onClick={() => handleDetailClick(Number(value))}
+                onClick={() => handleDetailClick(Number(value))}
               />
             </TooltipTrigger>
             <TooltipContent side="top">Detail Data Guru</TooltipContent>
@@ -288,7 +335,9 @@ export default function AdminTeacherAccountPage() {
                 variant="outline-info"
                 className="w-fit py-1 px-2! text-xs border-2 border-blue-500"
                 disabled={loadingStates}
-                // onClick={() => handleRouteDetail(Number(value))}
+                onClick={() =>
+                  router.push(`/admin/guru/akun-guru/edit/${value}`)
+                }
               />
             </TooltipTrigger>
             <TooltipContent side="top">Edit Data Guru</TooltipContent>
@@ -301,7 +350,7 @@ export default function AdminTeacherAccountPage() {
                 variant="outline-danger"
                 className="w-fit py-1 px-2! border-2"
                 disabled={loadingStates}
-                // onClick={() => confirmDelete(Number(value))}
+                onClick={() => openDeleteModal(Number(value))}
               />
             </TooltipTrigger>
             <TooltipContent side="top">Hapus Data Guru</TooltipContent>
@@ -368,6 +417,150 @@ export default function AdminTeacherAccountPage() {
           </div>
         </div>
       </div>
+
+      {/* Detail Modal */}
+      <BaseModal
+        isOpen={isDetailModalOpen}
+        onClose={handleCloseDetailModal}
+        title="Detail Akun Guru"
+        size="xl"
+        footer={
+          <div className="flex justify-end">
+            <TextButton
+              variant="primary"
+              text="Tutup"
+              onClick={handleCloseDetailModal}
+              isLoading={isLoadingDetail}
+            />
+          </div>
+        }
+      >
+        {isLoadingDetail ? (
+          <div className="flex justify-center items-center py-10">
+            <p className="text-gray-500">Memuat data...</p>
+          </div>
+        ) : selectedTeacher ? (
+          <div className="flex border-t  border-gray-200">
+            {/* ===== SIDEBAR PROFIL ===== */}
+            <div className="w-48 flex flex-col items-center gap-4 p-6 rounded-md">
+              <div className="relative w-28 h-28 rounded-full overflow-hidden border bg-gray-200 border-gray-300">
+                {selectedTeacher.photoUrl ? (
+                  <Image
+                    src={selectedTeacher.photoUrl}
+                    alt={selectedTeacher.fullName}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-3xl text-gray-500">
+                      {selectedTeacher.fullName.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <TextButton
+                variant="primary"
+                text="Edit"
+                icon={<LuPen />}
+                onClick={handleEditFromModal}
+              />
+            </div>
+
+            {/* ===== KONTEN KANAN ===== */}
+            <div className="flex-1 -mb-3">
+              <div className="border-r border-l border-gray-200 rounded-none text-sm overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Informasi Akun
+                  </h3>
+                </div>
+                <div className="divide-y divide-gray-200">
+                  <div className="grid grid-cols-[160px_1fr] px-4 py-3">
+                    <span className="text-gray-500">Username</span>
+                    <span className="font-medium text-gray-900">
+                      {selectedTeacher.username}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-[160px_1fr] px-4 py-3">
+                    <span className="text-gray-500">Password</span>
+                    <span className="font-medium text-gray-900">
+                      ••••••••••
+                    </span>
+                  </div>
+                </div>
+
+                <div className="px-4 py-3 border-y border-gray-200 bg-gray-50">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Profil Guru
+                  </h3>
+                </div>
+                <div className="divide-y divide-gray-200">
+                  <div className="grid grid-cols-[160px_1fr] px-4 py-3">
+                    <span className="text-gray-500">Nama Guru</span>
+                    <span className="font-medium text-gray-900">
+                      {selectedTeacher.fullName}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="px-4 py-3 border-y border-gray-200 bg-gray-50">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    Mata Pelajaran Diampu
+                  </h3>
+                </div>
+                <div className="px-4 py-3">
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTeacher.schoolLessons.map((lesson) => (
+                      <span
+                        key={lesson.id}
+                        className="flex items-center gap-1 px-2 py-1 bg-gray-200 text-gray-800 rounded-sm text-xs font-medium"
+                      >
+                        <BsDot className="w-4 h-4" />
+                        {lesson.abbreviation || lesson.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center py-10">
+            <p className="text-gray-500">Data tidak tersedia</p>
+          </div>
+        )}
+      </BaseModal>
+
+      {/* Delete Confirmation Modal */}
+      <BaseModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        title="Hapus Akun Guru"
+        size="md"
+        footer={
+          <div className="flex justify-end gap-3">
+            <TextButton
+              variant="outline"
+              text="Batal"
+              onClick={closeDeleteModal}
+              disabled={loadingStates}
+            />
+            <TextButton
+              variant="danger"
+              text="Hapus"
+              onClick={confirmDelete}
+              isLoading={loadingStates}
+              disabled={loadingStates}
+            />
+          </div>
+        }
+      >
+        <div className="py-4 text-sm text-gray-700">
+          Apakah Anda yakin ingin menghapus akun guru ini?
+        </div>
+      </BaseModal>
     </div>
   );
 }

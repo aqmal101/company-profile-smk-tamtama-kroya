@@ -208,7 +208,7 @@ export default function DragDropFile({
             <img
               src={selectedPreviewUrl}
               alt={selectedFile?.name ?? "preview"}
-              className="h-full w-full object-contain rounded-md"
+              className="max-w-xs max-h-64 object-contain rounded-md"
             />
             <div className="flex gap-2">
               <TextButton
