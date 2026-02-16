@@ -523,8 +523,8 @@ export default function AdminRegisteredByTeacherPage() {
         />
         <div className="w-full h-fit bg-white rounded-md drop-shadow-sm">
           <div className="p-6 max-sm:p-2 border-b border-gray-200">
-            <div className="flex w-auto flex-wrap flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-3">
-              <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:w-auto lg:items-center">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:flex-row lg:flex-wrap lg:items-center lg:justify-end mb-3">
+              <div className="w-full flex flex-col gap-3 sm:col-span-2 sm:flex-row lg:w-auto">
                 <SelectInput
                   value={selectedYearId}
                   onChange={(e) => {
@@ -537,9 +537,8 @@ export default function AdminRegisteredByTeacherPage() {
                   ]}
                   placeholder={"Pilih Tahun Ajaran "}
                   isMandatory
-                  className="w-full lg:w-48"
+                  className="w-full sm:w-48"
                 />
-
                 <SelectInput
                   value={selectedMajor}
                   onChange={(e) => {
@@ -548,13 +547,15 @@ export default function AdminRegisteredByTeacherPage() {
                   }}
                   options={[{ value: "", label: "Semua Jurusan" }, ...majors]}
                   placeholder="Pilih Jurusan"
-                  className="w-full lg:w-38"
+                  className="w-full sm:w-40"
                 />
+              </div>
+              <div className="lg:w-6/10 w-full flex flex-col lg:flex-row gap-3 items-start">
                 <SearchableSelect
                   label=""
                   fetchOptions={fetchTeacher}
                   isAddValueActive={false}
-                  className="mb-4"
+                  className="w-full sm:col-span-2 lg:max-w-64"
                   minChars={0}
                   placeholder={"Cari berdasarkan Guru"}
                   isMandatory={false}
@@ -566,19 +567,17 @@ export default function AdminRegisteredByTeacherPage() {
                     setCurrentPage(1);
                   }}
                 />
-              </div>
-              <div className="w-full xl:w-1/2 h-fit flex lg:flex-row flex-col gap-3">
                 <TextButton
                   variant="outline"
                   text="Reset Filter"
                   disabled={loadingStates}
-                  className="w-full font-normal px-2! py-1.5! rouned-md! sm:col-span-2 lg:w-auto mb-2 shrink-0"
+                  className="w-full font-normal px-2! py-1.5! rouned-md! sm:col-span-1 lg:w-auto shrink-0"
                   isLoading={loadingStates}
                   icon={<IoMdRefresh className="text-lg shrink-0" />}
                   onClick={handleResetFilters}
                 />
                 <Search
-                  className="w-full mb-2 lg:max-w-lg"
+                  className="w-full sm:col-span-2 lg:max-w-md"
                   searchTerm={searchTerm}
                   handleSearchChange={handleSearchChange}
                 />
