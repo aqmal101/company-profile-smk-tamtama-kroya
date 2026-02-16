@@ -65,3 +65,14 @@ export const getHandleFromUrl = (url: string) => {
       return false;
     }
   };
+
+
+export const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr; // Return original if invalid
+    return date.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    });
+  }

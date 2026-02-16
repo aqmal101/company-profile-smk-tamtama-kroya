@@ -185,6 +185,10 @@ export function transformRecentRegistrations(items: unknown): Student[] {
     const updatedAt = String(
       item["updatedAt"] ?? sd["updatedAt"] ?? item["createdAt"] ?? new Date().toISOString(),
     );
+
+    const creactedAt = String(
+      item["createdAt"] ?? sd["createdAt"] ?? item["updatedAt"] ?? new Date().toISOString(),
+    );
     const majorChoice = String(item["majorChoiceCode"] ?? item["majorChoice"] ?? "");
 
     return {
@@ -205,6 +209,7 @@ export function transformRecentRegistrations(items: unknown): Student[] {
       registrationNumber: registrationNumber,
       registrationBatchId: registrationBatchId,
       updatedAt: updatedAt,
+      createdAt:creactedAt,
       // provide religion which Student expects
       religion: String(sd["religion"] ?? ""),
       // provide author shape (kept simple and derived from the author object)

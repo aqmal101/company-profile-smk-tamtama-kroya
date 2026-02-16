@@ -23,6 +23,7 @@ export interface Student {
   registrationNumber?: number;
   registrationBatchId?: number;
   updatedAt: string;
+  createdAt: string;
   author: Record<string, unknown> | null;
   authorName: string | "";
 }

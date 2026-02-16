@@ -16,6 +16,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { formatDate } from "@/lib/stringFormat";
 import { getAuthHeader } from "@/utils/auth";
 import { RegistrationData } from "@/utils/registrationTypes";
 import {
@@ -39,20 +40,19 @@ export default function AdminRegisteredByTeacherPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [limit, setLimit] = useState(10);
+  const [teacherResetKey, setTeacherResetKey] = useState(0);
   const [selectedBatchId, setSelectedBatchId] = useState<string | number | "">(
     "",
   );
+
   const [selectedMajor, setSelectedMajor] = useState<string | number | "">("");
-  const [selectAuthored, setSelectedAuthor] = useState<"" | "true" | "false">(
-    "",
-  );
   // Selected academic year filter
   const [selectedYearId, setSelectedYearId] = useState<string | number | "">(
     "",
   );
-  const [batches, setBatches] = useState<
-    Array<{ value: string | number; label: string; disabled?: boolean }>
-  >([]);
+  const [selectedTeacherId, setSelectedTeacherId] = useState<
+    string | number | ""
+  >("");
 
   const [majors, setMajors] = useState<
     Array<{ value: string | number; label: string; disabled?: boolean }>
@@ -65,9 +65,6 @@ export default function AdminRegisteredByTeacherPage() {
 
   // Filter options loaded from server (cached endpoint)
   const [yearsOptions, setYearsOptions] = useState<
-    Array<{ value: string | number; label: string }>
-  >([]);
-  const [registrationTypeOptions, setRegistrationTypeOptions] = useState<
     Array<{ value: string | number; label: string }>
   >([]);
 
@@ -87,6 +84,47 @@ export default function AdminRegisteredByTeacherPage() {
   const confirmDelete = (registrationId: number) => {
     setDeletingId(registrationId);
     setDeleteModalOpen(true);
+  };
+
+  const fetchTeacher = async (
+    query: string,
+  ): Promise<Array<{ value: string | number; label: string }>> => {
+    try {
+      const res = await fetch(
+        `/api/backoffice/teachers/teacher-lookup?q=${encodeURIComponent(query)}`,
+        {
+          headers: {
+            ...getAuthHeader(),
+          },
+        },
+      );
+      const result = await res.json();
+
+      if (!res.ok) {
+        // Handle error response
+        if (result.errors && Array.isArray(result.errors)) {
+          const errorMsg = result.errors[0]?.message || result.message;
+          throw new Error(errorMsg);
+        }
+        throw new Error(result.message || "Gagal mengambil data guru");
+      }
+
+      const teachers = Array.isArray(result) ? result : result.data || [];
+      return Array.isArray(teachers)
+        ? teachers
+            .filter((item) => item && item.fullName)
+            .map((item) => ({
+              value: item.id,
+              label: item.fullName,
+            }))
+        : [];
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Terjadi kesalahan saat mengambil data guru";
+      throw new Error(message);
+    }
   };
 
   const performDelete = async () => {
@@ -175,13 +213,14 @@ export default function AdminRegisteredByTeacherPage() {
         if (selectedYearId) {
           params.append("academic_year_id", String(selectedYearId));
         }
-        // Only append `authored` when a specific type is selected
-        if (selectAuthored !== "") {
-          params.append("authored", selectAuthored);
-        }
+        params.append("authored", "true");
 
         if (selectedMajor !== "") {
           params.append("major_code", String(selectedMajor));
+        }
+
+        if (selectedTeacherId) {
+          params.append("teacher_id", String(selectedTeacherId));
         }
 
         const response = await fetch(
@@ -214,7 +253,7 @@ export default function AdminRegisteredByTeacherPage() {
         setIsLoading(false);
       }
     },
-    [selectedBatchId, selectAuthored, selectedYearId, selectedMajor],
+    [selectedBatchId, selectedYearId, selectedMajor, selectedTeacherId],
   );
 
   useEffect(() => {
@@ -226,8 +265,9 @@ export default function AdminRegisteredByTeacherPage() {
     setCurrentPage(1);
     setSearchTerm("");
     setSelectedBatchId("");
-    setSelectedAuthor("");
     setSelectedYearId("");
+    setSelectedTeacherId("");
+    setTeacherResetKey((prev) => prev + 1);
   };
 
   const handleSearchChange = (value: string) => {
@@ -242,14 +282,10 @@ export default function AdminRegisteredByTeacherPage() {
     const loadCachedOptions = () => {
       if (cancelled) return;
       try {
-        const cachedBatches = localStorage.getItem("filterOptions.batches");
         const cachedYears = localStorage.getItem("filterOptions.years");
-        const cachedReg = localStorage.getItem("filterOptions.regTypes");
         const cachedMajors = localStorage.getItem("filterOptions.majors");
         if (cachedMajors) setMajors(JSON.parse(cachedMajors));
-        if (cachedBatches) setBatches(JSON.parse(cachedBatches));
         if (cachedYears) setYearsOptions(JSON.parse(cachedYears));
-        if (cachedReg) setRegistrationTypeOptions(JSON.parse(cachedReg));
       } catch (e) {
         console.error("Failed to load cached filter options", e);
       }
@@ -294,10 +330,8 @@ export default function AdminRegisteredByTeacherPage() {
 
         if (cancelled) return;
 
-        setBatches(batchOpts);
         setMajors(majorOpts);
         setYearsOptions(data.years || []);
-        setRegistrationTypeOptions(data.registrationTypes || []);
 
         // Cache to localStorage as fallback when network fails
         try {
@@ -395,16 +429,7 @@ export default function AdminRegisteredByTeacherPage() {
       sorter: true,
       width: 200,
     },
-    {
-      title: "No. Pendaftaran",
-      dataIndex: "registrationNumber",
-      key: "registrationNumber",
-      sorter: true,
-      align: "center",
-      width: 130,
-      render: (value, record) =>
-        record.registrationNumber || record.registrationId,
-    },
+
     {
       title: "Asal SMP/MTs",
       dataIndex: "schoolOriginName",
@@ -419,19 +444,14 @@ export default function AdminRegisteredByTeacherPage() {
       width: 120,
       align: "center",
     },
-
     {
-      title: "Jenis Pendaftaran",
-      dataIndex: "author",
-      key: "author",
+      title: "Tanggal Daftar",
+      dataIndex: "createdAt",
+      key: "createdAt",
       sorter: true,
       align: "center",
-      width: 120,
-      // render: (value) => value.fullname,
-      render: (value, record) =>
-        !record.author || Object.keys(record.author).length === 0
-          ? "Mandiri"
-          : "Oleh Guru",
+      render: (value) => formatDate(value as string),
+      width: 210,
     },
     {
       title: "Didaftarkan Oleh",
@@ -532,18 +552,18 @@ export default function AdminRegisteredByTeacherPage() {
                 />
                 <SearchableSelect
                   label=""
-                  // fetchOptions={{}}
+                  fetchOptions={fetchTeacher}
                   isAddValueActive={false}
                   className="mb-4"
-                  minChars={3}
+                  minChars={0}
                   placeholder={"Cari berdasarkan Guru"}
                   isMandatory={false}
-                  name={""}
-                  value={""}
-                  onChange={function (
-                    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-                  ): void {
-                    throw new Error("Function not implemented.");
+                  name={"teacherId"}
+                  value={selectedTeacherId}
+                  resetKey={teacherResetKey}
+                  onChange={(e) => {
+                    setSelectedTeacherId(e.target.value);
+                    setCurrentPage(1);
                   }}
                 />
               </div>

@@ -1,23 +1,30 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { LuX } from "react-icons/lu";
 
 interface SearchableSelectProps {
   label: string;
   name: string;
-  value: string;
+  value: string | number;
   onChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;
-  options?: string[];
-  fetchOptions?: (query: string) => Promise<string[]>;
+  options?: Array<string | { value: string | number; label: string }>;
+  fetchOptions?: (
+    query: string,
+  ) => Promise<Array<string | { value: string | number; label: string }>>;
   minChars?: number;
   placeholder?: string;
   isMandatory?: boolean;
   error?: string;
   className?: string;
   isAddValueActive?: boolean; // Opsi untuk mengaktifkan fitur tambah nilai custom
+  resetKey?: string | number;
+  allowClear?: boolean;
 }
+
+type SearchableOption = { value: string | number; label: string };
 
 export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   label,
@@ -32,13 +39,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   error,
   className = "",
   isAddValueActive = true,
+  resetKey,
+  allowClear = true,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [useTextInput, setUseTextInput] = useState(
-    () => value && !options.includes(value),
-  );
-  const [remoteOptions, setRemoteOptions] = useState<string[]>([]);
+  const [useTextInput, setUseTextInput] = useState(false);
+  const [remoteOptions, setRemoteOptions] = useState<SearchableOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [touched, setTouched] = useState(false);
@@ -46,25 +53,58 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const baseOptions = options || [];
+  const normalizeOption = (
+    option: string | SearchableOption,
+  ): SearchableOption =>
+    typeof option === "string" ? { value: option, label: option } : option;
+
+  const baseOptions = (options || []).map(normalizeOption);
   const combinedOptions = Array.from(
-    new Set([...baseOptions, ...remoteOptions]),
+    new Map(
+      [...baseOptions, ...remoteOptions].map((option) => [
+        String(option.value),
+        option,
+      ]),
+    ).values(),
   );
-  const isValueInOptions = combinedOptions.includes(value);
+  const isValueInOptions = combinedOptions.some(
+    (option) => String(option.value) === String(value),
+  );
+  const selectedOption = combinedOptions.find(
+    (option) => String(option.value) === String(value),
+  );
+  const selectedLabel = selectedOption?.label ?? String(value ?? "");
 
   // Gunakan error dari Zod validation
   const hasError = !!error;
 
   // Update useTextInput ketika value berubah
   useEffect(() => {
+    if (!isAddValueActive) {
+      setUseTextInput(false);
+      return;
+    }
     if (!value) {
       setUseTextInput(false);
       return;
     }
-    if (!combinedOptions.includes(value)) {
+    if (
+      !combinedOptions.some((option) => String(option.value) === String(value))
+    ) {
       setUseTextInput(true);
     }
-  }, [value, combinedOptions]);
+  }, [value, combinedOptions, isAddValueActive]);
+
+  useEffect(() => {
+    setSearchValue("");
+    setIsOpen(false);
+    setRemoteOptions([]);
+    setFetchError(null);
+    setIsLoading(false);
+    if (!value) {
+      setUseTextInput(false);
+    }
+  }, [resetKey, value]);
 
   // Fetch options dari API dengan debounce
   useEffect(() => {
@@ -94,15 +134,16 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       try {
         const result = await fetchOptions(query);
         if (!isCancelled) {
-          setRemoteOptions(Array.isArray(result) ? result : []);
+          const normalized = Array.isArray(result)
+            ? result.map(normalizeOption)
+            : [];
+          setRemoteOptions(normalized);
           setFetchError(null);
         }
       } catch (error) {
         if (!isCancelled) {
           const errorMessage =
-            error instanceof Error
-              ? error.message
-              : "Gagal memuat data sekolah";
+            error instanceof Error ? error.message : "Gagal memuat data";
           setFetchError(errorMessage);
           setRemoteOptions([]);
         }
@@ -167,6 +208,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   };
 
   const handleAddCustom = (customSearchValue: string) => {
+    if (!isAddValueActive) return;
     setUseTextInput(true);
     setIsOpen(false);
     setSearchValue("");
@@ -194,6 +236,20 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     }, 0);
   };
 
+  const handleClear = () => {
+    setSearchValue("");
+    setIsOpen(false);
+    setRemoteOptions([]);
+    setFetchError(null);
+    setIsLoading(false);
+    setUseTextInput(false);
+
+    const syntheticEvent = {
+      target: { name, value: "" },
+    } as React.ChangeEvent<HTMLInputElement>;
+    onChange(syntheticEvent);
+  };
+
   // Render options berdasarkan apakah menggunakan fetch atau static
   const renderDropdownContent = () => {
     if (fetchOptions) {
@@ -210,7 +266,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           {/* Loading state */}
           {searchValue.trim().length >= minChars && isLoading && (
             <div className="px-4 py-2 text-gray-500 text-sm">
-              Memuat data sekolah...
+              Memuat data...
             </div>
           )}
 
@@ -227,23 +283,25 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
               <>
                 {remoteOptions.map((option, index) => (
                   <div
-                    key={index}
-                    onClick={() => handleSelectOption(option)}
+                    key={`${option.value}-${index}`}
+                    onClick={() => handleSelectOption(String(option.value))}
                     className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
-                      value === option
+                      String(value) === String(option.value)
                         ? "bg-primary text-white hover:bg-primary"
                         : ""
                     }`}
                   >
-                    {option}
+                    {option.label}
                   </div>
                 ))}
-                <div
-                  onClick={() => handleAddCustom(searchValue)}
-                  className="px-4 py-2 bg-blue-50 text-primary font-semibold cursor-pointer hover:bg-blue-100 border-t border-gray-300 transition-colors"
-                >
-                  Tidak Ada Pilihan
-                </div>
+                {isAddValueActive && searchValue.trim() !== "" && (
+                  <div
+                    onClick={() => handleAddCustom(searchValue)}
+                    className="px-4 py-2 bg-blue-50 text-primary font-semibold cursor-pointer hover:bg-blue-100 border-t border-gray-300 transition-colors"
+                  >
+                    Tidak Ada Pilihan
+                  </div>
+                )}
               </>
             )}
 
@@ -272,7 +330,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
     // Mode static options (fallback)
     const filteredOptions = combinedOptions.filter((option) =>
-      option.toLowerCase().includes(searchValue.toLowerCase()),
+      option.label.toLowerCase().includes(searchValue.toLowerCase()),
     );
 
     if (filteredOptions.length > 0) {
@@ -280,21 +338,25 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
         <>
           {filteredOptions.map((option) => (
             <div
-              key={option}
-              onClick={() => handleSelectOption(option)}
+              key={String(option.value)}
+              onClick={() => handleSelectOption(String(option.value))}
               className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
-                value === option ? "bg-primary text-white hover:bg-primary" : ""
+                String(value) === String(option.value)
+                  ? "bg-primary text-white hover:bg-primary"
+                  : ""
               }`}
             >
-              {option}
+              {option.label}
             </div>
           ))}
-          <div
-            onClick={() => handleAddCustom(searchValue)}
-            className="px-4 py-2 bg-blue-50 text-primary font-semibold cursor-pointer hover:bg-blue-100 border-t border-gray-300 transition-colors"
-          >
-            Tidak Ada Pilihan
-          </div>
+          {isAddValueActive && searchValue.trim() !== "" && (
+            <div
+              onClick={() => handleAddCustom(searchValue)}
+              className="px-4 py-2 bg-blue-50 text-primary font-semibold cursor-pointer hover:bg-blue-100 border-t border-gray-300 transition-colors"
+            >
+              Tidak Ada Pilihan
+            </div>
+          )}
         </>
       );
     }
@@ -322,13 +384,15 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
       <>
         {combinedOptions.map((option) => (
           <div
-            key={option}
-            onClick={() => handleSelectOption(option)}
+            key={String(option.value)}
+            onClick={() => handleSelectOption(String(option.value))}
             className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
-              value === option ? "bg-primary text-white hover:bg-primary" : ""
+              String(value) === String(option.value)
+                ? "bg-primary text-white hover:bg-primary"
+                : ""
             }`}
           >
-            {option}
+            {option.label}
           </div>
         ))}
       </>
@@ -347,7 +411,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <input
             type="text"
             name={name}
-            value={value}
+            value={String(value ?? "")}
             onChange={handleCustomInputChange}
             onBlur={handleBlur}
             className={`w-full max-sm:text-xs px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:border-transparent transition-colors ${
@@ -357,6 +421,16 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             }`}
             placeholder={placeholder}
           />
+          {allowClear && value && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="absolute right-16 top-1/2 -translate-y-1/2 text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded transition-colors"
+              title="Clear"
+            >
+              <LuX></LuX>
+            </button>
+          )}
           {/* Tombol kembali ke select */}
           <button
             type="button"
@@ -373,7 +447,9 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <input
             ref={inputRef}
             type="text"
-            value={searchValue || (value && isValueInOptions ? value : "")}
+            value={
+              searchValue || (value && isValueInOptions ? selectedLabel : "")
+            }
             onChange={handleSearchChange}
             onFocus={() => setIsOpen(true)}
             onBlur={handleBlur}
@@ -386,6 +462,16 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
             placeholder={placeholder}
             autoComplete="off"
           />
+          {allowClear && (value || searchValue) && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded transition-colors"
+              title="Clear"
+            >
+              <LuX />
+            </button>
+          )}
 
           {isOpen && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-sm shadow-lg z-50 max-h-60 overflow-y-auto">
