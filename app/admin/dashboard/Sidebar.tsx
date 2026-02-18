@@ -3,9 +3,13 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   FiBarChart2,
   FiChevronRight,
-  FiFile,
   FiFileText,
   FiHome,
   FiMap,
@@ -14,12 +18,9 @@ import {
   FiUsers,
 } from "react-icons/fi";
 import { MdExpandMore } from "react-icons/md";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { LuListChecks, LuUserCheck } from "react-icons/lu";
+import { LuFilePenLine, LuListChecks } from "react-icons/lu";
+import { TbMessageUser } from "react-icons/tb";
+import { FaChalkboardTeacher } from "react-icons/fa";
 
 const sidebarItems = [
   {
@@ -66,7 +67,12 @@ const sidebarItems = [
         href: "/admin/ppdb/data-calon-murid",
       },
       {
-        icon: FiFile,
+        icon: TbMessageUser,
+        label: "Panitia PPDB",
+        href: "/admin/ppdb/panitia-ppdb",
+      },
+      {
+        icon: LuFilePenLine,
         label: "Bukti Pendaftaran",
         href: "/admin/ppdb/bukti-pendaftaran",
       },
@@ -76,7 +82,7 @@ const sidebarItems = [
     group: "manajemen guru",
     items: [
       {
-        icon: LuUserCheck,
+        icon: FaChalkboardTeacher,
         label: "Akun Guru",
         href: "/admin/guru/akun-guru",
       },
