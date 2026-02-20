@@ -11,6 +11,7 @@ export interface PhotoUploadProps {
   label?: string;
   isMandatory?: boolean;
   error?: string;
+  textButton?: string;
   className?: string;
 }
 
@@ -22,6 +23,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
   label = "Foto Profil",
   isMandatory = false,
   error,
+  textButton = "Ganti Foto",
   className = "",
 }) => {
   return (
@@ -62,6 +64,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
           accept="image/*"
           multiple={false}
           disabled={disabled}
+          textButton={textButton}
           onFile={(file) => onFileSelect(file || null)}
           previewUrl={previewUrl || undefined}
           showPreview={true}

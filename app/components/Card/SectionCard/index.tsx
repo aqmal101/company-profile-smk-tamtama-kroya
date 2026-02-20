@@ -53,7 +53,7 @@ export const SectionCard = ({
     ></div>
   ));
   return (
-    <div className={`${className} shadow-lg rounded-md`}>
+    <div className={`${className} border border-gray-300 shadow-lg rounded-md`}>
       {title && (
         <div className="w-full h-fit border-b border-b-gray-400 px-4">
           <h3 className="font-semibold text-gray-800 py-3">{title}</h3>

@@ -11,6 +11,7 @@ export interface DragDropFileProps {
   initialFile?: File | null;
   label?: string;
   description?: string;
+  textButton?: string;
   className?: string;
   showPreview?: boolean;
   onFiles?: (files: File[]) => void;
@@ -28,6 +29,7 @@ export default function DragDropFile({
   initialFile = null,
   className = "",
   showPreview = true,
+  textButton = "Ganti Foto",
   onFiles,
   onFile,
   onValidate,
@@ -208,12 +210,12 @@ export default function DragDropFile({
             <img
               src={selectedPreviewUrl}
               alt={selectedFile?.name ?? "preview"}
-              className="max-w-xs max-h-64 object-contain rounded-md"
+              className="max-w-48 max-h-64 object-contain rounded-md"
             />
             <div className="flex gap-2">
               <TextButton
                 variant="primary"
-                text="Ganti Foto"
+                text={textButton}
                 onClick={(e) => {
                   e.stopPropagation();
                   removeFile();
@@ -223,7 +225,7 @@ export default function DragDropFile({
           </div>
         ) : (
           <div className="flex justify-center items-center flex-col text-primary">
-            <LuUpload className="text-6xl mb-2" />
+            <LuUpload className="text-5xl mb-2" />
             <TextButton text="Cari Foto" className="font-semibold" />
             <div className="text-base text-gray-600 mt-2">
               Seret dan Lepas sebuah foto

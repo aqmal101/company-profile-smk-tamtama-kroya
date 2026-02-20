@@ -64,7 +64,8 @@ export const TextButton = React.forwardRef<HTMLButtonElement, TextButtonProps>(
         loadingStyle = "border-white border-t-white/30";
         break;
       case "outline":
-        defaultStyle = "border bg-white border-gray-300 hover:bg-gray-50";
+        defaultStyle =
+          "border bg-white text-primary border-primary hover:bg-primary/10  ";
         loadingStyle = "border-gray-300 border-t-gray-300/30";
         break;
       case "outline-danger":
