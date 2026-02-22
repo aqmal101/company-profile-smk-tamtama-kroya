@@ -16,6 +16,10 @@ import {
 import { FormInput } from "@/components/ui/form-input";
 import { PhotoUpload } from "@/components/Upload/PhotoUpload";
 import { getAuthHeader } from "@/utils/auth";
+import {
+  generatePendaftaranUlangPdf,
+  generatePendaftaranUlangPdfDataUrl,
+} from "@/utils/pdfTemplateGenerator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -41,18 +45,59 @@ interface CommitteeData {
 const committeeSchema = z.object({
   name: z.string().min(1, "Mohon isi nama panitia terlebih dahulu"),
   position: z.string().min(1, "Mohon isi jabatan terlebih dahulu"),
-  nip: z.string().optional(),
+  nip: z.string().optional().nullable(),
   place: z.string().min(1, "Mohon isi tempat terlebih dahulu"),
   defaultDate: z.string().min(1, "Mohon isi tanggal terlebih dahulu"),
 });
 
 type CommitteeFormData = z.infer<typeof committeeSchema>;
 
+function toNullableString(value: string | null | undefined): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+async function safeReadJson(response: Response): Promise<unknown> {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function getApiErrorMessage(result: unknown, status: number, fallback: string) {
+  if (result && typeof result === "object") {
+    const maybeRecord = result as { message?: string; error?: string };
+    if (maybeRecord.message?.trim()) {
+      return maybeRecord.message;
+    }
+    if (maybeRecord.error?.trim()) {
+      return maybeRecord.error;
+    }
+  }
+
+  if (status === 401) {
+    return "Sesi login berakhir. Silakan login kembali";
+  }
+
+  if (status >= 500) {
+    return "Terjadi kesalahan server. Silakan coba lagi beberapa saat";
+  }
+
+  return fallback;
+}
+
 export default function PanitiaPpdbPage() {
   const { showAlert } = useAlert();
 
   const [displayPreview, setDisplayPreview] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isGeneratingInlinePreview, setIsGeneratingInlinePreview] =
+    useState(false);
   const [isLoadingYears, setIsLoadingYears] = useState(true);
   const [isLoadingCommittee, setIsLoadingCommittee] = useState(false);
 
@@ -67,13 +112,14 @@ export default function PanitiaPpdbPage() {
   const [stampFile, setStampFile] = useState<File | null>(null);
   const [signaturePreview, setSignaturePreview] = useState<string>("");
   const [stampPreview, setStampPreview] = useState<string>("");
+  const [inlinePdfPreviewUrl, setInlinePdfPreviewUrl] = useState<string>("");
 
   const form = useForm<CommitteeFormData>({
     resolver: zodResolver(committeeSchema),
     defaultValues: {
       name: "",
       position: "",
-      nip: "",
+      nip: null,
       place: "",
       defaultDate: "",
     },
@@ -108,10 +154,11 @@ export default function PanitiaPpdbPage() {
     setStampFile(null);
     setSignaturePreview("");
     setStampPreview("");
+    setInlinePdfPreviewUrl("");
     form.reset({
       name: "",
       position: "",
-      nip: "",
+      nip: null,
       place: "",
       defaultDate: "",
     });
@@ -254,15 +301,25 @@ export default function PanitiaPpdbPage() {
           return;
         }
 
-        const result = await response.json();
+        const result = await safeReadJson(response);
 
         if (!response.ok) {
-          throw new Error(
-            result?.message || result?.error || "Gagal memuat data panitia",
-          );
+          showAlert({
+            title: "Gagal",
+            description: getApiErrorMessage(
+              result,
+              response.status,
+              "Gagal memuat data panitia",
+            ),
+            variant: "error",
+          });
+          return;
         }
 
-        const data: CommitteeData = result?.data ?? result;
+        const dataSource = result as { data?: CommitteeData } | CommitteeData;
+        const data: CommitteeData =
+          (dataSource as { data?: CommitteeData })?.data ??
+          (dataSource as CommitteeData);
 
         setCommitteeId(data?.id ?? null);
         setSignatureFile(null);
@@ -273,18 +330,17 @@ export default function PanitiaPpdbPage() {
         form.reset({
           name: data?.name || "",
           position: data?.position || "",
-          nip: data?.nip || "",
+          nip: data?.nip ?? null,
           place: data?.place || "",
           defaultDate: data?.defaultDate || "",
         });
       } catch (error) {
         console.error("Error loading committee:", error);
-        resetCommitteeForm();
         showAlert({
           title: "Gagal",
           description:
             error instanceof Error
-              ? error.message
+              ? `Gagal memuat data panitia: ${error.message}`
               : "Gagal memuat data panitia",
           variant: "error",
         });
@@ -341,7 +397,7 @@ export default function PanitiaPpdbPage() {
         academicYearId: Number(selectedYearId),
         name: values.name,
         position: values.position,
-        ...(values.nip?.trim() ? { nip: values.nip.trim() } : {}),
+        nip: toNullableString(values.nip),
         place: values.place,
         defaultDate: values.defaultDate,
         signatureUrl,
@@ -375,6 +431,11 @@ export default function PanitiaPpdbPage() {
       });
 
       await loadCommitteeByAcademicYear(selectedYearId);
+
+      // Regenerate PDF preview to reflect newly saved data
+      if (displayPreview) {
+        renderInlinePdfPreview();
+      }
     } catch (error) {
       console.error("Error saving committee:", error);
       showAlert({
@@ -399,6 +460,124 @@ export default function PanitiaPpdbPage() {
     loadCommitteeByAcademicYear(selectedYearId);
   }, [loadCommitteeByAcademicYear, selectedYearId]);
 
+  const buildPreviewRegistration = useCallback((): Parameters<
+    typeof generatePendaftaranUlangPdf
+  >[0]["registration"] => {
+    return {
+      registrationNumber: 20260001,
+      majorChoiceCode: "Jurusan Pilihan",
+      createdAt: new Date().toISOString(),
+      updatedAt: null,
+      studentDetail: {
+        nisn: "1234567890",
+        nik: "3301010101010001",
+        fullName: "Nama Calon Murid",
+        placeOfBirth: "Kota Lahir",
+        dateOfBirth: "2010-01-01",
+        gender: 1,
+        religion: "islam",
+        schoolOriginName: "SMP Negeri 1 Kroya",
+        schoolOriginNpsn: "20300562",
+        address: "Jl. Semangka Kedawung, Kroya",
+        phoneNumber: "081234567890",
+        email: "preview@student.com",
+        isKipRecipient: false,
+        kipNumber: null,
+      },
+      parentDetail: {
+        fatherName: "Ayah Preview",
+        fatherLivingStatus: "alive",
+        motherName: "Ibu Preview",
+        motherLivingStatus: "alive",
+        parentPhoneNumber: "081234567891",
+        parentAddress: "Jl. Semangka Kedawung, Kroya",
+        guardianName: null,
+        guardianPhoneNumber: null,
+        guardianAddress: null,
+      },
+      majorChoice: null,
+      author: null,
+    };
+  }, []);
+
+  const renderInlinePdfPreview = useCallback(async () => {
+    try {
+      setIsGeneratingInlinePreview(true);
+
+      const registration = buildPreviewRegistration();
+
+      let dataUrl = "";
+      let lastError: unknown = null;
+
+      for (let attempt = 1; attempt <= 2; attempt += 1) {
+        try {
+          dataUrl = await generatePendaftaranUlangPdfDataUrl({
+            registration,
+            committee: {
+              name: previewData.name || "Panitia PPDB",
+              position: previewData.position || "Ketua",
+              title: "Panitia Sistem Penerimaan Murid Baru",
+              nip: toNullableString(previewData.nip),
+              place: previewData.place || "Kroya",
+              date: previewData.defaultDate,
+              signatureUrl: previewData.signatureUrl,
+              stampUrl: previewData.stampUrl,
+              stampSize: "small",
+            },
+          });
+          break;
+        } catch (error) {
+          lastError = error;
+
+          if (attempt === 1) {
+            await new Promise((resolve) => setTimeout(resolve, 700));
+          }
+        }
+      }
+
+      if (!dataUrl) {
+        throw lastError ?? new Error("Gagal menyiapkan preview PDF");
+      }
+
+      setInlinePdfPreviewUrl(dataUrl);
+    } catch (error) {
+      console.error("Failed to render inline PDF preview:", error);
+      setInlinePdfPreviewUrl("");
+      showAlert({
+        title: "Gagal",
+        description: "Tidak dapat menampilkan preview PDF di panel",
+        variant: "error",
+      });
+    } finally {
+      setIsGeneratingInlinePreview(false);
+    }
+  }, [buildPreviewRegistration, previewData, showAlert]);
+
+  useEffect(() => {
+    if (isLoadingCommittee || isLoadingYears) {
+      setDisplayPreview(false);
+      setInlinePdfPreviewUrl("");
+    }
+  }, [isLoadingCommittee, isLoadingYears]);
+
+  useEffect(() => {
+    if (!displayPreview) {
+      setInlinePdfPreviewUrl("");
+      return;
+    }
+
+    if (isLoadingCommittee || isLoadingYears) {
+      return;
+    }
+
+    renderInlinePdfPreview();
+  }, [
+    displayPreview,
+    isLoadingCommittee,
+    isLoadingYears,
+    renderInlinePdfPreview,
+  ]);
+
   return (
     <div className="w-full min-h-[calc(100vh-4px)] bg-gray-100 p-4">
       <div className="h-full">
@@ -412,6 +591,7 @@ export default function PanitiaPpdbPage() {
             <h2 className="text-lg font-semibold">Edit Panitia PPDB</h2>
             <TextButton
               variant="outline"
+              isLoading={isBusy || isGeneratingInlinePreview}
               className="text-sm!"
               text={
                 displayPreview ? "Sembunyikan Preview" : "Tampilkan Preview"
@@ -425,13 +605,13 @@ export default function PanitiaPpdbPage() {
               <SectionCard
                 title="Informasi Panitia"
                 className="w-full px-2"
-                isLoading={isLoadingCommittee}
-                // saveButtonDisabled={isBusy}
+                isLoading={isLoadingCommittee || isBusy}
+                saveButtonDisabled={isBusy || isGeneratingInlinePreview}
                 leftButton={
                   <TextButton
                     variant="outline"
                     text="Batalkan"
-                    isLoading={isBusy}
+                    isLoading={isBusy || isGeneratingInlinePreview}
                     onClick={() => {
                       if (!selectedYearId) {
                         resetCommitteeForm();
@@ -510,6 +690,15 @@ export default function PanitiaPpdbPage() {
                           <FormControl>
                             <FormInput
                               {...field}
+                              value={field.value ?? ""}
+                              onChange={(event) => {
+                                const inputValue = event.target.value;
+                                field.onChange(
+                                  inputValue.trim().length === 0
+                                    ? null
+                                    : inputValue,
+                                );
+                              }}
                               label="NIP (Opsional)"
                               placeholder="Masukkan NIP"
                               type="number"
@@ -606,62 +795,21 @@ export default function PanitiaPpdbPage() {
 
             {displayPreview && (
               <div className="w-1/2 border border-gray-300 shadow-sm rounded-md bg-white p-4">
-                <h3 className="font-semibold mb-4">Preview Panitia PPDB</h3>
-                <div className="space-y-2 text-sm">
-                  <p>
-                    <span className="font-medium">Nama:</span>{" "}
-                    {previewData.name || "-"}
-                  </p>
-                  <p>
-                    <span className="font-medium">Jabatan:</span>{" "}
-                    {previewData.position || "-"}
-                  </p>
-                  <p>
-                    <span className="font-medium">NIP:</span>{" "}
-                    {previewData.nip || "-"}
-                  </p>
-                  <p>
-                    <span className="font-medium">Tempat:</span>{" "}
-                    {previewData.place || "-"}
-                  </p>
-                  <p>
-                    <span className="font-medium">Tanggal:</span>{" "}
-                    {previewData.defaultDate || "-"}
-                  </p>
-                </div>
-
-                <div className="mt-6 grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm font-medium mb-2">Tanda Tangan</p>
-                    {previewData.signatureUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={previewData.signatureUrl}
-                        alt="Preview tanda tangan"
-                        className="w-full h-32 object-contain border rounded"
-                      />
-                    ) : (
-                      <div className="w-full h-32 border rounded flex items-center justify-center text-xs text-gray-400">
-                        Belum ada tanda tangan
-                      </div>
-                    )}
+                {isGeneratingInlinePreview ? (
+                  <div className="h-full border border-gray-200 rounded-md flex items-center justify-center text-sm text-gray-500">
+                    Menyiapkan preview PDF...
                   </div>
-                  <div>
-                    <p className="text-sm font-medium mb-2">Stempel</p>
-                    {previewData.stampUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={previewData.stampUrl}
-                        alt="Preview stempel"
-                        className="w-full h-32 object-contain border rounded"
-                      />
-                    ) : (
-                      <div className="w-full h-32 border rounded flex items-center justify-center text-xs text-gray-400">
-                        Belum ada stempel
-                      </div>
-                    )}
+                ) : inlinePdfPreviewUrl ? (
+                  <iframe
+                    title="Preview PDF Panitia PPDB"
+                    src={inlinePdfPreviewUrl}
+                    className="w-full h-full border border-gray-200 rounded-md"
+                  />
+                ) : (
+                  <div className="h-full border border-gray-200 rounded-md flex items-center justify-center text-sm text-gray-500">
+                    Preview belum tersedia
                   </div>
-                </div>
+                )}
               </div>
             )}
           </div>

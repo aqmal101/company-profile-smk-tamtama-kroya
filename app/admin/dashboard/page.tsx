@@ -9,8 +9,6 @@ import { useEffect, useState } from "react";
 import { FiUser, FiUsers } from "react-icons/fi";
 import { LiaChalkboardTeacherSolid } from "react-icons/lia";
 import { MdOutlineToday } from "react-icons/md";
-import AreaChart from "@/components/Chart/AreaChart";
-import PieChart from "@/components/Chart/PieChart";
 import { transformRecentRegistrations } from "@/utils/transformRegistrationData";
 import { PaginationMeta, Student } from "@/components/Dashboard";
 import { TextButton } from "@/components/Buttons/TextButton";
@@ -28,6 +26,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import AreaChart from "@/components/Chart/AreaChart";
+import PieChart from "@/components/Chart/PieChart";
 
 export function GreetingCard() {
   const { user } = useAuth();
@@ -423,32 +423,6 @@ export default function AdminDashboardPage() {
             </TooltipTrigger>
             <TooltipContent side="top">Detail Data Murid</TooltipContent>
           </Tooltip>
-          {/* <Tooltip>
-            <TooltipTrigger>
-              <TextButton
-                icon={<LuPen className="text-xl" />}
-                isLoading={loadingDetail}
-                variant="outline-info"
-                className="w-fit py-1 px-2! text-xs border-2 border-blue-500"
-                disabled={loadingDetail}
-                onClick={() => handleRouteDetail(Number(value))}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="top">Edit Data Murid</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger>
-              <TextButton
-                icon={<LuTrash2 className="text-xl" />}
-                isLoading={loadingDetail}
-                variant="outline-danger"
-                className="w-fit py-1 px-2! border-2"
-                disabled={loadingDetail}
-                onClick={() => confirmDelete(Number(value))}
-              />
-            </TooltipTrigger>
-            <TooltipContent side="top">Hapus Data Murid</TooltipContent>
-          </Tooltip> */}
         </div>
       ),
       // width: 120,

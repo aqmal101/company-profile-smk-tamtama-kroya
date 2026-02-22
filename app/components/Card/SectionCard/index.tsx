@@ -79,8 +79,8 @@ export const SectionCard = ({
         )}
 
         <TextButton
-          isLoading={isLoading}
-          disabled={saveButtonDisabled}
+          isLoading={isLoading || saveButtonDisabled}
+          // disabled={saveButtonDisabled}
           variant="primary"
           icon={saveButtonIcon}
           text={saveButtonText}
