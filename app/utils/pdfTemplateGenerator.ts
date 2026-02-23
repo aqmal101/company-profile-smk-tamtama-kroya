@@ -85,6 +85,7 @@ export function buildSignatureInfo(
     position: committee.position,
     title: committee.title,
     place: committee.place,
+    nip: committee.nip ?? undefined,
     date: parseSignatureDate(committee.date),
     signatureImage: committee.signatureUrl,
     stampImage: committee.stampUrl,

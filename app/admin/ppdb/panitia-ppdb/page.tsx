@@ -709,6 +709,7 @@ export default function PanitiaPpdbPage() {
                             <FormInput
                               {...field}
                               value={field.value ?? ""}
+                              limit={18}
                               onChange={(event) => {
                                 const inputValue = event.target.value;
                                 field.onChange(
@@ -820,7 +821,7 @@ export default function PanitiaPpdbPage() {
                 ) : inlinePdfPreviewUrl ? (
                   <iframe
                     title="Preview PDF Panitia PPDB"
-                    src={inlinePdfPreviewUrl}
+                    src={`${inlinePdfPreviewUrl}#zoom=page-fit&view=FitH`}
                     className="w-full h-full border border-gray-200 rounded-md"
                   />
                 ) : (
