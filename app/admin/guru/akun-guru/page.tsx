@@ -20,7 +20,6 @@ import { LuEye, LuPen, LuPlus, LuTrash2 } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 import { useAlert } from "@/components/ui/alert";
 import { BaseModal } from "@/components/Modal/BaseModal";
-import Image from "next/image";
 import { BsDot } from "react-icons/bs";
 
 interface TeacherDetail {

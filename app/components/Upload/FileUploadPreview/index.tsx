@@ -1,4 +1,4 @@
-import { LuFileText } from "react-icons/lu";
+import { LuFileText, LuFileWarning, LuFileX2 } from "react-icons/lu";
 import { useEffect, useState } from "react";
 import mammoth from "mammoth";
 
@@ -82,8 +82,9 @@ export default function FileUploadPreview({
 
   if (!fileKind || !previewUrl) {
     return (
-      <div className="w-full h-full flex items-center justify-center text-sm text-gray-500">
-        {emptyText}
+      <div className="w-full h-full flex flex-col items-center justify-center text-sm text-gray-500">
+        <LuFileX2 className="text-4xl" />
+        <p className="mt-2">{emptyText}</p>
       </div>
     );
   }
@@ -133,7 +134,7 @@ export default function FileUploadPreview({
       return (
         <div className="w-full h-full flex items-center justify-center text-sm text-red-500">
           <div className="flex flex-col items-center gap-2">
-            <LuFileText className="text-4xl" />
+            <LuFileWarning className="text-4xl" />
             <p>{conversionError}</p>
           </div>
         </div>
@@ -164,7 +165,7 @@ export default function FileUploadPreview({
   return (
     <div className="w-full border h-full flex flex-col items-center justify-center gap-3 text-gray-700 p-2">
       {file?.name && (
-        <div className="flex flex-row   items-center gap-1">
+        <div className="flex flex-row items-center gap-1">
           <LuFileText className="text-6xl text-gray-500" />
           <p className="text-sm text-center break-all">{file.name}</p>
         </div>
