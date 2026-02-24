@@ -7,6 +7,7 @@ interface SectionCardProps {
   title?: string;
   children?: React.ReactNode;
   leftButton?: React.ReactNode;
+  headerButton?: React.ReactNode;
   saveButtonText?: string;
   saveButtonIcon?: React.ReactNode;
   saveButtonDisabled?: boolean;
@@ -15,12 +16,14 @@ interface SectionCardProps {
   isLoading?: boolean;
   className?: string;
   maxRow?: number;
+  cardFooter?: boolean;
 }
 
 export const SectionCard = ({
   title = "",
   children,
   leftButton,
+  headerButton,
   saveButtonText = "Simpan Perubahan",
   saveButtonIcon = null,
   saveButtonDisabled = false,
@@ -29,6 +32,7 @@ export const SectionCard = ({
   isLoading = false,
   maxRow = 6,
   className = "w-1/2",
+  cardFooter = true,
 }: SectionCardProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [lastHeight, setLastHeight] = useState(360); // default height
@@ -55,8 +59,9 @@ export const SectionCard = ({
   return (
     <div className={`${className} border border-gray-300 shadow-lg rounded-md`}>
       {title && (
-        <div className="w-full h-fit border-b border-b-gray-400 px-4">
-          <h3 className="font-semibold text-gray-800 py-3">{title}</h3>
+        <div className="w-full h-fit flex flex-row justify-between items-center border-b border-b-gray-400 px-4">
+          <h3 className="font-semibold text-gray-800 py-3">{title}</h3>{" "}
+          {headerButton}
         </div>
       )}
       <div className="w-full h-fit">
@@ -66,27 +71,29 @@ export const SectionCard = ({
           <div ref={containerRef}>{children}</div>
         )}
       </div>
-      <div className="p-4 h-fit border-t border-gray-300 flex justify-end items-center gap-6">
-        {isCancelButton ? (
+      {cardFooter && (
+        <div className="p-4 h-fit border-t border-gray-300 flex justify-end items-center gap-6">
+          {isCancelButton ? (
+            <TextButton
+              isLoading={isLoading}
+              variant="primary"
+              text="Simpan Perubahan"
+              onClick={handleSaveChanges}
+            />
+          ) : (
+            leftButton
+          )}
+
           <TextButton
-            isLoading={isLoading}
+            isLoading={isLoading || saveButtonDisabled}
+            // disabled={saveButtonDisabled}
             variant="primary"
-            text="Simpan Perubahan"
+            icon={saveButtonIcon}
+            text={saveButtonText}
             onClick={handleSaveChanges}
           />
-        ) : (
-          leftButton
-        )}
-
-        <TextButton
-          isLoading={isLoading || saveButtonDisabled}
-          // disabled={saveButtonDisabled}
-          variant="primary"
-          icon={saveButtonIcon}
-          text={saveButtonText}
-          onClick={handleSaveChanges}
-        />
-      </div>
+        </div>
+      )}
     </div>
   );
 };
