@@ -8,7 +8,8 @@ import SelectInput from "@/components/InputForm/SelectInput";
 import { SearchableSelect } from "@/components/InputForm/SelectInput/SearchableSelect";
 import { BaseModal } from "@/components/Modal/BaseModal";
 import { ModalPreviewData } from "@/components/Modal/PreviewDataModal";
-import ReusableTable, { Column } from "@/components/Table/ReusableTable";
+import ReusableTable from "@/components/Table/ReusableTable";
+import { Column } from "@/components/Table/type";
 import { TitleSection } from "@/components/TitleSection/index";
 import { useAlert } from "@/components/ui/alert";
 import {

@@ -6,10 +6,7 @@ import { getAuthHeader, getCurrentUser } from "@/utils/auth";
 import { PaginationMeta } from "@/components/Dashboard/Pagination";
 import { TextButton } from "@/components/Buttons/TextButton";
 import { HiUserGroup } from "react-icons/hi";
-import {
-  FaCalendarDay,
-  FaCalendarWeek,
-} from "react-icons/fa6";
+import { FaCalendarDay, FaCalendarWeek } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import { ModalPreviewData } from "@/components/Modal/PreviewDataModal";
 import { RegistrationData } from "@/utils/registrationTypes";
@@ -18,12 +15,13 @@ import {
   transformRecentRegistrations,
 } from "@/utils/transformRegistrationData";
 import { useAlert } from "@/components/ui/alert";
-import ReusableTable, { Column } from "@/components/Table/ReusableTable";
+import ReusableTable from "@/components/Table/ReusableTable";
 import dayjs from "dayjs";
 import "dayjs/locale/id";
 import SelectInput from "@/components/InputForm/SelectInput";
 import { Student } from "@/components/Dashboard";
 import Search from "@/components/Filter/Search";
+import { Column } from "@/components/Table/type";
 
 export function GreetingCard() {
   const { user } = useAuth();

@@ -15,7 +15,7 @@ import { TextButton } from "@/components/Buttons/TextButton";
 import { RegistrationData } from "@/utils/registrationTypes";
 import { transformFromApiFormat } from "@/utils/transformRegistrationData";
 import { useAlert } from "@/components/ui/alert";
-import ReusableTable, { Column } from "@/components/Table/ReusableTable";
+import ReusableTable from "@/components/Table/ReusableTable";
 import { ModalPreviewData } from "@/components/Modal/PreviewDataModal";
 import { BaseModal } from "@/components/Modal/BaseModal";
 import Skeleton from "@/components/Skeleton";
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/tooltip";
 import AreaChart from "@/components/Chart/AreaChart";
 import PieChart from "@/components/Chart/PieChart";
+import { Column } from "@/components/Table/type";
 
 export function GreetingCard() {
   const { user } = useAuth();
