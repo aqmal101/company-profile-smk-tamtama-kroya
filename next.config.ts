@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "storage.haruaki.my.id",
+      }, 
+      {
+        protocol: "https",
+        hostname: "via.placeholder.com",
       }
     ],
   },

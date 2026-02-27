@@ -4,7 +4,7 @@ import { TextButton } from "@/components/Buttons/TextButton";
 import { PaginationMeta } from "@/components/Dashboard/Pagination";
 import Search from "@/components/Filter/Search";
 import { ProfileUser } from "@/components/Icon/UserIcon";
-import ReusableTable, { Column } from "@/components/Table/ReusableTable";
+import ReusableTable from "@/components/Table/ReusableTable";
 import { TitleSection } from "@/components/TitleSection/index";
 import {
   Tooltip,
@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { useAlert } from "@/components/ui/alert";
 import { BaseModal } from "@/components/Modal/BaseModal";
 import { BsDot } from "react-icons/bs";
+import { Column } from "@/components/Table/type";
 
 interface TeacherDetail {
   id: number;

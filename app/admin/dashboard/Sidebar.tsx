@@ -114,16 +114,6 @@ const sidebarItems = [
       },
     ],
   },
-  {
-    group: "teknis",
-    items: [
-      {
-        icon: FiSettings,
-        label: "Pengaturan",
-        href: "/admin/pengaturan",
-      },
-    ],
-  },
 ];
 
 export default function Sidebar({ collapsed }: { collapsed: boolean }) {
