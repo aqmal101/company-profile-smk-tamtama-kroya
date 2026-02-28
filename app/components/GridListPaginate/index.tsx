@@ -1,5 +1,5 @@
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 type ViewMode = "grid" | "list";
 
@@ -34,8 +34,52 @@ export default function GridListPaginate<T extends object>({
   showNumberInfo = true,
   emptyText = "Tidak ada data",
 }: GridListPaginateProps<T>) {
+  const [gridColumns, setGridColumns] = useState<1 | 2 | 3>(3);
+  const lastSyncedResponsiveSizeRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (viewMode !== "grid") return;
+
+    const updateGridColumns = () => {
+      if (window.innerWidth >= 1024) {
+        setGridColumns(3);
+      } else if (window.innerWidth >= 640) {
+        setGridColumns(2);
+      } else {
+        setGridColumns(1);
+      }
+    };
+
+    updateGridColumns();
+    window.addEventListener("resize", updateGridColumns);
+
+    return () => {
+      window.removeEventListener("resize", updateGridColumns);
+    };
+  }, [viewMode]);
+
+  const responsiveGridPageSize = useMemo(() => {
+    if (viewMode !== "grid") return 10;
+    return gridColumns === 2 ? 10 : 9;
+  }, [gridColumns, viewMode]);
+
+  useEffect(() => {
+    if (!pagination || viewMode !== "grid") return;
+    if (pagination.pageSize === responsiveGridPageSize) {
+      lastSyncedResponsiveSizeRef.current = null;
+      return;
+    }
+    if (lastSyncedResponsiveSizeRef.current === responsiveGridPageSize) return;
+
+    lastSyncedResponsiveSizeRef.current = responsiveGridPageSize;
+    pagination.onChange(1, responsiveGridPageSize);
+    pagination.onShowSizeChange?.(1, responsiveGridPageSize);
+  }, [pagination, responsiveGridPageSize, viewMode]);
+
   const defaultPageSize = viewMode === "grid" ? 9 : 10;
-  const effectivePageSize = pagination ? pagination.pageSize || defaultPageSize : defaultPageSize;
+  const effectivePageSize = pagination
+    ? pagination.pageSize || defaultPageSize
+    : defaultPageSize;
   const defaultPageSizeOptions =
     viewMode === "grid" ? [9, 18, 27, 36] : [10, 20, 50, 100];
 

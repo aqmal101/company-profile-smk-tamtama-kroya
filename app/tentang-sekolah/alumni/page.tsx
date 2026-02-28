@@ -43,7 +43,7 @@ export default function AlumnusPage() {
   const paginationConfig = useMemo(
     () => ({
       current: pagination.currentPage,
-      pageSize: 9,
+      pageSize: pagination.perPage,
       total: pagination.total,
       onChange: (page: number, pageSize: number) => {
         fetchAlumni(page, pageSize);
@@ -76,7 +76,7 @@ export default function AlumnusPage() {
         <img
           src={item.photoUrl}
           alt={item.name}
-          className="w-full h-auto aspect-1.5/1 bg-gray-300 border border-gray-300 rounded-lg object-cover"
+          className="w-full h-58 aspect-1.5/1 bg-gray-300 border border-gray-300 rounded-lg object-cover"
         />
         <p className="text-base font-semibold text-gray-800 my-1">
           {item.name}
@@ -93,10 +93,10 @@ export default function AlumnusPage() {
   };
 
   return (
-    <main className="h-fit flex bg-linear-to-b from-[#fafafa] to-gray-50 py-16 sm:pt-20 px-42">
-      <div className="w-full py-8 gap-6">
-        <div className="w-full flex flex-wrap items-center">
-          <h1 className="text-3xl font-bold text-primary">
+    <main className="min-h-screen w-full bg-linear-to-b from-[#fafafa] to-gray-50 px-4 py-10 sm:px-6 sm:py-12 md:px-10 lg:px-16 xl:px-24">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 py-16 sm:pb-4 max-sm:pt-20 max-sm:px-8">
+        <div className="w-full flex flex-wrap items-center justify-center md:justify-start">
+          <h1 className="text-center text-3xl font-bold text-primary md:text-left">
             ALUMNI SMK TAMTAMA KROYA
           </h1>
         </div>

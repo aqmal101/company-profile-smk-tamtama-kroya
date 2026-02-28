@@ -421,21 +421,8 @@ export default function DataAlumniPage() {
           subtitle="Halaman ini akan menampilkan daftar alumni SMK Tamtama Kroya yang dapat diubah"
         />
         <div className="w-full mb-3">
-          <div className="w-full flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-end lg:justify-end">
-            <div className="w-full lg:w-60">
-              <SelectInput
-                label=""
-                value={selectedMajor}
-                onChange={(event) =>
-                  setSelectedMajor(String(event.target.value))
-                }
-                options={majorOptions}
-                placeholder="Pilih jurusan"
-                disabled={isLoadingMajors}
-              />
-            </div>
-
-            <div className="w-full lg:w-52">
+          <div className="w-full flex flex-col gap-3 lg:flex lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
+            {/* <div className="w-full lg:w-52">
               <SearchableSelect
                 label=""
                 options={yearFilterOptions}
@@ -453,8 +440,21 @@ export default function DataAlumniPage() {
                   setCurrentPage(1);
                 }}
               />
+            </div> */}
+            <div className="w-full lg:w-74">
+              <SelectInput
+                label=""
+                value={selectedMajor}
+                onChange={(event) =>
+                  setSelectedMajor(String(event.target.value))
+                }
+                options={majorOptions}
+                placeholder="Pilih jurusan"
+                disabled={isLoadingMajors}
+              />
             </div>
-            <div className="w-full lg:w-60">
+
+            <div className="w-full lg:w-54">
               <SelectInput
                 label=""
                 value={sortBy}
@@ -462,7 +462,7 @@ export default function DataAlumniPage() {
                 options={sortByOptions}
               />
             </div>
-            <div className="w-full lg:w-52">
+            <div className="w-full lg:w-50">
               <SelectInput
                 label=""
                 value={sortOrder}
@@ -479,7 +479,7 @@ export default function DataAlumniPage() {
             />
             <Search
               placeholder="Cari nama alumni"
-              className="w-full lg:max-w-sm lg:mb-2"
+              className="w-full lg:max-w-58 lg:mb-2"
               searchTerm={searchTerm}
               handleSearchChange={handleSearchChange}
             />
