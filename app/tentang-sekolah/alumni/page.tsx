@@ -1,34 +1,8 @@
 "use client";
 
+import { AlumniApiResponse, AlumniItem } from "@/admin/siswa/data-alumni/type";
 import GridListPaginate from "@/components/GridListPaginate";
-import { TextButton } from "@/components/Buttons/TextButton";
 import { useEffect, useMemo, useState } from "react";
-
-type ViewMode = "grid" | "list";
-
-interface AlumniItem {
-  id: number;
-  name: string;
-  generationYear: number;
-  photoUrl: string;
-  major: string;
-  currentJob: string;
-}
-
-interface AlumniApiResponse {
-  meta: {
-    total: number;
-    perPage: number;
-    currentPage: number;
-    lastPage: number;
-    firstPage: number;
-    firstPageUrl: string;
-    lastPageUrl: string;
-    nextPageUrl: string | null;
-    previousPageUrl: string | null;
-  };
-  data: AlumniItem[];
-}
 
 export default function AlumnusPage() {
   const [loading, setLoading] = useState(false);
@@ -69,13 +43,11 @@ export default function AlumnusPage() {
   const paginationConfig = useMemo(
     () => ({
       current: pagination.currentPage,
-      pageSize: pagination.perPage,
+      pageSize: 9,
       total: pagination.total,
       onChange: (page: number, pageSize: number) => {
         fetchAlumni(page, pageSize);
       },
-      showSizeChanger: true,
-      pageSizeOptions: [9, 18, 27],
       onShowSizeChange: (page: number, pageSize: number) => {
         fetchAlumni(page, pageSize);
       },
@@ -83,30 +55,47 @@ export default function AlumnusPage() {
     [pagination],
   );
 
-  const renderItem = (item: AlumniItem, _: number, mode: ViewMode) => {
+  const renderItem = (item: AlumniItem, _: number) => {
+    let majorAbbr = item.major;
+    switch (item.major) {
+      case "TP":
+        item.major = "Teknik Permesinan";
+        break;
+      case "TKR":
+        item.major = "Teknik Kendaraan Ringan";
+        break;
+      case "TITL":
+        item.major = "Teknik Instalasi Tenaga Listrik";
+        break;
+      case "DKV":
+        item.major = "Desain Komunikasi Visual";
+        break;
+    }
     return (
       <div className="rounded-lg flex flex-col items-center">
         <img
           src={item.photoUrl}
           alt={item.name}
-          className="w-full h-auto aspect-video bg-gray-300 rounded-lg object-cover"
+          className="w-full h-auto aspect-1.5/1 bg-gray-300 border border-gray-300 rounded-lg object-cover"
         />
-        <p className="text-base font-semibold text-gray-800 my-2">
+        <p className="text-base font-semibold text-gray-800 my-1">
           {item.name}
         </p>
-        <p className="text-base italic text-gray-800">{item.major}</p>
+        <p className="text-base italic text-gray-800">{majorAbbr}</p>
         <p className="text-base italic text-gray-800">
           Angkatan {item.generationYear}
         </p>
-        <p className="text-base italic text-gray-800 mt-2">{item.currentJob}</p>
+        <p className="text-base italic text-gray-600 font-light mt-1">
+          {item.currentJob}
+        </p>
       </div>
     );
   };
 
   return (
     <main className="h-fit flex bg-linear-to-b from-[#fafafa] to-gray-50 py-16 sm:pt-20 px-42">
-      <div className="w-full py-8">
-        <div className="w-full flex flex-wrap items-center justify-between gap-4">
+      <div className="w-full py-8 gap-6">
+        <div className="w-full flex flex-wrap items-center">
           <h1 className="text-3xl font-bold text-primary">
             ALUMNI SMK TAMTAMA KROYA
           </h1>
@@ -114,6 +103,8 @@ export default function AlumnusPage() {
 
         <GridListPaginate
           data={alumni}
+          showSizeChanger={false}
+          showNumberInfo={false}
           renderItem={renderItem}
           viewMode="grid"
           loading={loading}

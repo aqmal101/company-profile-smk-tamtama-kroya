@@ -47,37 +47,34 @@ export default function DragDropFile({
   const getFileKindFromName = (name?: string | null) => {
     const ext = name?.split(".").pop()?.toLowerCase();
     if (!ext) return null;
-    if (ext === "png") return "png";
+    if (ext === "png" || ext === "jpg" || ext === "jpeg") return "image";
     if (ext === "pdf") return "pdf";
-    // if (ext === "doc") return "doc";
-    // if (ext === "docx") return "docx";
     return null;
   };
 
   const getFileKindFromFile = (file: File | null) => {
     if (!file) return null;
     const mime = file.type.toLowerCase();
-    if (mime === "image/png") return "png";
+    if (mime.startsWith("image/")) return "image";
     if (mime === "application/pdf") return "pdf";
-    // if (mime === "application/msword") return "doc";
-    // if (
-    //   mime ===
-    //   "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    // )
-    //   return "docx";
 
     return getFileKindFromName(file.name);
   };
 
   const getFileKindFromUrl = (url: string | null) => {
     if (!url) return null;
+
+    if (url.startsWith("data:image/")) return "image";
+    if (url.startsWith("data:application/pdf")) return "pdf";
+    if (url.startsWith("blob:")) return "image";
+
     const cleanUrl = url.split("?")[0].split("#")[0];
     return getFileKindFromName(cleanUrl);
   };
 
   const selectedFileKind =
     getFileKindFromFile(selectedFile) ?? getFileKindFromUrl(selectedPreviewUrl);
-  const isImagePreview = selectedFileKind === "png";
+  const isImagePreview = selectedFileKind === "image";
   const fileTypeLabel = selectedFileKind
     ? selectedFileKind.toUpperCase()
     : "FILE";

@@ -43,7 +43,8 @@ export const TextButton = React.forwardRef<HTMLButtonElement, TextButtonProps>(
     let loadingStyle = "";
     switch (variant) {
       case "primary":
-        defaultStyle = "bg-primary text-white border hover:opacity-90";
+        defaultStyle =
+          "bg-primary text-white border border-primary hover:opacity-90";
         loadingStyle = "border-white border-t-white/30";
         break;
       case "danger":

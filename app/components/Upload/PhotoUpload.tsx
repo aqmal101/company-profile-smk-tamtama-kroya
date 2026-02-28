@@ -13,6 +13,8 @@ export interface PhotoUploadProps {
   error?: string;
   textButton?: string;
   className?: string;
+  maxSizeInMB?: number;
+  onValidationError?: (message: string) => void;
 }
 
 export const PhotoUpload: React.FC<PhotoUploadProps> = ({
@@ -25,7 +27,11 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
   error,
   textButton = "Ganti Foto",
   className = "",
+  maxSizeInMB = 5,
+  onValidationError,
 }) => {
+  const maxSizeBytes = maxSizeInMB * 1024 * 1024;
+
   return (
     <div className={`form-item ${className}`}>
       {label && (
@@ -36,29 +42,6 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
       )}
 
       <div className="space-y-4">
-        {/* Image Preview */}
-        {/* {previewUrl && (
-          <div className="relative w-fit">
-            <Image
-              src={previewUrl}
-              alt="Preview"
-              width={120}
-              height={120}
-              className="rounded-lg object-cover border-2 border-gray-200"
-            />
-            {!disabled && (
-              <button
-                type="button"
-                onClick={onFileRemove}
-                className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors shadow-md"
-                aria-label="Remove photo"
-              >
-                <LuX size={16} />
-              </button>
-            )}
-          </div>
-        )} */}
-
         {/* Drag Drop File */}
         <DragDropFile
           accept="image/*"
@@ -70,14 +53,16 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
           showPreview={true}
           onRemove={onFileRemove}
           onValidate={(file) => {
-            // Validate file size (max 5MB)
-            const maxSize = 5 * 1024 * 1024;
-            if (file.size > maxSize) {
-              return "Ukuran file maksimal 5MB";
+            if (file.size > maxSizeBytes) {
+              const message = `Ukuran file maksimal ${maxSizeInMB}MB`;
+              onValidationError?.(message);
+              return message;
             }
             // Validate file type
             if (!file.type.startsWith("image/")) {
-              return "File harus berupa gambar";
+              const message = "File harus berupa gambar";
+              onValidationError?.(message);
+              return message;
             }
             return null;
           }}
@@ -88,7 +73,7 @@ export const PhotoUpload: React.FC<PhotoUploadProps> = ({
 
         {/* Helper Text */}
         <p className="text-xs text-gray-500">
-          Format: JPG, PNG, GIF. Ukuran maksimal: 5MB
+          Format: JPG, PNG, GIF. Ukuran maksimal: {maxSizeInMB}MB
         </p>
       </div>
     </div>

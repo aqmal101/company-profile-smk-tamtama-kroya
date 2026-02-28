@@ -22,6 +22,7 @@ interface SearchableSelectProps {
   isAddValueActive?: boolean; // Opsi untuk mengaktifkan fitur tambah nilai custom
   resetKey?: string | number;
   allowClear?: boolean;
+  maxDisplayOptions?: number;
 }
 
 type SearchableOption = { value: string | number; label: string };
@@ -41,6 +42,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   isAddValueActive = true,
   resetKey,
   allowClear = true,
+  maxDisplayOptions,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -252,7 +254,16 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
   // Render options berdasarkan apakah menggunakan fetch atau static
   const renderDropdownContent = () => {
+    const getLimitedOptions = (optionsList: SearchableOption[]) => {
+      if (!maxDisplayOptions || maxDisplayOptions <= 0) {
+        return optionsList;
+      }
+      return optionsList.slice(0, maxDisplayOptions);
+    };
+
     if (fetchOptions) {
+      const limitedRemoteOptions = getLimitedOptions(remoteOptions);
+
       // Mode API fetch
       return (
         <>
@@ -279,13 +290,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           {searchValue.trim().length >= minChars &&
             !isLoading &&
             !fetchError &&
-            remoteOptions.length > 0 && (
+            limitedRemoteOptions.length > 0 && (
               <>
-                {remoteOptions.map((option, index) => (
+                {limitedRemoteOptions.map((option, index) => (
                   <div
                     key={`${option.value}-${index}`}
                     onClick={() => handleSelectOption(String(option.value))}
-                    className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
+                    className={`px-4 py-1 text-sm cursor-pointer hover:bg-blue-50 transition-colors ${
                       String(value) === String(option.value)
                         ? "bg-primary text-white hover:bg-primary"
                         : ""
@@ -309,7 +320,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           {searchValue.trim().length >= minChars &&
             !isLoading &&
             !fetchError &&
-            remoteOptions.length === 0 && (
+            limitedRemoteOptions.length === 0 && (
               <div className="py-2">
                 <div className="px-4 py-2 text-gray-500 text-sm">
                   Tidak ada pilihan yang sesuai
@@ -332,15 +343,17 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     const filteredOptions = combinedOptions.filter((option) =>
       option.label.toLowerCase().includes(searchValue.toLowerCase()),
     );
+    const limitedFilteredOptions = getLimitedOptions(filteredOptions);
+    const limitedCombinedOptions = getLimitedOptions(combinedOptions);
 
-    if (filteredOptions.length > 0) {
+    if (limitedFilteredOptions.length > 0) {
       return (
         <>
-          {filteredOptions.map((option) => (
+          {limitedFilteredOptions.map((option) => (
             <div
               key={String(option.value)}
               onClick={() => handleSelectOption(String(option.value))}
-              className={`px-4 py-2 cursor-pointer hover:bg-blue-50 transition-colors ${
+              className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-300 transition-colors ${
                 String(value) === String(option.value)
                   ? "bg-primary text-white hover:bg-primary"
                   : ""
@@ -382,7 +395,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     // Show all options saat belum search
     return (
       <>
-        {combinedOptions.map((option) => (
+        {limitedCombinedOptions.map((option) => (
           <div
             key={String(option.value)}
             onClick={() => handleSelectOption(String(option.value))}
@@ -401,7 +414,9 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
 
   return (
     <div className={`mb-2 max-sm:mb-1 ${className}`} ref={dropdownRef}>
-      <label className={`block text-sm max-sm:text-xs font-semibold text-gray-700 ${label ? "mb-2" : ""}`}>
+      <label
+        className={`block text-sm max-sm:text-xs font-semibold text-gray-700 ${label ? "mb-2" : ""}`}
+      >
         {label} {isMandatory && <span className="text-red-500">*</span>}
       </label>
 

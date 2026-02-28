@@ -29,10 +29,10 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get("page") || "1");
-    const perPage = parseInt(searchParams.get("perPage") || "10");
+    const perPage = parseInt(searchParams.get("perPage") || "9");
 
     const backendResponse = await fetch(
-      `${API_BASE_URL}/alumni?page=${page}&perPage=${perPage}`,
+      `${API_BASE_URL}/alumni?page=${page}&limit=${perPage}`,
       {
         method: "GET",
         headers: {

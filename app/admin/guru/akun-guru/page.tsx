@@ -22,23 +22,7 @@ import { useAlert } from "@/components/ui/alert";
 import { BaseModal } from "@/components/Modal/BaseModal";
 import { BsDot } from "react-icons/bs";
 import { Column } from "@/components/Table/type";
-
-interface TeacherDetail {
-  id: number;
-  fullName: string;
-  username: string;
-  role: string;
-  photoUrl: string;
-  createdAt: string;
-  updatedAt: string;
-  schoolLessons: Array<{
-    id: number;
-    name: string;
-    abbreviation: string;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-}
+import { TeacherDetail } from "./type";
 
 export default function AdminTeacherAccountPage() {
   const router = useRouter();
