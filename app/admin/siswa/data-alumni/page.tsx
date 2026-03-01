@@ -20,6 +20,7 @@ import Search from "@/components/Filter/Search";
 import SelectInput from "@/components/InputForm/SelectInput";
 import { IoMdRefresh } from "react-icons/io";
 import { SearchableSelect } from "@/components/InputForm/SelectInput/SearchableSelect";
+import Image from "next/image";
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_MIN = 1977;
@@ -359,12 +360,13 @@ export default function DataAlumniPage() {
     return (
       <div className="rounded-lg h-28 flex flex-row items-center justify-between border border-gray-300 shadow-2xs p-2 gap-4">
         <div className="h-full flex flex-row items-center gap-4 ">
-          <img
-            src={item.photoUrl}
+          <Image
+            src={item.photoUrl || "https://placehold.co/600x400/png"}
             alt={item.name}
-            // height={100}
-            // width={100}
-            className="w-auto h-full border border-gray-300 aspect-video bg-gray-300 rounded-lg object-cover"
+            height={200}
+            width={100}
+            loading="lazy"
+            className="w-42 h-full border border-gray-300 aspect-video bg-gray-300 rounded-lg object-cover"
           />
           <div>
             <p className="text-base font-semibold text-gray-800 mb-3">

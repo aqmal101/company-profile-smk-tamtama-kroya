@@ -2,6 +2,7 @@
 
 import { AlumniApiResponse, AlumniItem } from "@/admin/siswa/data-alumni/type";
 import GridListPaginate from "@/components/GridListPaginate";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
 export default function AlumnusPage() {
@@ -73,9 +74,12 @@ export default function AlumnusPage() {
     }
     return (
       <div className="rounded-lg flex flex-col items-center">
-        <img
-          src={item.photoUrl}
+        <Image
+          src={item.photoUrl || "https://placehold.co/600x400/png"}
           alt={item.name}
+          width={232}
+          height={121}
+          loading="lazy"
           className="w-full h-58 aspect-1.5/1 bg-gray-300 border border-gray-300 rounded-lg object-cover"
         />
         <p className="text-base font-semibold text-gray-800 my-1">

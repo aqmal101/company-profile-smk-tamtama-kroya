@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["http://localhost:3030"],
   reactStrictMode: true,
   images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60 * 60 * 24,
     remotePatterns: [
       {
         protocol: "https",
@@ -16,6 +18,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "via.placeholder.com",
+      },
+      {
+        protocol: "https",
+        hostname: "placehold.co",
       }
     ],
   },
