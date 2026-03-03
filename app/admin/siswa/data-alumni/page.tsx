@@ -3,7 +3,7 @@
 import GridListPaginate from "@/components/GridListPaginate";
 import { TitleSection } from "@/components/TitleSection/index";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlumniApiResponse, AlumniItem, YEAR_OPTIONS_LIMIT } from "./type";
+import { AlumniApiResponse, AlumniItem } from "./type";
 import Toggle from "@/components/ui/toggle";
 import { TextButton } from "@/components/Buttons/TextButton";
 import { LuPen, LuTrash2 } from "react-icons/lu";
@@ -19,11 +19,7 @@ import { useAlert } from "@/components/ui/alert";
 import Search from "@/components/Filter/Search";
 import SelectInput from "@/components/InputForm/SelectInput";
 import { IoMdRefresh } from "react-icons/io";
-import { SearchableSelect } from "@/components/InputForm/SelectInput/SearchableSelect";
 import Image from "next/image";
-
-const CURRENT_YEAR = new Date().getFullYear();
-const YEAR_MIN = 1977;
 
 const sortByOptions = [
   { value: "createdAt", label: "Urutkan: Tanggal Dibuat" },
@@ -84,17 +80,6 @@ export default function DataAlumniPage() {
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
-
-  const yearFilterOptions = useMemo(
-    () => [
-      { value: "", label: "Semua Angkatan" },
-      ...Array.from({ length: CURRENT_YEAR - YEAR_MIN }, (_, index) => {
-        const year = CURRENT_YEAR - 1 - index;
-        return { value: String(year), label: String(year) };
-      }),
-    ],
-    [],
-  );
 
   const fetchAlumni = useCallback(async () => {
     try {
@@ -447,25 +432,6 @@ export default function DataAlumniPage() {
         />
         <div className="w-full mb-3">
           <div className="w-full flex flex-col gap-3 lg:flex lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
-            {/* <div className="w-full lg:w-52">
-              <SearchableSelect
-                label=""
-                options={yearFilterOptions}
-                isAddValueActive={false}
-                allowClear={false}
-                maxDisplayOptions={YEAR_OPTIONS_LIMIT}
-                className="w-full"
-                minChars={0}
-                placeholder={"Pilih Tahun Angkatan"}
-                isMandatory={false}
-                name={"generationYear"}
-                value={selectedGenerationYear}
-                onChange={(e) => {
-                  setSelectedGenerationYear(String(e.target.value));
-                  setCurrentPage(1);
-                }}
-              />
-            </div> */}
             <div className="w-full lg:w-74">
               <SelectInput
                 label=""

@@ -1,5 +1,5 @@
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
-import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { ReactNode } from "react";
 
 type ViewMode = "grid" | "list";
 
@@ -34,48 +34,6 @@ export default function GridListPaginate<T extends object>({
   showNumberInfo = true,
   emptyText = "Tidak ada data",
 }: GridListPaginateProps<T>) {
-  const [gridColumns, setGridColumns] = useState<1 | 2 | 3>(3);
-  const lastSyncedResponsiveSizeRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (viewMode !== "grid") return;
-
-    const updateGridColumns = () => {
-      if (window.innerWidth >= 1024) {
-        setGridColumns(3);
-      } else if (window.innerWidth >= 640) {
-        setGridColumns(2);
-      } else {
-        setGridColumns(1);
-      }
-    };
-
-    updateGridColumns();
-    window.addEventListener("resize", updateGridColumns);
-
-    return () => {
-      window.removeEventListener("resize", updateGridColumns);
-    };
-  }, [viewMode]);
-
-  const responsiveGridPageSize = useMemo(() => {
-    if (viewMode !== "grid") return 10;
-    return gridColumns === 2 ? 10 : 9;
-  }, [gridColumns, viewMode]);
-
-  useEffect(() => {
-    if (!pagination || viewMode !== "grid") return;
-    if (pagination.pageSize === responsiveGridPageSize) {
-      lastSyncedResponsiveSizeRef.current = null;
-      return;
-    }
-    if (lastSyncedResponsiveSizeRef.current === responsiveGridPageSize) return;
-
-    lastSyncedResponsiveSizeRef.current = responsiveGridPageSize;
-    pagination.onChange(1, responsiveGridPageSize);
-    pagination.onShowSizeChange?.(1, responsiveGridPageSize);
-  }, [pagination, responsiveGridPageSize, viewMode]);
-
   const defaultPageSize = viewMode === "grid" ? 9 : 10;
   const effectivePageSize = pagination
     ? pagination.pageSize || defaultPageSize
@@ -113,20 +71,22 @@ export default function GridListPaginate<T extends object>({
                 key={index}
                 className={
                   viewMode === "grid"
-                    ? "rounded-lg border border-gray-200 p-3 animate-pulse"
+                    ? "rounded-lg flex flex-col items-center animate-pulse"
                     : "rounded-lg border border-gray-200 p-3 animate-pulse flex items-center gap-4"
                 }
               >
                 <div
                   className={
                     viewMode === "grid"
-                      ? "w-full h-auto aspect-video bg-gray-200 rounded-lg"
+                      ? "w-full h-58 aspect-1.5/1 bg-gray-200 border border-gray-300 rounded-lg"
                       : "w-32 h-20 sm:w-40 sm:h-24 bg-gray-200 rounded-lg shrink-0"
                   }
                 />
                 <div className="w-full">
-                  <div className="h-4 bg-gray-200 rounded w-2/3 mt-3" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2 mt-2" />
+                  <div className="h-5 bg-gray-200 rounded w-2/3 mx-auto mt-2" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mt-2" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto mt-2" />
+                  <div className="h-4 bg-gray-200 rounded w-2/3 mx-auto mt-2" />
                   {viewMode === "list" && (
                     <>
                       <div className="h-3 bg-gray-200 rounded w-3/4 mt-2" />

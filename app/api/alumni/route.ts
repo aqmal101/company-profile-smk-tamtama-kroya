@@ -27,12 +27,32 @@ interface AlumniResponse {
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
+    const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
-    const perPage = parseInt(searchParams.get("perPage") || "9");
+    const perPage = parseInt(
+      searchParams.get("perPage") || searchParams.get("limit") || "9",
+    );
+    const search = searchParams.get("search") || "";
+    const major = searchParams.get("major") || "";
+    const generationYear = searchParams.get("generationYear") || "";
+
+    const backendParams = new URLSearchParams();
+    backendParams.set("page", String(page));
+    backendParams.set("perPage", String(perPage));
+    backendParams.set("limit", String(perPage));
+
+    if (search) {
+      backendParams.set("search", search);
+    }
+    if (major) {
+      backendParams.set("major", major);
+    }
+    if (generationYear) {
+      backendParams.set("generationYear", generationYear);
+    }
 
     const backendResponse = await fetch(
-      `${API_BASE_URL}/alumni?page=${page}&limit=${perPage}`,
+      `${API_BASE_URL}/alumni${backendParams.toString() ? `?${backendParams.toString()}` : ""}`,
       {
         method: "GET",
         headers: {
@@ -52,7 +72,36 @@ export async function GET(request: NextRequest) {
     const backendData = await backendResponse.json();
 
     if (backendData?.meta && Array.isArray(backendData?.data)) {
-      return NextResponse.json(backendData);
+      const baseUrl = request.nextUrl.pathname;
+      const backendTotal = Number(backendData.meta?.total ?? 0);
+      const backendPerPage = Number(backendData.meta?.perPage ?? perPage);
+      const backendCurrentPage = Number(backendData.meta?.currentPage ?? page);
+      const backendLastPage =
+        Number(backendData.meta?.lastPage) ||
+        Math.max(1, Math.ceil(backendTotal / Math.max(1, backendPerPage)));
+
+      const response: AlumniResponse = {
+        meta: {
+          total: backendTotal,
+          perPage: backendPerPage,
+          currentPage: backendCurrentPage,
+          lastPage: backendLastPage,
+          firstPage: 1,
+          firstPageUrl: `${baseUrl}?page=1`,
+          lastPageUrl: `${baseUrl}?page=${backendLastPage}`,
+          nextPageUrl:
+            backendCurrentPage < backendLastPage
+              ? `${baseUrl}?page=${backendCurrentPage + 1}`
+              : null,
+          previousPageUrl:
+            backendCurrentPage > 1
+              ? `${baseUrl}?page=${backendCurrentPage - 1}`
+              : null,
+        },
+        data: backendData.data,
+      };
+
+      return NextResponse.json(response);
     }
 
     const rawData: AlumniItem[] = Array.isArray(backendData)

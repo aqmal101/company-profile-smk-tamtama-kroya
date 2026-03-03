@@ -13,7 +13,8 @@ export type TextButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     | "outline-info"
     | "danger"
     | "icon"
-    | "ghost";
+    | "ghost"
+    | "gray";
   width?: "full" | "half" | "fit";
   icon?: React.ReactNode;
   isSubmit?: boolean;
@@ -91,6 +92,10 @@ export const TextButton = React.forwardRef<HTMLButtonElement, TextButtonProps>(
       case "icon":
         defaultStyle = "w-fit h-fit";
         loadingStyle = "border-primary border-t-primary/30";
+        break;
+      case "gray":
+        defaultStyle = "bg-gray-300 text-gray-700 hover:opacity-90";
+        loadingStyle = "border-white border-t-white/30";
         break;
     }
     return (

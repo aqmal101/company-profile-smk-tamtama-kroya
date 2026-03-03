@@ -1,10 +1,15 @@
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
-import { MdOutlineArrowDropDown, MdMenu, MdClose } from "react-icons/md";
+import {
+  MdOutlineArrowDropDown,
+  MdMenu,
+  MdClose,
+  MdSportsTennis,
+} from "react-icons/md";
 import { TextButton } from "../Buttons/TextButton";
 import Link from "next/link";
-import { LuSchool, LuTrophy } from "react-icons/lu";
+import { LuTrophy } from "react-icons/lu";
 import { FaGraduationCap, FaHandHoldingHeart, FaPhone } from "react-icons/fa6";
 import { AiOutlineRise } from "react-icons/ai";
 import { PiPathBold } from "react-icons/pi";
@@ -13,17 +18,15 @@ import { IoMdPin } from "react-icons/io";
 import { VideoTutorialModal } from "../Modal/VideoTutorialModal";
 import { getAcademicYear } from "@/lib/getAcademicYear";
 
-
-
 export const NavItems = [
   { label: "Beranda", href: "/" },
   {
     label: "Tentang Sekolah",
     children: [
       {
-        label: "Kegiatan Sekolah",
-        href: "/tentang-sekolah/kegiatan",
-        icon: <LuSchool />,
+        label: "Ekstrakurikuler",
+        href: "/tentang-sekolah/ekstrakulikuler",
+        icon: <MdSportsTennis />,
       },
       {
         label: "Fasilitas",
@@ -121,9 +124,7 @@ export const Header: React.FC = () => {
                 <h1 className="text-sm sm:text-base font-bold">
                   SMK Tamtama Kroya
                 </h1>
-                <p className="text-xs sm:text-sm">
-                  PPDB {getAcademicYear()}
-                </p>
+                <p className="text-xs sm:text-sm">PPDB {getAcademicYear()}</p>
               </div>
             )}
           </div>

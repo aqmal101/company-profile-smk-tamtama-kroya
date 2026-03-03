@@ -12,7 +12,7 @@ export const navFooterSection = [
 ];
 
 export const navFooterPage = [
-  { label: "Kegiatan Sekolah", href: "/tentang-sekolah/kegiatan" },
+  { label: "Ekstrakulikuler", href: "/tentang-sekolah/ekstrakulikuler" },
   { label: "Fasilitas", href: "/tentang-sekolah/fasilitas" },
   { label: "Profil Alumni", href: "/tentang-sekolah/alumni" },
   { label: "Program Keahlian", href: "/program-keahlian" },
