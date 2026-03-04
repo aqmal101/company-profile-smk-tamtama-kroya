@@ -14,6 +14,7 @@ export type TextButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     | "danger"
     | "icon"
     | "ghost"
+    | "shadow"
     | "gray";
   width?: "full" | "half" | "fit";
   icon?: React.ReactNode;
@@ -87,6 +88,10 @@ export const TextButton = React.forwardRef<HTMLButtonElement, TextButtonProps>(
         break;
       case "ghost":
         defaultStyle = "border bg-transparent border-white";
+        loadingStyle = "border-primary border-t-primary/30";
+        break;
+      case "shadow":
+        defaultStyle = "bg-transparent border-white shadow-lg";
         loadingStyle = "border-primary border-t-primary/30";
         break;
       case "icon":

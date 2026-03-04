@@ -17,6 +17,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { IoMdPin } from "react-icons/io";
 import { VideoTutorialModal } from "../Modal/VideoTutorialModal";
 import { getAcademicYear } from "@/lib/getAcademicYear";
+import { startsWith } from "zod";
 
 export const NavItems = [
   { label: "Beranda", href: "/" },
@@ -96,6 +97,8 @@ export const Header: React.FC = () => {
     setExpandedItem(expandedItem === label ? null : label);
   };
 
+  const schoolInformation = pathname.startsWith("/tentang-sekolah");
+
   const ppdbRoutes = ["/ppdb", "/"];
 
   const routeToRegistration = () => {
@@ -107,7 +110,7 @@ export const Header: React.FC = () => {
   return (
     <>
       <header
-        className={`fixed bg-white text-black shadow-lg w-full px-4 sm:px-6 lg:px-10 py-3 sm:py-4 z-[1000] top-0 `}
+        className={`fixed bg-white text-black shadow-lg w-full px-4 sm:px-6 lg:px-10 py-3 sm:py-4 z-1000 top-0 `}
       >
         <div className="w-full flex flex-row justify-between items-center">
           <div className="w-fit flex flex-row items-center justify-start">
@@ -141,7 +144,6 @@ export const Header: React.FC = () => {
           </button>
 
           {/* Desktop Navigation */}
-          {/* <div className="hidden w-auto lg:w-[70%] xl:w-[80%] lg:flex lg:flex-row lg:justify-between sm:items-center sm:justify-end"> */}
           <div className="w-fit h-full hidden lg:flex justify-center flex-row space-x-6 lg:space-x-8">
             {NavItems.map((item) => (
               <div key={item.label} className="relative group/nav">
@@ -195,13 +197,15 @@ export const Header: React.FC = () => {
             ))}
           </div>
           <div className="flex-row hidden lg:flex">
-            <TextButton
-              onClick={() => setIsVideoTutorialOpen(true)}
-              variant="outline"
-              text="Tutorial Pendaftaran"
-              className="w-fit px-3 h-fit py-3 md:text-sm ml-6"
-              width="fit"
-            />
+            {!schoolInformation && (
+              <TextButton
+                onClick={() => setIsVideoTutorialOpen(true)}
+                variant="outline"
+                width="fit"
+                text="Tutorial Pendaftaran"
+                className={`w-fit px-3 h-fit py-3 md:text-sm ml-6 flex`}
+              />
+            )}
             <TextButton
               onClick={routeToRegistration}
               variant="primary"

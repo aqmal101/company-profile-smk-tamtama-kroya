@@ -57,7 +57,7 @@ export default function VacationCard({
         </div>
       </div>
       <div className="w-full mt-4 space-y-3 border-t-2 border-gray-300">
-        <div className="flex flex-row space-x-3 justify-start items-center mt-2">
+        <div className="hidden flex-row space-x-3 justify-start items-center mt-2">
           <div className="flex flex-row space-x-3 justify-start items-center border-r-2 pr-3 border-gray-300">
             <h3
               className="font-bold text-xl max-sm:text-lg rounded-sm"
@@ -75,7 +75,7 @@ export default function VacationCard({
           </div>
         </div>
 
-        <div className="relative w-full h-6 bg-gray-200 rounded-sm overflow-hidden">
+        <div className="relative mt-2 w-full h-6 bg-gray-200 rounded-sm overflow-hidden">
           <div
             className="absolute inset-0 rounded-sm"
             style={{

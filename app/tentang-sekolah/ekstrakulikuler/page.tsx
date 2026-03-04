@@ -1,46 +1,169 @@
 "use client";
 
-import { AlumniApiResponse, AlumniItem } from "@/admin/siswa/data-alumni/type";
 import { TextButton } from "@/components/Buttons/TextButton";
+import Search from "@/components/Filter/Search";
 import GridListPaginate from "@/components/GridListPaginate";
+import SelectInput from "@/components/InputForm/SelectInput";
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { RiFilterOffFill } from "react-icons/ri";
+import { ExtracurricularListItem, ExtracurricularListResponse } from "./type";
 
-export default function AlumnusPage() {
+const LG_BREAKPOINT = 1024;
+const DEFAULT_CATEGORY_OPTION = { value: "", label: "Semua Kategori" };
+
+const getPerPageByViewport = () =>
+  typeof window !== "undefined" && window.innerWidth < LG_BREAKPOINT ? 10 : 9;
+
+const toSlug = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+
+export default function ExtracurricularPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [alumni, setAlumni] = useState<AlumniItem[]>([]);
+  const [extracurriculars, setExtracurriculars] = useState<
+    ExtracurricularListItem[]
+  >([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [categoryOptions, setCategoryOptions] = useState<
+    Array<{ value: string | number; label: string }>
+  >([DEFAULT_CATEGORY_OPTION]);
+
   const [pagination, setPagination] = useState({
     total: 0,
     currentPage: 1,
-    perPage: 9,
+    perPage: getPerPageByViewport(),
   });
 
-  const fetchAlumni = async (page = 1, perPage = pagination.perPage) => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `/api/alumni?page=${page}&perPage=${perPage}`,
-      );
-      const result: AlumniApiResponse = await response.json();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim());
+    }, 500);
 
-      setAlumni(result.data || []);
-      setPagination({
-        total: result.meta?.total || 0,
-        currentPage: result.meta?.currentPage || 1,
-        perPage: result.meta?.perPage || perPage,
-      });
-    } catch (error) {
-      console.error("Failed fetch alumni", error);
-      setAlumni([]);
-      setPagination((prev) => ({ ...prev, total: 0 }));
-    } finally {
-      setLoading(false);
-    }
-  };
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
-    fetchAlumni(1, pagination.perPage);
+    const syncPerPageWithViewport = () => {
+      const nextPerPage = getPerPageByViewport();
+
+      setPagination((prev) => {
+        if (prev.perPage === nextPerPage) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          currentPage: 1,
+          perPage: nextPerPage,
+        };
+      });
+    };
+
+    syncPerPageWithViewport();
+    window.addEventListener("resize", syncPerPageWithViewport);
+
+    return () => {
+      window.removeEventListener("resize", syncPerPageWithViewport);
+    };
   }, []);
+
+  const fetchExtracurriculars = useCallback(
+    async (page = 1, perPage = pagination.perPage) => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams({
+          page: String(page),
+          perPage: String(perPage),
+        });
+
+        if (debouncedSearchTerm) {
+          params.append("search", debouncedSearchTerm);
+        }
+        if (selectedCategory) {
+          params.append("category", selectedCategory);
+        }
+
+        const response = await fetch(
+          `/api/extracurriculars?${params.toString()}`,
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch extracurricular data");
+        }
+
+        const result: ExtracurricularListResponse = await response.json();
+        const items = result.items || [];
+
+        setExtracurriculars(items);
+        setPagination({
+          total: result.meta?.total || 0,
+          currentPage: result.meta?.currentPage || 1,
+          perPage: result.meta?.perPage || perPage,
+        });
+
+        setCategoryOptions((prev) => {
+          const mergedCategories = new Set(
+            prev
+              .map((option) => String(option.value))
+              .filter((value) => value !== ""),
+          );
+
+          items.forEach((item) => {
+            item.category.forEach((category) => {
+              const normalized = category.trim();
+              if (normalized) {
+                mergedCategories.add(normalized);
+              }
+            });
+          });
+
+          return [
+            DEFAULT_CATEGORY_OPTION,
+            ...Array.from(mergedCategories).map((category) => ({
+              value: category,
+              label: category,
+            })),
+          ];
+        });
+      } catch (error) {
+        console.error("Failed fetch extracurriculars", error);
+        setExtracurriculars([]);
+        setPagination((prev) => ({ ...prev, total: 0 }));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [debouncedSearchTerm, selectedCategory, pagination.perPage],
+  );
+
+  useEffect(() => {
+    fetchExtracurriculars(1, pagination.perPage);
+  }, [fetchExtracurriculars, pagination.perPage]);
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+  };
+
+  const handleCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(event.target.value);
+  };
+
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setDebouncedSearchTerm("");
+    setSelectedCategory("");
+  };
+
+  const filterValue = searchTerm || selectedCategory;
 
   const paginationConfig = useMemo(
     () => ({
@@ -48,51 +171,43 @@ export default function AlumnusPage() {
       pageSize: pagination.perPage,
       total: pagination.total,
       onChange: (page: number, pageSize: number) => {
-        fetchAlumni(page, pageSize);
+        fetchExtracurriculars(page, pageSize);
       },
       onShowSizeChange: (page: number, pageSize: number) => {
-        fetchAlumni(page, pageSize);
+        fetchExtracurriculars(page, pageSize);
       },
     }),
-    [pagination],
+    [pagination, fetchExtracurriculars],
   );
 
-  const renderItem = (item: AlumniItem, _: number) => {
-    let majorAbbr = item.major;
-    switch (item.major) {
-      case "TP":
-        item.major = "Teknik Permesinan";
-        break;
-      case "TKR":
-        item.major = "Teknik Kendaraan Ringan";
-        break;
-      case "TITL":
-        item.major = "Teknik Instalasi Tenaga Listrik";
-        break;
-      case "DKV":
-        item.major = "Desain Komunikasi Visual";
-        break;
-    }
+  const renderItem = (item: ExtracurricularListItem, _: number) => {
+    const categoryLabel = item.category.join(" • ") || "Tanpa kategori";
+    const slug = item.slug || toSlug(item.name);
+
     return (
-      <div className="rounded-lg flex flex-col border border-gray-300 bg-white">
+      <div className="rounded-lg flex flex-col border border-gray-300 bg-white overflow-hidden">
         <Image
-          src={item.photoUrl || "https://placehold.co/600x400/png"}
+          src={item.thumbnail || "https://placehold.co/1200x800/png"}
           alt={item.name}
-          width={232}
-          height={121}
+          width={1200}
+          height={800}
           loading="lazy"
           unoptimized
-          className="w-full h-58 rounded-t-md aspect-1.5/1 bg-gray-300 border border-gray-300 object-cover"
+          className="w-full h-58 aspect-1.5/1 bg-gray-300 object-cover"
         />
 
         <div className="w-full flex flex-col px-3 py-2 gap-4">
           <p className="text-base text-left font-semibold text-gray-800">
-            Ini adalah nama kegiatasn ekstrakulikuler yang Popolarabansb
+            {item.name}
           </p>
+          <p className="text-sm text-gray-600">{categoryLabel}</p>
           <TextButton
             variant="gray"
             text="Lihat Detail"
             className="w-fit rounded-full! text-sm!"
+            onClick={() =>
+              router.push(`/tentang-sekolah/ekstrakulikuler/${slug}`)
+            }
           />
         </div>
       </div>
@@ -100,26 +215,47 @@ export default function AlumnusPage() {
   };
 
   return (
-    <main className="min-h-screen w-full bg-linear-to-b from-[#fafafa] to-gray-50 px-4 py-10 sm:px-6 sm:py-12 md:px-10 lg:px-16 xl:px-24">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 py-28 sm:pb-4 max-sm:pt-20 max-sm:px-8 justify-center items-center">
-        <div className="w-full flex flex-wrap items-center justify-center max-w-3xl gap-4">
+    <main className="min-h-screen w-full bg-linear-to-b from-[#fafafa] to-gray-50 px-4 sm:px-6 sm:py-12 md:px-10 lg:px-16 xl:px-24">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 mt-20 sm:pb-4 max-sm:mt-20 max-sm:px-8 justify-center items-center">
+        <div className="w-full flex flex-wrap items-center justify-center max-w-2xl gap-4">
           <h1 className="text-4xl max-sm:text-2xl font-bold text-primary text-center">
             Ekstrakurikuler di SMK Tamtama Kroya
           </h1>
           <p className="text-center text-lg max-sm:text-sm text-gray-600">
-            SMK Tamtama Kroya memiliki berbagai kegiatan ekstrakurikuler yang
-            dapat diikuti siswa sesuai minat dan bakatnya.
+            Berbagai kegiatan ekstrakurikuler tersedia untuk mengembangkan
+            minat, bakat, dan karakter siswa.
           </p>
         </div>
-
+        <div className="flex flex-col justify-end w-full flex-wrap md:flex-nowrap gap-3 md:flex-row md:items-end px-0">
+          <SelectInput
+            className="w-full!"
+            options={categoryOptions}
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+          />
+          {filterValue && (
+            <TextButton
+              variant="outline"
+              className="w-full sm:w-fit! sm:mb-2"
+              onClick={handleResetFilters}
+              icon={<RiFilterOffFill className="text-xl shrink-0" />}
+            />
+          )}
+          <Search
+            placeholder="Cari nama ekstrakurikuler"
+            className="w-full md:max-w-72 sm:max-w-68 mb-2"
+            searchTerm={searchTerm}
+            handleSearchChange={handleSearchChange}
+          />
+        </div>
         <GridListPaginate
-          data={alumni}
+          data={extracurriculars}
           showSizeChanger={false}
           showNumberInfo={false}
           renderItem={renderItem}
           viewMode="grid"
           loading={loading}
-          emptyText="Data alumni belum tersedia"
+          emptyText="Data ekstrakurikuler belum tersedia"
           pagination={paginationConfig}
         />
       </div>
