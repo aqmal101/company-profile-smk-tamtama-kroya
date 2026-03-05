@@ -51,7 +51,7 @@ export async function PUT(
     }
 
     const backendResponse = await fetch(
-      `${API_BASE_URL}/extracurriculars/${encodeURIComponent(slug)}/achievements/reorder`,
+      `${API_BASE_URL}/backoffice/extracurriculars/${encodeURIComponent(slug)}/achievements/reorder`,
       {
         method: "PUT",
         headers: {
