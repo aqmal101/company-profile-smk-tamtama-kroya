@@ -49,6 +49,11 @@ interface BackendDetailPayload {
   data?: BackendExtracurricularDetail;
 }
 
+const isBackendDetailPayload = (
+  value: BackendExtracurricularDetail | BackendDetailPayload,
+): value is BackendDetailPayload =>
+  Object.prototype.hasOwnProperty.call(value, "data");
+
 const toCategoryArray = (value: unknown): string[] => {
   if (Array.isArray(value)) {
     return value
@@ -181,10 +186,16 @@ export async function GET(request: NextRequest) {
       const backendData: BackendExtracurricularDetail | BackendDetailPayload =
         await backendResponse.json();
 
-      const rawData = "data" in backendData ? backendData.data : backendData;
-
-      if (rawData) {
-        return NextResponse.json(normalizeDetail(rawData), { status: 200 });
+      if (isBackendDetailPayload(backendData)) {
+        if (backendData.data) {
+          return NextResponse.json(normalizeDetail(backendData.data), {
+            status: 200,
+          });
+        }
+      } else {
+        return NextResponse.json(normalizeDetail(backendData), {
+          status: 200,
+        });
       }
     }
   } catch (error) {
