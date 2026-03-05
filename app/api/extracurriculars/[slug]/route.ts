@@ -183,9 +183,9 @@ export async function GET(request: NextRequest) {
 
       const rawData = "data" in backendData ? backendData.data : backendData;
 
-    //   if (rawData) {
-    //     return NextResponse.json(normalizeDetail(rawData), { status: 200 });
-    //   }
+      if (rawData) {
+        return NextResponse.json(normalizeDetail(rawData), { status: 200 });
+      }
     }
   } catch (error) {
     console.error("Failed to fetch extracurricular detail from backend:", error);

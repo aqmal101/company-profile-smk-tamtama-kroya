@@ -1,9 +1,10 @@
 "use client";
 
 import { TextButton } from "@/components/Buttons/TextButton";
+import RotatedHighlightTitle from "@/components/SectionTitle/RotatedHighlightTitle";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { CSSProperties, useEffect, useMemo, useState } from "react";
 import { ExtracurricularDetail } from "../type";
 import { resolveSlug } from "@/utils/resolveSlug";
 import { LuArrowLeft } from "react-icons/lu";
@@ -78,6 +79,32 @@ export default function ExtracurricularDetailPage() {
     [detail?.achievements],
   );
 
+  const shouldAutoScrollGallery = galleries.length >= 4;
+
+  const marqueeGalleries = useMemo(
+    () => (shouldAutoScrollGallery ? [...galleries, ...galleries] : galleries),
+    [galleries, shouldAutoScrollGallery],
+  );
+
+  const marqueeDuration = useMemo(
+    () => Math.max(18, galleries.length * 4),
+    [galleries.length],
+  );
+
+  const marqueeStyle = useMemo(
+    () =>
+      ({
+        "--marquee-duration": `${marqueeDuration}s`,
+      }) as CSSProperties,
+    [marqueeDuration],
+  );
+
+  const [firstNameWord, remainingNameWords] = useMemo(() => {
+    const words = (detail?.name || "").trim().split(/\s+/).filter(Boolean);
+
+    return [words[0] || "", words.slice(1).join(" ")];
+  }, [detail?.name]);
+
   if (loading) {
     return (
       <main className="min-h-screen w-full bg-linear-to-b from-[#fafafa] to-gray-50 px-4 sm:px-6 sm:py-12 md:px-10 lg:px-16 xl:px-24">
@@ -121,13 +148,13 @@ export default function ExtracurricularDetailPage() {
         </div>
 
         <div className="w-full flex flex-col gap-3">
-          <h1 className="text-4xl max-sm:text-2xl font-bold text-primary">
+          <h1 className="text-4xl max-sm:text-2xl font-semibold text-primary">
             {detail.name}
           </h1>
           <h2 className="text-xl text-primary">SMK Tamtama Kroya</h2>
         </div>
 
-        <div className="flex flex-row gap-4 w-full h-full">
+        <div className="flex flex-col md:flex-row gap-4 w-full h-full">
           <Image
             src={detail.thumbnailUrl || "https://placehold.co/1200x800/png"}
             alt={detail.name}
@@ -135,75 +162,157 @@ export default function ExtracurricularDetailPage() {
             height={800}
             loading="lazy"
             unoptimized
-            className="w-6/10 h-auto max-h-92 rounded-lg border border-gray-200 object-cover"
+            className="md:w-6/10 w-full h-auto max-h-92 rounded-md border border-gray-200 object-cover"
           />
-          <div className="w-4/10 h-full flex flex-col gap-4 p-8 border border-gray-400 rounded-md">
-            <h2 className="text-xl text-primary font-bold">
+          <div className="md:w-4/10 w-full h-full flex flex-col gap-4 p-8 border border-gray-300 shadow rounded-md">
+            <h2 className="text-xl text-primary font-semibold">
               Informasi Singkat
             </h2>
 
-            <p className="">• Pembina: {detail.mentorName}</p>
-            <div className="flex flex-wrap gap-1">
+            <p className="font-semibold">
+              • Pembina:{" "}
+              <span className="font-normal">{detail.mentorName}</span>
+            </p>
+            <div className="flex flex-wrap gap-1 font-semibold">
               • Kategori:
               {detail.categories.map((category) => (
                 <span
                   key={category}
-                  className="px-3 rounded-full bg-primary/10"
+                  className="pr-2 rounded-full bg-primary/10 font-normal capitalize"
                 >
                   {category}
                 </span>
               ))}
             </div>
-            <p className="">• Lokasi: {detail.location}</p>
-            <p className="">• Jadwal: {detail.schedule}</p>
+            <p className="font-semibold">
+              • Lokasi: <span className="font-normal">{detail.location}</span>
+            </p>
+            <p className="font-semibold">
+              • Jadwal: <span className="font-normal">{detail.schedule}</span>
+            </p>
           </div>
         </div>
 
-        <section className="flex flex-col gap-3">
-          <h2 className="text-2xl max-sm:text-xl font-bold text-primary">
-            Tentang {detail.name} SMK Tamtama Kroya
+        <section className="flex flex-col gap-3 mt-10 max-w-7xl">
+          <h2 className="text-2xl max-sm:text-xl font-semibold text-primary flex flex-wrap items-center gap-2">
+            <span>Tentang</span>
+            {firstNameWord && (
+              <RotatedHighlightTitle
+                as="span"
+                title={firstNameWord}
+                className="align-middle"
+                titleClassName="text-2xl max-sm:text-xl font-semibold text-primary"
+                highlightClassName="h-9 max-sm:h-8"
+              />
+            )}
+            {remainingNameWords && <span>{remainingNameWords}</span>}
+            <span>SMK Tamtama Kroya</span>
           </h2>
-          <p className="text-base text-gray-700 leading-relaxed">
+          <p className="text-base text-gray-700 leading-relaxed break-all">
             {detail.description}
           </p>
         </section>
 
-        <section className="flex flex-col gap-3">
-          <h2 className="text-2xl max-sm:text-xl font-bold text-primary">
-            Foto Kegiatan
-          </h2>
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {galleries.map((gallery) => (
-              <Image
-                key={gallery.id}
-                src={gallery.photoUrl || "https://placehold.co/1600x900/png"}
-                alt={`${detail.name} galeri ${gallery.order + 1}`}
-                width={1600}
-                height={900}
-                loading="lazy"
-                unoptimized
-                className="w-full h-52 rounded-lg border border-gray-200 object-cover"
-              />
-            ))}
-          </div>
+        <section className="flex flex-col gap-3 mt-10">
+          <RotatedHighlightTitle title="Foto Kegiatan" />
+          {galleries.length > 0 ? (
+            shouldAutoScrollGallery ? (
+              <div className="group relative mt-6 overflow-hidden">
+                {/* <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-linear-to-r from-white via-white/60 to-transparent" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-linear-to-l from-white via-white/60 to-transparent" /> */}
+
+                <div
+                  className="ekstra-marquee-track flex w-max gap-4"
+                  style={marqueeStyle}
+                >
+                  {marqueeGalleries.map((gallery, index) => (
+                    <div
+                      key={`${gallery.id}-${index}`}
+                      className="w-[78vw] shrink-0 sm:w-[45vw] md:w-[34vw] lg:w-[28vw] xl:w-[22vw]"
+                    >
+                      <Image
+                        src={
+                          gallery.photoUrl ||
+                          "https://placehold.co/1600x900/png"
+                        }
+                        alt={`${detail.name} galeri ${gallery.order + 1}`}
+                        width={1600}
+                        height={900}
+                        loading="lazy"
+                        unoptimized
+                        className="h-52 w-full rounded-lg border border-gray-200 object-cover grayscale transition-[filter,transform] duration-500 ease-out hover:grayscale-0 hover:scale-[1.01]"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {galleries.map((gallery) => (
+                  <Image
+                    key={gallery.id}
+                    src={
+                      gallery.photoUrl || "https://placehold.co/1600x900/png"
+                    }
+                    alt={`${detail.name} galeri ${gallery.order + 1}`}
+                    width={1600}
+                    height={900}
+                    loading="lazy"
+                    unoptimized
+                    className="h-52 w-full rounded-lg border border-gray-200 object-cover grayscale transition-[filter,transform] duration-500 ease-out hover:grayscale-0 hover:scale-[1.01]"
+                  />
+                ))}
+              </div>
+            )
+          ) : (
+            <p className="mt-6">Belum ada foto kegiatan</p>
+          )}
         </section>
 
-        <section className="flex flex-col gap-3">
-          <h2 className="text-2xl max-sm:text-xl font-bold text-primary">
-            Prestasi Kegiatan
-          </h2>
-          <div className="flex flex-col gap-2">
-            {achievements.map((achievement) => (
-              <div
-                key={achievement.id}
-                className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-gray-700"
-              >
-                {achievement.name}
-              </div>
-            ))}
-          </div>
+        <section className="flex flex-col gap-3 mt-10">
+          <RotatedHighlightTitle title="Prestasi Kegiatan" />
+
+          <ol className="flex flex-col gap-2 mt-4 ml-6">
+            {achievements.length > 0 ? (
+              achievements.map((achievement) => (
+                <li key={achievement.id} className="text-gray-700 list-disc">
+                  {achievement.name}
+                </li>
+              ))
+            ) : (
+              <p>Belum ada data prestasi</p>
+            )}
+          </ol>
         </section>
       </div>
+
+      <style jsx>{`
+        .ekstra-marquee-track {
+          animation: marquee-left var(--marquee-duration, 30s) linear infinite;
+          will-change: transform;
+        }
+
+        .group:hover .ekstra-marquee-track {
+          animation-play-state: paused;
+        }
+
+        @keyframes marquee-left {
+          from {
+            transform: translateX(0);
+          }
+
+          to {
+            transform: translateX(calc(-50% - 0.5rem));
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .ekstra-marquee-track {
+            animation: none;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
     </main>
   );
 }

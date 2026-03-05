@@ -9,20 +9,13 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { RiFilterOffFill } from "react-icons/ri";
 import { ExtracurricularListItem, ExtracurricularListResponse } from "./type";
+import { toSlug } from "@/utils/resolveSlug";
 
 const LG_BREAKPOINT = 1024;
 const DEFAULT_CATEGORY_OPTION = { value: "", label: "Semua Kategori" };
 
 const getPerPageByViewport = () =>
   typeof window !== "undefined" && window.innerWidth < LG_BREAKPOINT ? 10 : 9;
-
-const toSlug = (value: string) =>
-  value
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[^\w\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
 
 export default function ExtracurricularPage() {
   const router = useRouter();
@@ -181,7 +174,7 @@ export default function ExtracurricularPage() {
   );
 
   const renderItem = (item: ExtracurricularListItem, _: number) => {
-    const categoryLabel = item.category.join(" • ") || "Tanpa kategori";
+    const categoryLabel = item.category.join(" • ") || "-";
     const slug = item.slug || toSlug(item.name);
 
     return (

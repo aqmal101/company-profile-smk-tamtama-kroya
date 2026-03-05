@@ -5,3 +5,11 @@ export const resolveSlug = (value: string | string[] | undefined) => {
 
   return value || "";
 };
+
+export const toSlug = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");

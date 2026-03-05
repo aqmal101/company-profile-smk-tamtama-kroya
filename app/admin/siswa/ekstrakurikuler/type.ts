@@ -60,3 +60,21 @@ export interface ExtracurricularFormValues {
   thumbnailUrl: string;
   isPublished: boolean;
 }
+
+export interface ExtracurricularGalleryInputItem {
+  clientId: string;
+  id?: number;
+  previewUrl: string;
+  file?: File;
+  order: number;
+}
+
+export interface ExtracurricularAchievementInputItem {
+  clientId: string;
+  id?: number;
+  name: string;
+  order: number;
+}
+
+export type ExtracurricularFormMode = "create" | "edit";
+
