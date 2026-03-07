@@ -255,12 +255,12 @@ export default function ExtracurricularDetailPage() {
                 </div>
               </div>
             ) : (
-              <div className="gallery-thin-scrollbar mt-6 -mx-2 overflow-x-auto px-2 pb-2">
+              <div className="no-scrollbar mt-6 -mx-2 overflow-x-auto px-2 pb-2">
                 <div className="flex w-max gap-4">
                   {galleries.map((gallery) => (
                     <div
                       key={gallery.id}
-                      className="w-[78vw] shrink-0 sm:w-[45vw] md:w-[34vw] lg:w-[28vw] xl:w-[22vw]"
+                      className="w-[78vw] shrink-0 sm:w-[45vw] md:w-[34vw] lg:w-[28vw] xl:w-[20vw]"
                     >
                       <Image
                         src={
@@ -272,7 +272,7 @@ export default function ExtracurricularDetailPage() {
                         height={900}
                         loading="lazy"
                         unoptimized
-                        className="h-52 w-full rounded-lg border border-gray-200 object-cover grayscale transition-[filter,transform] duration-500 ease-out hover:grayscale-0 hover:scale-[1.01]"
+                        className="h-42 w-full rounded-lg border border-gray-200 object-cover grayscale transition-[filter,transform] duration-500 ease-out hover:grayscale-0 hover:scale-[1.01]"
                       />
                     </div>
                   ))}

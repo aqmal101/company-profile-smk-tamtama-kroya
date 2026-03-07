@@ -251,6 +251,18 @@ input[type="number"] {
     /* Firefox */
 }
 
+.no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE/Edge lama */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari/Edge */
+}
+
 /* Chrome, Edge, Safari */
 .thin-scrollbar::-webkit-scrollbar {
     height: 6px;
@@ -274,7 +286,7 @@ input[type="number"] {
 
 /* Firefox */
 .thin-scrollbar {
-    scrollbar-width: thin;
+    scrollbar-width: none;
     scrollbar-color: rgba(0, 0, 0, 0.25) transparent;
 }
 
