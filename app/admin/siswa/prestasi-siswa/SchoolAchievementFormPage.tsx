@@ -6,6 +6,7 @@ import { LuGripVertical, LuRefreshCcw, LuPlus, LuTrash2 } from "react-icons/lu";
 import { TextButton } from "@/components/Buttons/TextButton";
 import { DateInput } from "@/components/InputForm/DateInput";
 import SelectInput from "@/components/InputForm/SelectInput";
+import { SearchableSelect } from "@/components/InputForm/SelectInput/SearchableSelect";
 import { BaseModal } from "@/components/Modal/BaseModal";
 import { TitleSection } from "@/components/TitleSection";
 import { useAlert } from "@/components/ui/alert";
@@ -973,10 +974,13 @@ export default function SchoolAchievementFormPage({
               error={formErrors.competitionLevel}
             />
 
-            <SelectInput
+            <SearchableSelect
               label="Provinsi"
+              name="placeName"
               value={formValues.placeName}
               options={provinceOptions}
+              minChars={0}
+              isAddValueActive={false}
               placeholder="Pilih provinsi"
               onChange={(event) => {
                 setFormValues((prev) => ({
@@ -986,8 +990,8 @@ export default function SchoolAchievementFormPage({
                 setFormErrors((prev) => ({ ...prev, placeName: undefined }));
               }}
               isMandatory
-              disabled={isSubmitting}
               error={formErrors.placeName}
+              className={isSubmitting ? "pointer-events-none opacity-60" : ""}
             />
 
             <div className="space-y-1">
@@ -1096,9 +1100,9 @@ export default function SchoolAchievementFormPage({
             error={formErrors.description}
           />
         </section>
-        <div className="w-full flex flex-row gap-6">
-          <div className="flex flex-col w-4/10 gap-6">
-            <section className="space-y-4">
+        <div className="w-full space-y-6">
+          <div className="w-full flex flex-col gap-6 lg:flex-row lg:items-start">
+            <section className="space-y-4 w-full lg:w-2/5">
               <h3 className="text-lg font-semibold text-gray-800">
                 Upload Gambar Utama
               </h3>
@@ -1123,119 +1127,120 @@ export default function SchoolAchievementFormPage({
               />
             </section>
 
-            <section className="space-y-4">
+            <section className="space-y-4 w-full lg:w-3/5">
               <h3 className="text-lg font-semibold text-gray-800">
-                Galeri Foto Prestasi
+                Prestasi yang Diraih
               </h3>
 
-              <MultipleImageUploader
-                label="Foto Galeri"
-                items={galleryItems}
-                onChange={handleGalleryItemsChange}
-                disabled={isSubmitting}
-                maxItems={20}
-                maxSizeInMB={5}
-                onValidationError={(message) => {
-                  showAlert({
-                    title: "Validasi Galeri",
-                    description: message,
-                    variant: "error",
-                  });
-                }}
-              />
+              <div className="flex flex-col gap-2">
+                {sortByOrder(awardItems).map((item) => (
+                  <div
+                    key={item.clientId}
+                    draggable={!isSubmitting}
+                    onDragStart={(event) =>
+                      handleAwardDragStart(event, item.clientId)
+                    }
+                    onDragOver={handleAwardDragOver}
+                    onDrop={(event) => handleAwardDrop(event, item.clientId)}
+                    onDragEnd={handleAwardDragEnd}
+                    className={`flex items-center gap-2 border border-gray-300 rounded-sm px-2 py-2 ${
+                      isSubmitting ? "" : "cursor-move"
+                    } ${draggingAwardClientId === item.clientId ? "opacity-60" : ""}`}
+                  >
+                    <div className="flex items-center gap-1 text-gray-500">
+                      <LuGripVertical className="text-sm" />
+                    </div>
+                    <span className="text-sm text-gray-700 flex-1">
+                      {item.name}
+                    </span>
+                    <TextButton
+                      variant="outline-danger"
+                      icon={<LuTrash2 className="text-md" />}
+                      className="p-1! text-md"
+                      disabled={isSubmitting}
+                      onClick={() => removeAward(item.clientId)}
+                    />
+                  </div>
+                ))}
+              </div>
 
-              {galleryUploadAlert && (
-                <div className="mt-2 space-y-2">
+              <div className="flex items-center gap-2">
+                <input
+                  value={newAwardName}
+                  onChange={(event) => setNewAwardName(event.target.value)}
+                  placeholder="Tambah prestasi yang diraih..."
+                  className="w-full rounded-sm border border-gray-300 px-3 py-2 text-sm"
+                  disabled={isSubmitting}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      addAward();
+                    }
+                  }}
+                />
+              </div>
+
+              {awardAddAlert && (
+                <div className="space-y-2">
                   <div
                     className={`rounded-sm border px-3 py-2 text-sm ${
-                      galleryUploadAlert.variant === "success"
+                      awardAddAlert.variant === "success"
                         ? "border-green-300 bg-green-50 text-green-700"
                         : "border-red-300 bg-red-50 text-red-700"
                     }`}
                     role="alert"
                   >
-                    {galleryUploadAlert.message}
+                    {awardAddAlert.message}
                   </div>
                 </div>
               )}
+
+              <TextButton
+                variant="outline"
+                icon={<LuPlus className="text-sm" />}
+                text="Tambah Prestasi"
+                className="py-1.5!"
+                disabled={isSubmitting || !newAwardName.trim()}
+                onClick={addAward}
+              />
             </section>
           </div>
-          <section className="space-y-4 w-6/10">
+
+          <section className="space-y-4 w-full">
             <h3 className="text-lg font-semibold text-gray-800">
-              Prestasi yang Diraih
+              Galeri Foto Prestasi
             </h3>
 
-            <div className="flex flex-col gap-2">
-              {sortByOrder(awardItems).map((item) => (
-                <div
-                  key={item.clientId}
-                  draggable={!isSubmitting}
-                  onDragStart={(event) =>
-                    handleAwardDragStart(event, item.clientId)
-                  }
-                  onDragOver={handleAwardDragOver}
-                  onDrop={(event) => handleAwardDrop(event, item.clientId)}
-                  onDragEnd={handleAwardDragEnd}
-                  className={`flex items-center gap-2 border border-gray-300 rounded-sm px-2 py-2 ${
-                    isSubmitting ? "" : "cursor-move"
-                  } ${draggingAwardClientId === item.clientId ? "opacity-60" : ""}`}
-                >
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <LuGripVertical className="text-sm" />
-                  </div>
-                  <span className="text-sm text-gray-700 flex-1">
-                    {item.name}
-                  </span>
-                  <TextButton
-                    variant="outline-danger"
-                    icon={<LuTrash2 className="text-md" />}
-                    className="p-1! text-md"
-                    disabled={isSubmitting}
-                    onClick={() => removeAward(item.clientId)}
-                  />
-                </div>
-              ))}
-            </div>
+            <MultipleImageUploader
+              label="Foto Galeri"
+              items={galleryItems}
+              onChange={handleGalleryItemsChange}
+              disabled={isSubmitting}
+              maxItems={20}
+              maxSizeInMB={5}
+              onValidationError={(message) => {
+                showAlert({
+                  title: "Validasi Galeri",
+                  description: message,
+                  variant: "error",
+                });
+              }}
+            />
 
-            <div className="flex items-center gap-2">
-              <input
-                value={newAwardName}
-                onChange={(event) => setNewAwardName(event.target.value)}
-                placeholder="Tambah prestasi yang diraih..."
-                className="w-full rounded-sm border border-gray-300 px-3 py-2 text-sm"
-                disabled={isSubmitting}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    addAward();
-                  }
-                }}
-              />
-            </div>
-
-            {awardAddAlert && (
-              <div className="space-y-2">
+            {galleryUploadAlert && (
+              <div className="mt-2 space-y-2">
                 <div
                   className={`rounded-sm border px-3 py-2 text-sm ${
-                    awardAddAlert.variant === "success"
+                    galleryUploadAlert.variant === "success"
                       ? "border-green-300 bg-green-50 text-green-700"
                       : "border-red-300 bg-red-50 text-red-700"
                   }`}
                   role="alert"
                 >
-                  {awardAddAlert.message}
+                  {galleryUploadAlert.message}
                 </div>
               </div>
             )}
-
-            <TextButton
-              variant="outline"
-              icon={<LuPlus className="text-sm" />}
-              text="Tambah Prestasi"
-              className="py-1.5!"
-              disabled={isSubmitting || !newAwardName.trim()}
-              onClick={addAward}
-            />
           </section>
         </div>
 

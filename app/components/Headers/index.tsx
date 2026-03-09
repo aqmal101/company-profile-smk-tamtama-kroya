@@ -34,8 +34,8 @@ export const NavItems = [
         icon: <FaHandHoldingHeart />,
       },
       {
-        label: "Prestasi",
-        href: "/tentang-sekolah/prestasi",
+        label: "Prestasi Siswa",
+        href: "/tentang-sekolah/prestasi-siswa",
         icon: <LuTrophy />,
       },
       {

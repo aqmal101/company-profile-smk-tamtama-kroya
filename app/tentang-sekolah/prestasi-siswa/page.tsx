@@ -354,7 +354,7 @@ export default function SchoolAchievementPage() {
               className="w-fit rounded-full! text-sm!"
               onClick={() =>
                 router.push(
-                  `/tentang-sekolah/prestasi/${encodeURIComponent(slug)}`,
+                  `/tentang-sekolah/prestasi-siswa/${encodeURIComponent(slug)}`,
                 )
               }
             />

@@ -1,13 +1,12 @@
 "use client";
 
 import { TextButton } from "@/components/Buttons/TextButton";
+import DetailContentLayout from "@/components/LandingPage/DetailContentLayout";
 import RotatedHighlightTitle from "@/components/SectionTitle/RotatedHighlightTitle";
-import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { CSSProperties, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ExtracurricularDetail } from "../type";
 import { resolveSlug } from "@/utils/resolveSlug";
-import { LuArrowLeft } from "react-icons/lu";
 
 export default function ExtracurricularDetailPage() {
   const params = useParams();
@@ -79,26 +78,6 @@ export default function ExtracurricularDetailPage() {
     [detail?.achievements],
   );
 
-  const shouldUseMarquee = galleries.length > 4;
-
-  const marqueeGalleries = useMemo(
-    () => (shouldUseMarquee ? [...galleries, ...galleries] : galleries),
-    [galleries, shouldUseMarquee],
-  );
-
-  const marqueeDuration = useMemo(
-    () => Math.max(50, galleries.length * 4),
-    [galleries.length],
-  );
-
-  const marqueeStyle = useMemo(
-    () =>
-      ({
-        "--marquee-duration": `${marqueeDuration}s`,
-      }) as CSSProperties,
-    [marqueeDuration],
-  );
-
   const [firstNameWord, remainingNameWords] = useMemo(() => {
     const words = (detail?.name || "").trim().split(/\s+/).filter(Boolean);
 
@@ -138,196 +117,49 @@ export default function ExtracurricularDetailPage() {
   }
 
   return (
-    <main className="min-h-screen w-full bg-white px-4 py-10 sm:px-6 sm:py-12 md:px-10 lg:px-16 xl:px-24">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 py-16 sm:pb-4 max-sm:pt-20 max-sm:px-8">
-        <div className="w-fit">
-          <TextButton
-            variant="shadow"
-            icon={<LuArrowLeft className="text-2xl" />}
-            className="w-fit!"
-            onClick={() => router.push("/tentang-sekolah/ekstrakulikuler")}
-          />
-        </div>
-
-        <div className="w-full flex flex-col gap-3">
-          <h1 className="text-4xl max-sm:text-2xl font-semibold text-primary">
-            {detail.name}
-          </h1>
-          <h2 className="text-xl text-primary">SMK Tamtama Kroya</h2>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-4 w-full h-full">
-          <Image
-            src={detail.thumbnailUrl || "https://placehold.co/1200x800/png"}
-            alt={detail.name}
-            width={1200}
-            height={800}
-            loading="lazy"
-            unoptimized
-            className="md:w-6/10 w-full h-auto max-h-92 rounded-md border border-gray-200 object-cover"
-          />
-          <div className="md:w-4/10 w-full h-full flex flex-col gap-4 p-8 border border-gray-300 shadow rounded-md">
-            <h2 className="text-xl text-primary font-semibold">
-              Informasi Singkat
-            </h2>
-
-            <div className="flex flex-col gap-2 text-gray-800">
-              <div className="grid grid-cols-[7rem_1fr] items-start gap-x-2">
-                <p className="font-semibold whitespace-nowrap">Pembina</p>
-                <p className="font-normal wrap-break-word">
-                  : {detail.mentorName}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-[7rem_1fr] items-start gap-x-2">
-                <p className="font-semibold whitespace-nowrap">Kategori</p>
-                <p className="font-normal wrap-break-word">: {categoryLabel}</p>
-              </div>
-
-              <div className="grid grid-cols-[7rem_1fr] items-start gap-x-2">
-                <p className="font-semibold whitespace-nowrap">Lokasi</p>
-                <p className="font-normal wrap-break-word">
-                  : {detail.location}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-[7rem_1fr] items-start gap-x-2">
-                <p className="font-semibold whitespace-nowrap">Jadwal</p>
-                <p className="font-normal wrap-break-word">
-                  : {detail.schedule}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <section className="flex flex-col gap-3 mt-10 max-w-7xl">
-          <h2 className="text-2xl max-sm:text-xl font-semibold text-primary flex flex-wrap items-center gap-2">
-            <span>Tentang</span>
-            {firstNameWord && (
-              <RotatedHighlightTitle
-                as="span"
-                title={firstNameWord}
-                className="align-middle"
-                titleClassName="text-2xl max-sm:text-xl font-semibold text-primary"
-                highlightClassName="h-9 max-sm:h-8"
-              />
-            )}
-            {remainingNameWords && <span>{remainingNameWords}</span>}
-            <span>SMK Tamtama Kroya</span>
-          </h2>
-          <p className="text-base text-gray-700 leading-relaxed break-all">
-            {detail.description}
-          </p>
-        </section>
-
-        <section className="flex flex-col gap-3 mt-10">
-          <RotatedHighlightTitle title="Foto Kegiatan" />
-          {galleries.length > 0 ? (
-            shouldUseMarquee ? (
-              <div className="group relative mt-6 overflow-hidden">
-                {/* <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-linear-to-r from-white via-white/60 to-transparent" />
-                <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-linear-to-l from-white via-white/60 to-transparent" /> */}
-
-                <div
-                  className="ekstra-marquee-track flex w-max gap-4"
-                  style={marqueeStyle}
-                >
-                  {marqueeGalleries.map((gallery, index) => (
-                    <div
-                      key={`${gallery.id}-${index}`}
-                      className="w-[78vw] shrink-0 sm:w-[45vw] md:w-[34vw] lg:w-[28vw] xl:w-[22vw]"
-                    >
-                      <Image
-                        src={
-                          gallery.photoUrl ||
-                          "https://placehold.co/1600x900/png"
-                        }
-                        alt={`${detail.name} galeri ${gallery.order + 1}`}
-                        width={1600}
-                        height={900}
-                        loading="lazy"
-                        unoptimized
-                        className="h-52 w-full rounded-lg border border-gray-200 object-cover grayscale transition-[filter,transform] duration-500 ease-out hover:grayscale-0 hover:scale-[1.01]"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="no-scrollbar mt-6 -mx-2 overflow-x-auto px-2 pb-2">
-                <div className="flex w-max gap-4">
-                  {galleries.map((gallery) => (
-                    <div
-                      key={gallery.id}
-                      className="w-[78vw] shrink-0 sm:w-[45vw] md:w-[34vw] lg:w-[28vw] xl:w-[20vw]"
-                    >
-                      <Image
-                        src={
-                          gallery.photoUrl ||
-                          "https://placehold.co/1600x900/png"
-                        }
-                        alt={`${detail.name} galeri ${gallery.order + 1}`}
-                        width={1600}
-                        height={900}
-                        loading="lazy"
-                        unoptimized
-                        className="h-42 w-full rounded-lg border border-gray-200 object-cover grayscale transition-[filter,transform] duration-500 ease-out hover:grayscale-0 hover:scale-[1.01]"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
-          ) : (
-            <p className="mt-6">Belum ada foto kegiatan</p>
+    <DetailContentLayout
+      backPath="/tentang-sekolah/ekstrakulikuler"
+      title={detail.name}
+      subtitle="SMK Tamtama Kroya"
+      heroImageUrl={detail.thumbnailUrl || "https://placehold.co/1200x800/png"}
+      heroImageAlt={detail.name}
+      infoTitle="Informasi Singkat"
+      infoItems={[
+        { label: "Pembina", value: detail.mentorName },
+        { label: "Kategori", value: categoryLabel },
+        { label: "Lokasi", value: detail.location },
+        { label: "Jadwal", value: detail.schedule },
+      ]}
+      descriptionTitle={
+        <h2 className="text-2xl max-sm:text-xl font-semibold text-primary flex flex-wrap items-center gap-2">
+          <span>Tentang</span>
+          {firstNameWord && (
+            <RotatedHighlightTitle
+              as="span"
+              title={firstNameWord}
+              className="align-middle"
+              titleClassName="text-2xl max-sm:text-xl font-semibold text-primary"
+              highlightClassName="h-9 max-sm:h-8"
+            />
           )}
-        </section>
-
-        <section className="flex flex-col gap-3 mt-10">
-          <RotatedHighlightTitle title="Prestasi Kegiatan" />
-
-          <ol className="flex flex-col gap-2 mt-4 ml-6">
-            {achievements.length > 0 ? (
-              achievements.map((achievement) => (
-                <li key={achievement.id} className="text-gray-700 list-disc">
-                  {achievement.name}
-                </li>
-              ))
-            ) : (
-              <p>Belum ada data prestasi</p>
-            )}
-          </ol>
-        </section>
-      </div>
-
-      <style jsx>{`
-        .ekstra-marquee-track {
-          animation: marquee-left var(--marquee-duration, 60s) linear infinite;
-          will-change: transform;
-        }
-
-        .group:hover .ekstra-marquee-track {
-          animation-play-state: paused;
-        }
-
-        @keyframes marquee-left {
-          from {
-            transform: translateX(0);
-          }
-
-          to {
-            transform: translateX(calc(-50% - 0.5rem));
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .ekstra-marquee-track {
-            animation: none;
-            transform: translateX(0);
-          }
-        }
-      `}</style>
-    </main>
+          {remainingNameWords && <span>{remainingNameWords}</span>}
+          <span>SMK Tamtama Kroya</span>
+        </h2>
+      }
+      description={detail.description}
+      galleryTitle="Foto Kegiatan"
+      galleries={galleries.map((gallery) => ({
+        id: gallery.id,
+        photoUrl: gallery.photoUrl,
+        order: gallery.order,
+      }))}
+      galleryEmptyText="Belum ada foto kegiatan"
+      highlightsTitle="Prestasi Kegiatan"
+      highlights={achievements.map((achievement) => ({
+        id: achievement.id,
+        name: achievement.name,
+      }))}
+      highlightsEmptyText="Belum ada data prestasi"
+    />
   );
 }
