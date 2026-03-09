@@ -58,7 +58,7 @@ export default function GridListPaginate<T extends object>({
     : 0;
 
   return (
-    <div>
+    <div className="w-full">
       {loading ? (
         <div
           className={
@@ -74,7 +74,7 @@ export default function GridListPaginate<T extends object>({
                 className={
                   viewMode === "grid"
                     ? "rounded-lg flex flex-col items-center animate-pulse"
-                    : "rounded-lg border border-gray-200 p-3 animate-pulse flex items-center gap-4"
+                    : "w-full rounded-lg border border-gray-200 p-3 animate-pulse flex items-center gap-4"
                 }
               >
                 <div
@@ -113,7 +113,9 @@ export default function GridListPaginate<T extends object>({
           }
         >
           {data.map((item, index) => (
-            <div key={index}>{renderItem(item, index, viewMode)}</div>
+            <div key={index} className={viewMode === "list" ? "w-full" : ""}>
+              {renderItem(item, index, viewMode)}
+            </div>
           ))}
         </div>
       )}

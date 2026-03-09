@@ -17,6 +17,31 @@ const MAJOR_LABEL_MAP: Record<string, string> = {
   DKV: "Desain Komunikasi Visual",
 };
 
+const MAJOR_NAME_MAP: Record<string, string> = {
+  "teknik permesinan": "TP",
+  "teknik kendaraan ringan": "TKR",
+  "teknik instalasi tenaga listrik": "TITL",
+  "desain komunikasi visual": "DKV",
+};
+
+const normalizeMajorAbbreviation = (value: string) => {
+  const normalizedValue = String(value || "").trim();
+
+  if (!normalizedValue) {
+    return "-";
+  }
+
+  const upperValue = normalizedValue.toUpperCase();
+
+  if (MAJOR_LABEL_MAP[upperValue]) {
+    return upperValue;
+  }
+
+  const abbreviationFromName = MAJOR_NAME_MAP[normalizedValue.toLowerCase()];
+
+  return abbreviationFromName || normalizedValue;
+};
+
 const LG_BREAKPOINT = 1024;
 
 const getPerPageByViewport = () =>
@@ -200,8 +225,8 @@ export default function AlumnusPage() {
   );
 
   const renderItem = (item: AlumniItem, _: number) => {
-    const majorAbbr = item.major;
-    const majorLabel = MAJOR_LABEL_MAP[item.major] || item.major;
+    const majorAbbr = normalizeMajorAbbreviation(item.major);
+    const majorLabel = MAJOR_LABEL_MAP[majorAbbr] || item.major;
 
     return (
       <div className="rounded-lg flex flex-col items-center">

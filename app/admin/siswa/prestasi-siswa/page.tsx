@@ -379,7 +379,7 @@ export default function DataPrestasiSiswaPage() {
       showAlert({
         title: "Berhasil",
         description: `Status prestasi siswa berhasil diubah menjadi ${
-          nextPublishedValue ? "Active" : "Non Active"
+          nextPublishedValue ? "Dipublikasikan" : "Draft"
         }`,
         variant: "success",
       });
