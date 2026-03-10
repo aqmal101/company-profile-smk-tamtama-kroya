@@ -6,11 +6,7 @@ import GridListPaginate from "@/components/GridListPaginate";
 import SelectInput from "@/components/InputForm/SelectInput";
 import { BaseModal } from "@/components/Modal/BaseModal";
 import { TitleSection } from "@/components/TitleSection/index";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import TruncatedTooltipText from "@/components/ui/truncated-tooltip-text";
 import Toggle from "@/components/ui/toggle";
 import { useAlert } from "@/components/ui/alert";
 import { getAuthHeader } from "@/utils/auth";
@@ -28,7 +24,6 @@ import {
 
 const CATEGORY_FILTER_DEFAULT = { value: "", label: "Semua Kategori" };
 const CATEGORY_OPTIONS_ENDPOINT = "/api/school-achievements/category-options";
-const DESCRIPTION_TOOLTIP_CHARACTER_LIMIT = 80;
 
 const COMPETITION_LEVEL_FILTER_OPTIONS = [
   { value: "", label: "Semua Tingkat" },
@@ -76,24 +71,6 @@ const toCategoryOptionList = (payload: unknown): string[] => {
       return true;
     })
     .sort((a, b) => a.localeCompare(b));
-};
-
-const formatCompetitionDate = (value: string): string => {
-  if (!value.trim()) {
-    return "-";
-  }
-
-  const parsedDate = new Date(value);
-
-  if (Number.isNaN(parsedDate.getTime())) {
-    return value;
-  }
-
-  return parsedDate.toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
 };
 
 export default function DataPrestasiSiswaPage() {
@@ -444,9 +421,6 @@ export default function DataPrestasiSiswaPage() {
     __: "grid" | "list",
   ) => {
     const descriptionText = item.description?.trim() || "-";
-    const shouldShowDescriptionTooltip =
-      descriptionText !== "-" &&
-      descriptionText.length > DESCRIPTION_TOOLTIP_CHARACTER_LIMIT;
 
     return (
       <div className="rounded-lg border border-gray-300 bg-white p-3 shadow-2xs">
@@ -478,28 +452,10 @@ export default function DataPrestasiSiswaPage() {
 
               <div className="mt-2 flex flex-col gap-2 text-sm text-gray-600 sm:flex-row sm:items-stretch">
                 <div className="min-w-0 flex-1">
-                  {shouldShowDescriptionTooltip ? (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <p className="mt-0 truncate text-gray-600 cursor-help">
-                          {descriptionText}
-                        </p>
-                      </TooltipTrigger>
-                      <TooltipContent
-                        side="bottom"
-                        align="start"
-                        className="max-w-xs border border-gray-400 bg-white text-black font-normal shadow-md sm:max-w-sm text-sm [&>svg]:border-gray-200 [&>svg]:fill-white"
-                      >
-                        <p className="whitespace-normal wrap-break-word">
-                          {descriptionText}
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ) : (
-                    <p className="mt-0.5 truncate text-gray-600">
-                      {descriptionText}
-                    </p>
-                  )}
+                  <TruncatedTooltipText
+                    text={descriptionText}
+                    tooltipContentClassName="border-gray-400"
+                  />
                 </div>
 
                 <div className="h-px w-full bg-gray-200 sm:h-auto sm:w-px" />

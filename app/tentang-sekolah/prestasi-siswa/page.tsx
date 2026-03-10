@@ -6,11 +6,7 @@ import { TextButton } from "@/components/Buttons/TextButton";
 import Search from "@/components/Filter/Search";
 import GridListPaginate from "@/components/GridListPaginate";
 import SelectInput from "@/components/InputForm/SelectInput";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import TruncatedTooltipText from "@/components/ui/truncated-tooltip-text";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
@@ -24,7 +20,6 @@ import {
 const ITEMS_PER_PAGE = 5;
 const CATEGORY_FILTER_DEFAULT = { value: "", label: "Semua Kategori" };
 const CATEGORY_OPTIONS_ENDPOINT = "/api/school-achievements/category-options";
-const DESCRIPTION_TOOLTIP_CHARACTER_LIMIT = 80;
 
 const COMPETITION_LEVEL_FILTER_OPTIONS: Array<{
   value: string;
@@ -322,9 +317,6 @@ export default function SchoolAchievementPage() {
   const renderItem = (item: SchoolAchievementListItem, _: number) => {
     const slug = item.slug?.trim() || toSlug(item.title || "prestasi");
     const descriptionText = item.description?.trim() || "-";
-    const shouldShowDescriptionTooltip =
-      descriptionText !== "-" &&
-      descriptionText.length > DESCRIPTION_TOOLTIP_CHARACTER_LIMIT;
 
     return (
       <div className="w-full rounded-lg border border-gray-300 bg-white p-3 sm:p-4">
@@ -355,28 +347,10 @@ export default function SchoolAchievementPage() {
 
             <div className="mt-2 flex flex-col gap-2 text-sm text-gray-600 sm:flex-row sm:items-stretch">
               <div className="min-w-0 flex-1">
-                {shouldShowDescriptionTooltip ? (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <p className="mt-0.5 cursor-help truncate text-gray-600">
-                        {descriptionText}
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      side="bottom"
-                      align="start"
-                      className="max-w-xs border border-gray-300 text-sm bg-white text-black font-normal shadow-md sm:max-w-sm [&>svg]:border-gray-200 [&>svg]:fill-white"
-                    >
-                      <p className="whitespace-normal wrap-break-word">
-                        {descriptionText}
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                ) : (
-                  <p className="mt-0.5 truncate text-gray-600">
-                    {descriptionText}
-                  </p>
-                )}
+                <TruncatedTooltipText
+                  text={descriptionText}
+                  tooltipContentClassName="border-gray-300"
+                />
               </div>
 
               <div className="h-px w-full bg-gray-200 sm:h-auto sm:w-px" />
