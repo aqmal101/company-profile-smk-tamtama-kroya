@@ -19,7 +19,9 @@ export interface SchoolAchievementListItem {
   id: number;
   title: string;
   slug: string;
+  description: string;
   coverPhotoUrl: string;
+  galleryDescription?: string;
   competitionLevel: string;
   category: string;
   competitionDate: string;
@@ -55,6 +57,7 @@ export interface SchoolAchievementDetail {
   title: string;
   slug: string;
   description: string;
+  galleryDescription: string;
   competitionLevel: string;
   placeName: string;
   organizerName: string;

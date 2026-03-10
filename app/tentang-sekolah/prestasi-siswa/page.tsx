@@ -1,6 +1,7 @@
 "use client";
 
 import { toSlug } from "@/utils/resolveSlug";
+import Breadcrumb from "@/components/Breadcrumb";
 import { TextButton } from "@/components/Buttons/TextButton";
 import Search from "@/components/Filter/Search";
 import GridListPaginate from "@/components/GridListPaginate";
@@ -333,7 +334,7 @@ export default function SchoolAchievementPage() {
               {item.title}
             </p>
 
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div className="mt-1 flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-teal-500/10 px-2 py-1 text-xs text-primary">
                 {item.category || "Tanpa Kategori"}
               </span>
@@ -342,8 +343,12 @@ export default function SchoolAchievementPage() {
               </span>
             </div>
 
-            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
-              Deskripsi Prestasi
+            <div className="mt-2 grid grid-cols-1 gap-1 text-sm text-gray-600 sm:grid-cols-2">
+              <span className="font-medium text-gray-700 col-span-2 line-clamp-1">
+                <p className="font-medium text-gray-700">
+                  {item.description || "-"}
+                </p>
+              </span>
             </div>
           </div>
 
@@ -367,9 +372,14 @@ export default function SchoolAchievementPage() {
   return (
     <main className="min-h-screen w-full bg-linear-to-b from-[#fafafa] to-gray-50 px-4 sm:px-6 sm:py-12 md:px-10 lg:px-16 xl:px-24">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 mt-20 sm:pb-4 max-sm:mt-20 max-sm:px-8 justify-center items-center">
+        <Breadcrumb
+          className="w-full justify-start"
+          items={[{ label: "Tentang Sekolah" }, { label: "Prestasi Siswa" }]}
+        />
+
         <div className="w-full flex flex-wrap items-center justify-center max-w-3xl gap-4">
           <h1 className="text-4xl max-sm:text-2xl font-bold text-primary text-center">
-            Prestasi Siswa SMK Tamtama Kroya
+            PRESTASI SISWA <br /> SMK TAMTAMA KROYA
           </h1>
           <p className="text-center text-lg max-sm:text-sm text-gray-600">
             Jelajahi pencapaian siswa dari berbagai kompetisi tingkat kecamatan,

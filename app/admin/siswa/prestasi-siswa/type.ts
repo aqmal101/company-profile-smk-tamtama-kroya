@@ -31,6 +31,7 @@ export interface SchoolAchievementItem {
   title: string;
   slug: string;
   description: string;
+  galleryDescription: string;
   competitionLevel: string;
   placeName: string;
   organizerName: string;
@@ -62,6 +63,7 @@ export interface SchoolAchievementFormValues {
   category: string;
   participantName: string;
   description: string;
+  galleryDescription: string;
   coverPhotoUrl: string;
   isPublished: boolean;
 }

@@ -70,6 +70,7 @@ const DEFAULT_FORM_VALUES: SchoolAchievementFormValues = {
   category: "",
   participantName: "",
   description: "",
+  galleryDescription: "",
   coverPhotoUrl: "",
   isPublished: false,
 };
@@ -363,6 +364,7 @@ export default function SchoolAchievementFormPage({
           category: detail.category,
           participantName: detail.participantName,
           description: detail.description,
+          galleryDescription: detail.galleryDescription,
           coverPhotoUrl: detail.coverPhotoUrl,
           isPublished: detail.isPublished,
         });
@@ -755,6 +757,7 @@ export default function SchoolAchievementFormPage({
         title: formValues.title.trim(),
         slug: formValues.slug.trim() || toSlug(formValues.title),
         description: formValues.description.trim(),
+        galleryDescription: formValues.galleryDescription.trim(),
         competitionLevel: formValues.competitionLevel.trim().toLowerCase(),
         placeName: formValues.placeName.trim(),
         organizerName: formValues.organizerName.trim(),
@@ -1225,6 +1228,20 @@ export default function SchoolAchievementFormPage({
                   variant: "error",
                 });
               }}
+            />
+
+            <FormTextarea
+              label="Deskripsi Galeri"
+              limit={800}
+              value={formValues.galleryDescription}
+              onChange={(event) => {
+                setFormValues((prev) => ({
+                  ...prev,
+                  galleryDescription: event.target.value,
+                }));
+              }}
+              placeholder="Tambahkan deskripsi singkat untuk galeri foto prestasi"
+              className="mt-2"
             />
 
             {galleryUploadAlert && (

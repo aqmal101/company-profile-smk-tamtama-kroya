@@ -35,6 +35,7 @@ interface DetailContentLayoutProps {
   description: string;
   galleryTitle: string;
   galleries: DetailGalleryItem[];
+  galleryDescription?: string;
   galleryEmptyText?: string;
   highlightsTitle: string;
   highlights: DetailHighlightItem[];
@@ -55,6 +56,7 @@ export default function DetailContentLayout({
   description,
   galleryTitle,
   galleries,
+  galleryDescription,
   galleryEmptyText = "Belum ada foto dokumentasi.",
   highlightsTitle,
   highlights,
@@ -208,6 +210,12 @@ export default function DetailContentLayout({
           ) : (
             <p className="mt-6 text-gray-700">{galleryEmptyText}</p>
           )}
+
+          {galleryDescription?.trim() ? (
+            <p className="mt-2 text-sm text-gray-700 text-center leading-relaxed">
+              {galleryDescription}
+            </p>
+          ) : null}
         </section>
 
         {footer && footerInlineWithHighlights ? (

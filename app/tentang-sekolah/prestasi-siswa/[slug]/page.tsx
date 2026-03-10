@@ -179,6 +179,9 @@ export default function SchoolAchievementDetailPage() {
         photoUrl: gallery.photoUrl,
         order: gallery.order,
       }))}
+      galleryDescription={
+        detail.galleryDescription || "Belum ada deskripsi galeri prestasi."
+      }
       galleryEmptyText="Belum ada foto dokumentasi."
       highlightsTitle="Penghargaan"
       highlights={awards.map((award) => ({

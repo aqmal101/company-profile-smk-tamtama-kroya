@@ -19,6 +19,7 @@ interface SchoolAchievementItem {
   title: string;
   slug: string;
   description: string;
+  galleryDescription: string;
   competitionLevel: string;
   placeName: string;
   organizerName: string;
@@ -137,6 +138,7 @@ const normalizeItem = (value: unknown): SchoolAchievementItem | null => {
     title: normalizedTitle,
     slug: toStringValue(root.slug) || toSlug(normalizedTitle),
     description: toStringValue(root.description),
+    galleryDescription: toStringValue(root.galleryDescription),
     competitionLevel: toStringValue(root.competitionLevel).toLowerCase(),
     placeName: toStringValue(root.placeName),
     organizerName: toStringValue(root.organizerName),

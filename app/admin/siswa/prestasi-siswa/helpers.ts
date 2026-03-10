@@ -143,6 +143,7 @@ export const normalizeItem = (
     title: normalizedTitle,
     slug: item.slug?.trim() || toSlug(normalizedTitle),
     description: item.description?.trim() || "",
+    galleryDescription: item.galleryDescription?.trim() || "",
     competitionLevel: normalizeCompetitionLevel(item.competitionLevel),
     placeName: item.placeName?.trim() || "",
     organizerName: item.organizerName?.trim() || "",
