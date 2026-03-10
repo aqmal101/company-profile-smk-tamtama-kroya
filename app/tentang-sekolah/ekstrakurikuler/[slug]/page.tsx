@@ -109,7 +109,7 @@ export default function ExtracurricularDetailPage() {
           <TextButton
             variant="outline"
             text="Kembali ke daftar ekstrakurikuler"
-            onClick={() => router.push("/tentang-sekolah/ekstrakulikuler")}
+            onClick={() => router.push("/tentang-sekolah/ekstrakurikuler")}
           />
         </div>
       </main>
@@ -118,7 +118,7 @@ export default function ExtracurricularDetailPage() {
 
   return (
     <DetailContentLayout
-      backPath="/tentang-sekolah/ekstrakulikuler"
+      backPath="/tentang-sekolah/ekstrakurikuler"
       title={detail.name}
       subtitle="SMK Tamtama Kroya"
       heroImageUrl={detail.thumbnailUrl || "https://placehold.co/1200x800/png"}

@@ -893,7 +893,8 @@ export default function SchoolAchievementFormPage({
 
             <div className="space-y-2">
               <FormInput
-                label="Slug"
+                label="Slug (Diisi otomatis oleh sistem)"
+                disabled
                 value={formValues.slug}
                 onChange={(event) => {
                   setIsSlugEditedManually(true);

@@ -25,7 +25,7 @@ export const NavItems = [
     children: [
       {
         label: "Ekstrakurikuler",
-        href: "/tentang-sekolah/ekstrakulikuler",
+        href: "/tentang-sekolah/ekstrakurikuler",
         icon: <MdSportsTennis />,
       },
       {

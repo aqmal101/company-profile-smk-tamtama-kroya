@@ -278,7 +278,7 @@ export default function ExtracurricularPage() {
               text="Lihat Detail"
               className="w-fit rounded-full! text-sm!"
               onClick={() =>
-                router.push(`/tentang-sekolah/ekstrakulikuler/${slug}`)
+                router.push(`/tentang-sekolah/ekstrakurikuler/${slug}`)
               }
             />
           </div>
@@ -292,12 +292,12 @@ export default function ExtracurricularPage() {
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 mt-20 sm:pb-4 max-sm:mt-20 max-sm:px-8 justify-center items-center">
         <Breadcrumb
           className="w-full justify-start"
-          items={[{ label: "Tentang Sekolah" }, { label: "Ekstrakulikuler" }]}
+          items={[{ label: "Tentang Sekolah" }, { label: "Ekstrakurikuler" }]}
         />
 
         <div className="w-full flex flex-wrap items-center justify-center max-w-2xl gap-4">
           <h1 className="text-4xl max-sm:text-2xl font-bold text-primary text-center">
-            EKSTRAKULIKULER <br /> SMK TAMTAMA KROYA
+            EKSTRAKURIKULER <br /> SMK TAMTAMA KROYA
           </h1>
           <p className="text-center text-lg max-sm:text-sm text-gray-600">
             Berbagai kegiatan ekstrakurikuler tersedia untuk mengembangkan
