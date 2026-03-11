@@ -306,9 +306,7 @@ export default function SchoolFacilityPage() {
     const slug = item.slug?.trim() || toSlug(item.title);
     const categoryName = item.category?.name?.trim() || "";
     const summaryText =
-      item.summary?.trim() ||
-      item.description?.trim() ||
-      "Informasi fasilitas akan diperbarui segera.";
+      item.summary?.trim() || "Informasi fasilitas akan diperbarui segera.";
 
     if (mode === "list") {
       return (

@@ -44,6 +44,8 @@ interface DetailContentLayoutProps {
   footerInlineWithHighlights?: boolean;
 }
 
+const HTML_TAG_PATTERN = /<\/?[a-z][\s\S]*>/i;
+
 export default function DetailContentLayout({
   backPath,
   title,
@@ -65,6 +67,15 @@ export default function DetailContentLayout({
   footerInlineWithHighlights = false,
 }: DetailContentLayoutProps) {
   const router = useRouter();
+
+  const normalizedDescription = useMemo(
+    () => description.trim(),
+    [description],
+  );
+  const isDescriptionHtml = useMemo(
+    () => HTML_TAG_PATTERN.test(normalizedDescription),
+    [normalizedDescription],
+  );
 
   const sortedGalleries = useMemo(
     () => [...galleries].sort((a, b) => a.order - b.order),
@@ -146,9 +157,18 @@ export default function DetailContentLayout({
 
         <section className="flex flex-col gap-3 mt-10 max-w-7xl">
           {descriptionTitle}
-          <p className="text-base max-sm:text-sm text-gray-700 leading-relaxed break-all">
-            {description || "Belum ada deskripsi."}
-          </p>
+          {isDescriptionHtml ? (
+            <div
+              className="text-base max-sm:text-sm text-gray-700 leading-relaxed wrap-break-word [&_h1]:text-2xl [&_h1]:font-semibold [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:text-lg [&_h3]:font-semibold [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:pl-6 [&_li]:mb-1"
+              dangerouslySetInnerHTML={{
+                __html: normalizedDescription,
+              }}
+            />
+          ) : (
+            <p className="text-base max-sm:text-sm text-gray-700 leading-relaxed whitespace-pre-line wrap-break-word">
+              {normalizedDescription || "Belum ada deskripsi."}
+            </p>
+          )}
         </section>
 
         <section className="flex flex-col gap-3 mt-10">

@@ -2,13 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LuRefreshCcw } from "react-icons/lu";
 import { TextButton } from "@/components/Buttons/TextButton";
 import SelectInput from "@/components/InputForm/SelectInput";
 import { BaseModal } from "@/components/Modal/BaseModal";
 import { TitleSection } from "@/components/TitleSection";
 import { useAlert } from "@/components/ui/alert";
 import { FormInput, FormTextarea } from "@/components/ui/form-input";
+import { FormInputRichText } from "@/components/ui/form-input-richtext";
 import MultipleImageUploader from "@/components/Upload/MultipleImageUploader";
 import PhotoUpload from "@/components/Upload/PhotoUpload";
 import { getAuthHeader } from "@/utils/auth";
@@ -799,14 +799,14 @@ export default function SchoolFacilityFormPage({
             </div>
 
             <div className="lg:col-span-2">
-              <FormTextarea
+              <FormInputRichText
                 label="Deskripsi Lengkap"
                 limit={2500}
                 value={formValues.description}
-                onChange={(event) => {
+                onChange={(value) => {
                   setFormValues((prev) => ({
                     ...prev,
-                    description: event.target.value,
+                    description: value,
                   }));
                   setFormErrors((prev) => ({
                     ...prev,
@@ -815,6 +815,7 @@ export default function SchoolFacilityFormPage({
                 }}
                 placeholder="Masukkan deskripsi lengkap fasilitas"
                 isMandatory
+                disabled={isSubmitting}
                 error={formErrors.description}
               />
             </div>

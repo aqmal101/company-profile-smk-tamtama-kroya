@@ -8,8 +8,19 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { SchoolFacilityDetail } from "../types";
 
+const stripHtmlTags = (value: string) =>
+  value
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
 const toSummaryHighlights = (value: string) => {
-  const segments = value
+  const plainText = stripHtmlTags(value);
+
+  const segments = plainText
     .split(/\r?\n|[.;]/)
     .map((item) => item.trim())
     .filter(Boolean);
@@ -180,9 +191,9 @@ export default function SchoolFacilityDetailPage() {
         order: gallery.order,
       }))}
       galleryDescription={detail.galleryDescription}
+      highlights={highlights}
       galleryEmptyText="Belum ada dokumentasi fasilitas"
       highlightsTitle="Ringkasan Fasilitas"
-      highlights={highlights}
       highlightsEmptyText="Belum ada ringkasan fasilitas"
     />
   );
