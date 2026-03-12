@@ -129,7 +129,7 @@ const normalizeItem = (
   return {
     id: Number.isFinite(parsedId) && parsedId > 0 ? parsedId : index + 1,
     title: normalizedTitle,
-    summary: toStringValue(root.summary) || description,
+    summary: toStringValue(root.summary) || "-",
     slug: toStringValue(root.slug) || toSlug(normalizedTitle),
     description,
     coverPhotoUrl: toStringValue(root.coverPhotoUrl) || DEFAULT_COVER_URL,
