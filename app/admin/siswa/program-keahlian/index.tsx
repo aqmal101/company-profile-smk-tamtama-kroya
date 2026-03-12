@@ -5,7 +5,7 @@ import { TitleSection } from "@/components/TitleSection/index";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MajorApiResponse, MajorItem } from "./type";
 import { TextButton } from "@/components/Buttons/TextButton";
-import { LuPen, LuTrash2 } from "react-icons/lu";
+import { LuLayoutGrid, LuList, LuPen, LuTrash2 } from "react-icons/lu";
 import {
   Tooltip,
   TooltipContent,
@@ -21,13 +21,16 @@ import { IoMdRefresh } from "react-icons/io";
 import Image from "next/image";
 
 const sortByOptions = [
-  { value: "createdAt", label: "Urutkan: Tanggal Dibuat" },
-  { value: "name", label: "Urutkan: Nama" },
+  { value: "latest", label: "Urutkan: Terbaru" },
+  { value: "oldest", label: "Urutkan: Terlama" },
+  { value: "name_asc", label: "Urutkan: Nama A-Z" },
+  { value: "name_desc", label: "Urutkan: Nama Z-A" },
 ];
 
-const sortOrderOptions = [
-  { value: "desc", label: "Urutan: Terbaru" },
-  { value: "asc", label: "Urutan: Terlama" },
+const statusOptions = [
+  { value: "", label: "Status: Semua" },
+  { value: "active", label: "Aktif" },
+  { value: "inactive", label: "Tidak Aktif" },
 ];
 
 export default function ProgramKeahlianPage() {
@@ -41,8 +44,9 @@ export default function ProgramKeahlianPage() {
   const [limit, setLimit] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("createdAt");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortBy, setSortBy] = useState("latest");
+  const [status, setStatus] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -62,11 +66,14 @@ export default function ProgramKeahlianPage() {
         page: String(currentPage),
         limit: String(limit),
         sortBy,
-        sortOrder,
       });
 
       if (debouncedSearchTerm) {
         params.append("search", debouncedSearchTerm);
+      }
+
+      if (status) {
+        params.append("status", status);
       }
 
       const response = await fetch(
@@ -101,7 +108,7 @@ export default function ProgramKeahlianPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, limit, debouncedSearchTerm, sortBy, sortOrder, showAlert]);
+  }, [currentPage, limit, debouncedSearchTerm, sortBy, status, showAlert]);
 
   useEffect(() => {
     fetchMajors();
@@ -109,7 +116,7 @@ export default function ProgramKeahlianPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearchTerm, sortBy, sortOrder]);
+  }, [debouncedSearchTerm, sortBy, status]);
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
@@ -118,8 +125,8 @@ export default function ProgramKeahlianPage() {
   const handleResetFilters = () => {
     setSearchTerm("");
     setDebouncedSearchTerm("");
-    setSortBy("createdAt");
-    setSortOrder("desc");
+    setSortBy("latest");
+    setStatus("");
     setCurrentPage(1);
   };
 
@@ -185,7 +192,7 @@ export default function ProgramKeahlianPage() {
 
   const renderItem = (item: MajorItem, _: number) => {
     return (
-      <div className="rounded-lg flex flex-col border border-gray-300 bg-white overflow-hidden">
+      <div className="rounded-lg flex h-full flex-col border border-gray-300 bg-white overflow-hidden">
         <Image
           src={item.photoUrl || "https://placehold.co/1200x800/png"}
           alt={item.name}
@@ -202,18 +209,9 @@ export default function ProgramKeahlianPage() {
             <p className="text-sm text-gray-600">{item.abbreviation}</p>
           </div>
           <p className="text-sm text-gray-700 line-clamp-2 grow">
-            {item.description || "-"}
+            {item.summary || "-"}
           </p>
-          <div className="text-xs text-gray-500 space-y-1">
-            <p>Daya Tampung: {item.capacity} siswa</p>
-            <p>
-              {new Date(item.createdAt).toLocaleDateString("id-ID", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
-            </p>
-          </div>
+
           <div className="w-full flex flex-row justify-end gap-2 mt-auto">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -264,19 +262,8 @@ export default function ProgramKeahlianPage() {
             </p>
             <p className="text-sm text-gray-600 mb-2">{item.abbreviation}</p>
             <p className="text-sm text-gray-700 line-clamp-2 mb-2">
-              {item.description || "-"}
+              {item.summary || "-"}
             </p>
-            <div className="flex flex-row gap-4 text-xs text-gray-500">
-              <span>Daya Tampung: {item.capacity}</span>
-              <span>|</span>
-              <span>
-                {new Date(item.createdAt).toLocaleDateString("id-ID", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </span>
-            </div>
           </div>
         </div>
         <div className="flex flex-row justify-center gap-3 items-center">
@@ -312,9 +299,15 @@ export default function ProgramKeahlianPage() {
   return (
     <div className="w-full h-auto min-h-screen bg-gray-100 p-4">
       <div className="w-full h-fit bg-white rounded-md drop-shadow-sm px-4 py-2">
+        {/* <Breadcrumb
+          homeHref="/admin/dashboard"
+          homeLabel="Dashboard"
+          items={[{ label: "Jurusan Sekolah" }]}
+          className="pt-2 pb-1"
+        /> */}
         <TitleSection
-          title="Program Keahlian SMK Tamtama Kroya"
-          subtitle="Kelola data program keahlian yang ditampilkan pada halaman website sekolah"
+          title="Jurusan Sekolah"
+          subtitle="Kelola data jurusan yang ditampilkan pada halaman website sekolah"
         />
         <div className="w-full mb-3">
           <div className="w-full flex flex-col gap-3 lg:flex lg:flex-row lg:flex-wrap lg:items-center lg:justify-end">
@@ -326,14 +319,6 @@ export default function ProgramKeahlianPage() {
                 options={sortByOptions}
               />
             </div>
-            <div className="w-full lg:w-50">
-              <SelectInput
-                label=""
-                value={sortOrder}
-                onChange={(event) => setSortOrder(String(event.target.value))}
-                options={sortOrderOptions}
-              />
-            </div>
             <TextButton
               variant="outline"
               text="Reset Filter"
@@ -342,14 +327,46 @@ export default function ProgramKeahlianPage() {
               icon={<IoMdRefresh className="text-lg shrink-0" />}
             />
             <Search
-              placeholder="Cari program keahlian"
+              placeholder="Cari jurusan"
               className="w-full lg:max-w-72 lg:mb-2"
               searchTerm={searchTerm}
               handleSearchChange={handleSearchChange}
             />
+            <div className="hidden lg:flex items-center gap-1 mb-2">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`p-2 rounded border transition-colors ${
+                      viewMode === "list"
+                        ? "bg-primary text-white border-primary"
+                        : "bg-white text-gray-500 border-gray-300 hover:border-gray-400"
+                    }`}
+                  >
+                    <LuList className="text-lg" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Tampilan List</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`p-2 rounded border transition-colors ${
+                      viewMode === "grid"
+                        ? "bg-primary text-white border-primary"
+                        : "bg-white text-gray-500 border-gray-300 hover:border-gray-400"
+                    }`}
+                  >
+                    <LuLayoutGrid className="text-lg" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Tampilan Grid</TooltipContent>
+              </Tooltip>
+            </div>
             <TextButton
               variant="primary"
-              text="Tambah Program Keahlian"
+              text="Tambah Jurusan"
               onClick={() =>
                 router.push("/admin/siswa/program-keahlian/tambah")
               }
@@ -360,11 +377,12 @@ export default function ProgramKeahlianPage() {
         <div className="w-full h-fit">
           <GridListPaginate
             data={majors}
-            renderItem={renderListItem}
-            viewMode="list"
+            viewMode={viewMode}
             loading={loading}
-            emptyText="Data program keahlian belum tersedia"
             pagination={paginationConfig}
+            emptyText="Data jurusan belum tersedia"
+            renderItem={viewMode === "list" ? renderListItem : renderItem}
+            gridClassName="w-full h-fit grid gap-6 my-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-2"
           />
         </div>
         <BaseModal

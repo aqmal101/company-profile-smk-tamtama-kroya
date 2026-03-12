@@ -23,6 +23,7 @@ interface GridListPaginateProps<T extends object> {
   showSizeChanger?: boolean;
   showNumberInfo?: boolean;
   pageSizeOptions?: number[];
+  gridClassName?: string;
 }
 
 export default function GridListPaginate<T extends object>({
@@ -35,6 +36,7 @@ export default function GridListPaginate<T extends object>({
   pageSizeOptions = [9, 18, 27, 36],
   showNumberInfo = true,
   emptyText = "Tidak ada data",
+  gridClassName,
 }: GridListPaginateProps<T>) {
   const defaultPageSize = viewMode === "grid" ? 9 : 10;
   const effectivePageSize = pagination
@@ -42,6 +44,9 @@ export default function GridListPaginate<T extends object>({
     : defaultPageSize;
   const defaultPageSizeOptions =
     viewMode === "grid" ? pageSizeOptions : [10, 20, 50, 100];
+  const resolvedGridClassName =
+    gridClassName ||
+    "w-full h-fit grid gap-6 my-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
 
   const totalPages = pagination
     ? Math.max(1, Math.ceil(pagination.total / effectivePageSize))
@@ -63,7 +68,7 @@ export default function GridListPaginate<T extends object>({
         <div
           className={
             viewMode === "grid"
-              ? "w-full h-fit grid gap-6 my-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              ? resolvedGridClassName
               : "w-full h-fit flex flex-col gap-4 my-6"
           }
         >
@@ -108,7 +113,7 @@ export default function GridListPaginate<T extends object>({
         <div
           className={
             viewMode === "grid"
-              ? "w-full h-fit grid gap-6 my-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              ? resolvedGridClassName
               : "w-full h-fit flex flex-col gap-4 my-6"
           }
         >

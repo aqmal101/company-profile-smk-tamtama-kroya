@@ -82,6 +82,11 @@ const sidebarItems = [
         label: "Fasilitas Sekolah",
         href: "/admin/siswa/fasilitas",
       },
+      {
+        icon: FaHandHoldingHeart,
+        label: "Program Keahlian",
+        href: "/admin/siswa/program-keahlian",
+      },
     ],
   },
   {

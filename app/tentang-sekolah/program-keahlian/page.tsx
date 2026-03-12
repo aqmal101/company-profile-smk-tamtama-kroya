@@ -105,7 +105,7 @@ export default function MajorPage() {
     const slug = item.slug || toSlug(item.name);
 
     return (
-      <div className="rounded-lg flex flex-col border border-gray-300 bg-white overflow-hidden">
+      <div className="rounded-lg h-full flex flex-col border border-gray-300 bg-white overflow-hidden">
         <Image
           src={item.photoUrl || "https://placehold.co/1200x800/png"}
           alt={item.name}
@@ -113,12 +113,12 @@ export default function MajorPage() {
           height={800}
           loading="lazy"
           unoptimized
-          className="w-full h-58 aspect-video bg-gray-300 object-cover"
+          className="w-full h-86 aspect-video bg-gray-300 object-cover"
         />
 
-        <div className="w-full flex flex-col px-3 py-2 gap-4">
+        <div className="w-full flex grow flex-col px-3 py-2 gap-4">
           <div>
-            <p className="text-base text-left font-semibold text-gray-800">
+            <p className="text-base text-left font-semibold text-gray-800 line-clamp-2 max-h-12">
               {item.name}
             </p>
             <p className="text-sm text-gray-600">{item.abbreviation}</p>
@@ -126,7 +126,7 @@ export default function MajorPage() {
           <p className="text-sm text-gray-700 line-clamp-2">
             {item.summary || "-"}
           </p>
-          <div className="w-full flex flex-row justify-end">
+          <div className="w-full mt-auto flex flex-row justify-end">
             <TextButton
               variant="gray"
               text="Lihat Detail"
@@ -145,7 +145,9 @@ export default function MajorPage() {
     <main className="min-h-screen w-full bg-linear-to-b from-[#fafafa] to-gray-50 px-4 sm:px-6 sm:py-12 md:px-10 lg:px-16 xl:px-24">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 mt-20 sm:pb-4 max-sm:mt-20 max-sm:px-8 justify-center items-center">
         <Breadcrumb
-          className="w-full justify-start"
+          className="w-full"
+          homeHref="/"
+          homeLabel="Beranda"
           items={[{ label: "Tentang Sekolah" }, { label: "Program Keahlian" }]}
         />
 
@@ -183,8 +185,9 @@ export default function MajorPage() {
           renderItem={renderItem}
           viewMode="grid"
           loading={loading}
-          emptyText="Data program keahlian belum tersedia"
           pagination={paginationConfig}
+          emptyText="Data program keahlian belum tersedia"
+          gridClassName="w-full h-fit grid auto-rows-fr gap-6 my-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-2"
         />
       </div>
     </main>
