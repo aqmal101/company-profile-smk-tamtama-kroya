@@ -285,26 +285,15 @@ export default function AdminProspectiveStudentPage() {
             disabled: Number(b.isActive) === 0,
           }),
         );
-        const majorOpts = (data.majors || []).map(
-          (b: { name: string; abbreviation: string }) => ({
-            value: b.abbreviation,
-            label: `Jurusan ${b.abbreviation}`,
-          }),
-        );
 
         if (cancelled) return;
 
         setBatches(batchOpts);
-        setMajors(majorOpts);
         setYearsOptions(data.years || []);
         setRegistrationTypeOptions(data.registrationTypes || []);
 
         // Cache to localStorage as fallback when network fails
         try {
-          localStorage.setItem(
-            "filterOptions.majors",
-            JSON.stringify(majorOpts),
-          );
           localStorage.setItem(
             "filterOptions.batches",
             JSON.stringify(batchOpts),
@@ -330,6 +319,73 @@ export default function AdminProspectiveStudentPage() {
     };
 
     loadOptions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadCachedMajorOptions = () => {
+      if (cancelled) return;
+
+      try {
+        const cachedMajors = localStorage.getItem("filterOptions.majors");
+        if (cachedMajors) {
+          setMajors(JSON.parse(cachedMajors));
+        }
+      } catch (error) {
+        console.error("Failed to load cached major options", error);
+      }
+    };
+
+    const loadMajorOptions = async () => {
+      try {
+        const response = await fetch(`/api/majors/options`, {
+          headers: {
+            "Content-Type": "application/json",
+            ...getAuthHeader(),
+          },
+        });
+
+        if (!response.ok) {
+          console.error("Failed to fetch major options", response.status);
+          loadCachedMajorOptions();
+          return;
+        }
+
+        const data = await response.json();
+        const majorOpts = (data || []).map(
+          (major: { name: string; abbreviation: string }) => ({
+            value: major.abbreviation,
+            label: `Jurusan ${major.abbreviation}`,
+          }),
+        );
+
+        if (cancelled) return;
+
+        setMajors(majorOpts);
+
+        try {
+          localStorage.setItem(
+            "filterOptions.majors",
+            JSON.stringify(majorOpts),
+          );
+        } catch {
+          /* ignore localStorage errors */
+        }
+      } catch (error) {
+        console.error(
+          "Failed to load major options, falling back to cache",
+          error,
+        );
+        loadCachedMajorOptions();
+      }
+    };
+
+    loadMajorOptions();
 
     return () => {
       cancelled = true;
@@ -517,10 +573,10 @@ export default function AdminProspectiveStudentPage() {
                   ]}
                   placeholder={"Pilih Tahun Ajaran "}
                   isMandatory
-                  className="w-full lg:w-48"
+                  className="w-full lg:w-46"
                 />
                 <SelectInput
-                  className="w-full lg:w-56"
+                  className="w-full lg:w-52"
                   value={selectAuthored}
                   onChange={(e) => {
                     setSelectedAuthor(e.target.value as "" | "true" | "false");
@@ -549,7 +605,7 @@ export default function AdminProspectiveStudentPage() {
                     ...batches,
                   ]}
                   placeholder="Pilih Gelombang"
-                  className="w-full lg:w-44"
+                  className="w-full lg:w-42"
                 />
                 <SelectInput
                   value={selectedMajor}
@@ -559,7 +615,7 @@ export default function AdminProspectiveStudentPage() {
                   }}
                   options={[{ value: "", label: "Semua Jurusan" }, ...majors]}
                   placeholder="Pilih Jurusan"
-                  className="w-full lg:w-38"
+                  className="w-full lg:w-35"
                 />
               </div>
               <TextButton
@@ -572,7 +628,7 @@ export default function AdminProspectiveStudentPage() {
                 onClick={handleResetFilters}
               />
               <Search
-                className="w-full mb-2 lg:max-w-sm lg:w-full"
+                className="w-full mb-2 lg:max-w-2xs lg:w-full"
                 searchTerm={searchTerm}
                 handleSearchChange={handleSearchChange}
               />
