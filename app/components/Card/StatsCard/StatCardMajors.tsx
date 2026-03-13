@@ -16,13 +16,22 @@ export type MajorData = {
 export default function StatsMajorCard({
   data,
   isLoading,
+  totalCount,
 }: {
   data: MajorData[];
   isLoading: boolean;
+  totalCount?: number;
 }) {
-  const totalCount = data.reduce((sum, item) => sum + item.count, 0);
+  const resolvedTotalCount =
+    typeof totalCount === "number" && Number.isFinite(totalCount)
+      ? totalCount
+      : data.reduce((sum, item) => sum + item.count, 0);
   const dataWithTotal = [
-    { major: "Total Pendaftar", count: totalCount, isFirstUnique: true },
+    {
+      major: "Total Pendaftar",
+      count: resolvedTotalCount,
+      isFirstUnique: true,
+    },
     ...data,
   ];
 

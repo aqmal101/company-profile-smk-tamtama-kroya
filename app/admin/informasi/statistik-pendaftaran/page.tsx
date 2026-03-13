@@ -25,19 +25,32 @@ import {
   transformFromApiFormat,
   transformRecentRegistrations,
 } from "@/utils/transformRegistrationData";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { LuEye, LuPen, LuTrash2 } from "react-icons/lu";
+
+const PRIORITY_MAJORS = ["TKR", "DKV", "TITL", "TP"] as const;
+
+const normalizeMajorDistribution = (payload: unknown): MajorData[] => {
+  if (Array.isArray(payload)) {
+    return payload as MajorData[];
+  }
+
+  if (payload && typeof payload === "object") {
+    const maybeData = (payload as { data?: unknown }).data;
+    if (Array.isArray(maybeData)) {
+      return maybeData as MajorData[];
+    }
+  }
+
+  return [];
+};
 
 export default function AdminStatisticPage() {
   const { showAlert } = useAlert();
 
-  const [majorDistribution, setMajorDistribution] = useState<MajorData[]>([
-    { major: "TKR", count: 0 },
-    { major: "DKV", count: 0 },
-    { major: "TITL", count: 0 },
-    { major: "TP", count: 0 },
-  ]);
+  const [majorDistribution, setMajorDistribution] = useState<MajorData[]>([]);
 
   const [students, setStudents] = useState<Student[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
@@ -61,7 +74,6 @@ export default function AdminStatisticPage() {
   const [batches, setBatches] = useState<
     Array<{ value: string | number; label: string; disabled?: boolean }>
   >([]);
-  console.log(batches);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedData, setSelectedData] = useState<RegistrationData | null>(
     null,
@@ -74,6 +86,31 @@ export default function AdminStatisticPage() {
   const [registrationTypeOptions, setRegistrationTypeOptions] = useState<
     Array<{ value: string | number; label: string }>
   >([]);
+
+  const featuredMajorDistribution = useMemo<MajorData[]>(() => {
+    const distributionByMajor = new Map(
+      majorDistribution.map((item) => [
+        String(item.major || "")
+          .trim()
+          .toUpperCase(),
+        Number(item.count) || 0,
+      ]),
+    );
+
+    return PRIORITY_MAJORS.map((major) => ({
+      major,
+      count: distributionByMajor.get(major) ?? 0,
+    }));
+  }, [majorDistribution]);
+
+  const totalMajorCount = useMemo(
+    () =>
+      majorDistribution.reduce(
+        (sum, item) => sum + (Number(item.count) || 0),
+        0,
+      ),
+    [majorDistribution],
+  );
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -91,7 +128,7 @@ export default function AdminStatisticPage() {
 
         if (response.ok) {
           const data = await response.json();
-          setMajorDistribution(data);
+          setMajorDistribution(normalizeMajorDistribution(data));
         }
       } catch (error) {
         console.error("Failed to fetch stats:", error);
@@ -501,7 +538,19 @@ export default function AdminStatisticPage() {
           title="Data Pendaftar Sekolah"
           subtitle="Menampilkan daftar lengkap calon murid yang telah melakukan <br /> pendaftaran baik secara mandiri maupun melalui guru."
         />
-        <StatsMajorCard data={majorDistribution} isLoading={isLoading} />
+        <StatsMajorCard
+          data={featuredMajorDistribution}
+          isLoading={isLoading}
+          totalCount={totalMajorCount}
+        />
+        <div className="mb-4 flex justify-end">
+          <Link
+            href="/admin/informasi/statistik-pendaftaran/semua-jurusan"
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            Lihat Semua Jurusan
+          </Link>
+        </div>
         <div className="w-full h-fit bg-white rounded-md drop-shadow-sm">
           <div className="p-6 max-sm:p-2 border-b border-gray-200">
             {/* Search Filter */}

@@ -10,7 +10,7 @@ export const HeroSection: React.FC = () => {
   };
 
   const handleDepartmentRoute = () => {
-    window.location.href = "/jurusan";
+    window.location.href = "/tentang-sekolah/program-keahlian";
   };
 
   return (
