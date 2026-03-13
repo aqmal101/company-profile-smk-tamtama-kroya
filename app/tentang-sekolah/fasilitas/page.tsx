@@ -1,6 +1,5 @@
 "use client";
 
-import Breadcrumb from "@/components/Breadcrumb";
 import { TextButton } from "@/components/Buttons/TextButton";
 import Search from "@/components/Filter/Search";
 import GridListPaginate from "@/components/GridListPaginate";
@@ -422,11 +421,6 @@ export default function SchoolFacilityPage() {
   return (
     <main className="min-h-screen w-full bg-linear-to-b from-[#fafafa] to-gray-50 px-4 sm:px-6 sm:py-12 md:px-10 lg:px-16 xl:px-24">
       <div className="mx-auto mt-20 flex w-full max-w-7xl flex-col items-center justify-center gap-6 pb-4 max-sm:mt-20 max-sm:px-4">
-        <Breadcrumb
-          className="w-full justify-start"
-          items={[{ label: "Tentang Sekolah" }, { label: "Fasilitas" }]}
-        />
-
         <div className="flex w-full max-w-3xl flex-col items-center gap-4 text-center">
           <h1 className="text-4xl font-bold text-primary max-sm:text-2xl">
             FASILITAS <br /> SMK TAMTAMA KROYA

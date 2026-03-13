@@ -1,7 +1,6 @@
 "use client";
 
 import { toSlug } from "@/utils/resolveSlug";
-import Breadcrumb from "@/components/Breadcrumb";
 import { TextButton } from "@/components/Buttons/TextButton";
 import Search from "@/components/Filter/Search";
 import GridListPaginate from "@/components/GridListPaginate";
@@ -390,11 +389,6 @@ export default function SchoolAchievementPage() {
   return (
     <main className="min-h-screen w-full bg-linear-to-b from-[#fafafa] to-gray-50 px-4 sm:px-6 sm:py-12 md:px-10 lg:px-16 xl:px-24">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 mt-20 sm:pb-4 max-sm:mt-20 max-sm:px-8 justify-center items-center">
-        <Breadcrumb
-          className="w-full justify-start"
-          items={[{ label: "Tentang Sekolah" }, { label: "Prestasi Siswa" }]}
-        />
-
         <div className="w-full flex flex-wrap items-center justify-center max-w-3xl gap-4">
           <h1 className="text-4xl max-sm:text-2xl font-bold text-primary text-center">
             PRESTASI SISWA <br /> SMK TAMTAMA KROYA

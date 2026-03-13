@@ -3,12 +3,100 @@ import { Footer } from "@/components/Footer";
 import RegistrationHeader from "@/components/Headers/RegistrationHeader";
 import Header from "@/components/Headers";
 import { AuthGuard } from "@/components/AuthGuard";
+import Breadcrumb from "@/components/Breadcrumb";
 import { usePathname } from "next/navigation";
-import { JSX, useState } from "react";
+import { JSX, useMemo, useState } from "react";
 import { BsWhatsapp } from "react-icons/bs";
 import DashboardHeader from "@/components/Headers/DashboardHeader";
 import AdminHeader from "@/app/admin/dashboard/AdminHeader";
 import Sidebar from "@/app/admin/dashboard/Sidebar";
+
+type BreadcrumbItem = {
+  label: string;
+  href?: string;
+};
+
+const BREADCRUMB_LABEL_MAP: Record<string, string> = {
+  admin: "Admin",
+  dashboard: "Dashboard",
+  guru: "Guru",
+  "akun-guru": "Akun Guru",
+  "pendaftaran-oleh-guru": "Pendaftaran Oleh Guru",
+  informasi: "Informasi",
+  "jalur-pendaftaran": "Jalur Pendaftaran",
+  "kontak-media": "Kontak Media",
+  "statistik-pendaftaran": "Statistik Pendaftaran",
+  "syarat-periode-pendaftaran": "Syarat Periode Pendaftaran",
+  ppdb: "PPDB",
+  "bukti-pendaftaran": "Bukti Pendaftaran",
+  "data-calon-murid": "Data Calon Murid",
+  "panitia-ppdb": "Panitia PPDB",
+  siswa: "Siswa",
+  "data-alumni": "Data Alumni",
+  ekstrakurikuler: "Ekstrakurikuler",
+  fasilitas: "Fasilitas",
+  "prestasi-siswa": "Prestasi Siswa",
+  "program-keahlian": "Program Keahlian",
+  tambah: "Tambah",
+  edit: "Edit",
+  pendaftaran: "Pendaftaran",
+  "tentang-sekolah": "Tentang Sekolah",
+  alumni: "Alumni",
+  about: "Tentang",
+};
+
+const toTitleCase = (value: string): string =>
+  value
+    .split(" ")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+const toReadableLabel = (segment: string): string => {
+  const mappedLabel = BREADCRUMB_LABEL_MAP[segment.toLowerCase()];
+
+  if (mappedLabel) {
+    return mappedLabel;
+  }
+
+  let decodedSegment = segment;
+
+  try {
+    decodedSegment = decodeURIComponent(segment);
+  } catch {
+    decodedSegment = segment;
+  }
+
+  const normalizedSegment = decodedSegment
+    .replace(/\+/g, " ")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!normalizedSegment) {
+    return "Detail";
+  }
+
+  if (/^\d+$/.test(normalizedSegment)) {
+    return `#${normalizedSegment}`;
+  }
+
+  return toTitleCase(normalizedSegment);
+};
+
+const buildBreadcrumbItems = (
+  pathname: string,
+  options?: { skipFirstSegment?: boolean },
+): BreadcrumbItem[] => {
+  const allSegments = pathname.split("/").filter(Boolean);
+  const shouldSkipFirstSegment = Boolean(options?.skipFirstSegment);
+  const segments = shouldSkipFirstSegment ? allSegments.slice(1) : allSegments;
+
+  return segments.map((segment) => ({
+    // Only home should be clickable; all path segments are display-only.
+    label: toReadableLabel(segment),
+  }));
+};
 
 export default function LayoutWrapper({
   children,
@@ -44,6 +132,20 @@ export default function LayoutWrapper({
   );
 
   const isAdminPage = adminRoutes.some((route) => pathname.startsWith(route));
+  const isLandingPage = !isNoHeader && !isDashboardPage && !isAdminPage;
+
+  const adminBreadcrumbItems = useMemo(
+    () => buildBreadcrumbItems(pathname, { skipFirstSegment: true }),
+    [pathname],
+  );
+
+  const landingBreadcrumbItems = useMemo(
+    () => buildBreadcrumbItems(pathname),
+    [pathname],
+  );
+
+  const shouldRenderLandingBreadcrumb =
+    isLandingPage && pathname !== "/" && landingBreadcrumbItems.length > 0;
 
   if (isNoHeader) {
     return <>{children}</>;
@@ -73,13 +175,35 @@ export default function LayoutWrapper({
       {isAdminPage ? (
         <AuthGuard allowedRoles={["admin"]}>
           <div
-            className={`pt-20 min-h-screen bg-gray-50 transition-all duration-300 ${collapsed ? "pl-16" : "pl-62"}`}
+            className={`pt-28 min-h-screen bg-gray-50 transition-all duration-300 ${collapsed ? "pl-16" : "pl-62"}`}
           >
+            {adminBreadcrumbItems.length > 0 ? (
+              <div className="px-4 pb-2 sm:px-6 lg:px-10">
+                <Breadcrumb
+                  className="w-fit"
+                  homeHref="/admin/dashboard"
+                  homeLabel="Admin"
+                  items={adminBreadcrumbItems}
+                />
+              </div>
+            ) : null}
             {children}
           </div>
         </AuthGuard>
       ) : (
-        children
+        <div className="relative">
+          {shouldRenderLandingBreadcrumb ? (
+            <div className="pointer-events-none absolute inset-x-0 top-24 z-40">
+              <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10">
+                <Breadcrumb
+                  className="pointer-events-auto w-fit"
+                  items={landingBreadcrumbItems}
+                />
+              </div>
+            </div>
+          ) : null}
+          {children}
+        </div>
       )}
       {!isDashboardPage && !isAdminPage && (
         <a
