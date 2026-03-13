@@ -6,9 +6,12 @@ import StatsMajorCard, {
 import { TitleSection } from "@/components/TitleSection/index";
 import { useAlert } from "@/components/ui/alert";
 import { getAuthHeader } from "@/utils/auth";
+import { getMajorMetadata } from "@/utils/majorMetadata";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LuChevronLeft } from "react-icons/lu";
+
+const DEFAULT_MAJOR_CODES = ["TKR", "DKV", "TITL", "TP"] as const;
 
 const normalizeMajorDistribution = (payload: unknown): MajorData[] => {
   if (Array.isArray(payload)) {
@@ -29,6 +32,34 @@ export default function AllMajorsStatisticPage() {
   const { showAlert } = useAlert();
   const [majorDistribution, setMajorDistribution] = useState<MajorData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const mergedMajorDistribution = useMemo<MajorData[]>(() => {
+    const distributionByCode = new Map<string, number>();
+    const apiMajorCodes: string[] = [];
+
+    majorDistribution.forEach((item) => {
+      const majorCode = getMajorMetadata(item.major).code;
+      const existingCount = distributionByCode.get(majorCode) ?? 0;
+
+      if (!apiMajorCodes.includes(majorCode)) {
+        apiMajorCodes.push(majorCode);
+      }
+
+      distributionByCode.set(
+        majorCode,
+        existingCount + (Number(item.count) || 0),
+      );
+    });
+
+    const baseMajorCodes = Array.from(
+      new Set([...apiMajorCodes, ...DEFAULT_MAJOR_CODES]),
+    );
+
+    return baseMajorCodes.map((majorCode) => ({
+      major: majorCode,
+      count: distributionByCode.get(majorCode) ?? 0,
+    }));
+  }, [majorDistribution]);
 
   useEffect(() => {
     const fetchMajorDistribution = async () => {
@@ -72,7 +103,7 @@ export default function AllMajorsStatisticPage() {
           title="Semua Jurusan"
           subtitle="Menampilkan seluruh distribusi pendaftar untuk semua jurusan."
         />
-        <StatsMajorCard data={majorDistribution} isLoading={isLoading} />
+        <StatsMajorCard data={mergedMajorDistribution} isLoading={isLoading} />
       </div>
     </div>
   );

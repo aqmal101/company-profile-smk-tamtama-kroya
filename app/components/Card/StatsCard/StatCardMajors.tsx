@@ -1,10 +1,6 @@
 import { IconType } from "react-icons";
-import { BsLightningCharge } from "react-icons/bs";
-import { FaGear } from "react-icons/fa6";
 import { FiUsers } from "react-icons/fi";
-import { LiaCarSideSolid } from "react-icons/lia";
-import { MdOutlineColorLens } from "react-icons/md";
-import { getMajorColor } from "@/utils/majorColors";
+import { getMajorMetadata } from "@/utils/majorMetadata";
 
 export type MajorData = {
   major: string;
@@ -51,18 +47,13 @@ export default function StatsMajorCard({
     major: string,
     index: number,
   ): { color: string; Icon?: IconType } => {
-    switch (major) {
-      case "TKR":
-        return { color: getMajorColor(major, index), Icon: LiaCarSideSolid };
-      case "DKV":
-        return { color: getMajorColor(major, index), Icon: MdOutlineColorLens };
-      case "TITL":
-        return { color: getMajorColor(major, index), Icon: BsLightningCharge };
-      case "TP":
-        return { color: getMajorColor(major, index), Icon: FaGear };
-      default:
-        return { color: getMajorColor(major, index), Icon: FiUsers };
+    if (major === "Total Pendaftar") {
+      return { color: "#1D4ED8", Icon: FiUsers };
     }
+
+    const majorMeta = getMajorMetadata(major, index);
+
+    return { color: majorMeta.color, Icon: majorMeta.Icon };
   };
 
   return (

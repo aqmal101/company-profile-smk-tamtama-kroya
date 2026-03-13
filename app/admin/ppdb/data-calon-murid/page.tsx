@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { getAuthHeader } from "@/utils/auth";
+import { formatMajorLabel } from "@/utils/majorMetadata";
 import { RegistrationData } from "@/utils/registrationTypes";
 import {
   transformFromApiFormat,
@@ -359,9 +360,18 @@ export default function AdminProspectiveStudentPage() {
 
         const data = await response.json();
         const majorOpts = (data || []).map(
-          (major: { name: string; abbreviation: string }) => ({
+          (
+            major: { name: string; abbreviation: string },
+            index: number,
+          ) => ({
             value: major.abbreviation,
-            label: `Jurusan ${major.abbreviation}`,
+            label: formatMajorLabel(
+              {
+                name: major.name,
+                abbreviation: major.abbreviation,
+              },
+              index,
+            ),
           }),
         );
 

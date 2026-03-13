@@ -19,6 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { getAuthHeader } from "@/utils/auth";
 import { transformAdonisValidationErrors } from "@/utils/adonisErrorTranslator";
+import { formatMajorLabel } from "@/utils/majorMetadata";
 import PhotoUpload from "@/components/Upload/PhotoUpload";
 import { SectionCard } from "@/components/Card/SectionCard";
 import SelectInput from "@/components/InputForm/SelectInput";
@@ -96,9 +97,15 @@ export default function AdminAddAlumniPage() {
 
         const data = await response.json();
         const mappedMajors = (data.majors || []).map(
-          (major: { name: string; abbreviation: string }) => ({
+          (major: { name: string; abbreviation: string }, index: number) => ({
             value: major.abbreviation,
-            label: `Jurusan ${major.name} (${major.abbreviation})`,
+            label: formatMajorLabel(
+              {
+                name: major.name,
+                abbreviation: major.abbreviation,
+              },
+              index,
+            ),
           }),
         );
 

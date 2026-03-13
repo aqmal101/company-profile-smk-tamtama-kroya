@@ -20,6 +20,7 @@ import Search from "@/components/Filter/Search";
 import SelectInput from "@/components/InputForm/SelectInput";
 import { IoMdRefresh } from "react-icons/io";
 import Image from "next/image";
+import { formatMajorLabel, getMajorMetadata } from "@/utils/majorMetadata";
 
 const sortByOptions = [
   { value: "createdAt", label: "Urutkan: Tanggal Dibuat" },
@@ -31,13 +32,6 @@ const sortOrderOptions = [
   { value: "desc", label: "Urutan: Terbaru / Z-A" },
   { value: "asc", label: "Urutan: Terlama / A-Z" },
 ];
-
-const MAJOR_LABEL_MAP: Record<string, string> = {
-  TP: "Teknik Permesinan",
-  TKR: "Teknik Kendaraan Ringan",
-  TITL: "Teknik Instalasi Tenaga Listrik",
-  DKV: "Desain Komunikasi Visual",
-};
 
 const normalizeBoolean = (value: unknown): boolean => {
   if (typeof value === "boolean") return value;
@@ -168,9 +162,15 @@ export default function DataAlumniPage() {
 
         const data = await response.json();
         const mappedMajors = (data.majors || []).map(
-          (major: { name: string; abbreviation: string }) => ({
+          (major: { name: string; abbreviation: string }, index: number) => ({
             value: major.abbreviation,
-            label: `${major.name} (${major.abbreviation})`,
+            label: formatMajorLabel(
+              {
+                name: major.name,
+                abbreviation: major.abbreviation,
+              },
+              index,
+            ),
           }),
         );
 
@@ -339,8 +339,9 @@ export default function DataAlumniPage() {
   };
 
   const renderItem = (item: AlumniItem, _: number) => {
-    const majorAbbr = item.major;
-    const majorName = MAJOR_LABEL_MAP[item.major] || item.major;
+    const majorMeta = getMajorMetadata(item.major);
+    const majorAbbr = item.major || majorMeta.code;
+    const majorName = majorMeta.name;
 
     return (
       <div className="rounded-lg h-28 flex flex-row items-center justify-between border border-gray-300 shadow-2xs p-2 gap-4">
