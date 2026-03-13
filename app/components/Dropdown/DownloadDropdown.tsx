@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LuDownload, LuFileSpreadsheet, LuFileText } from "react-icons/lu";
+import {
+  LuChevronDown,
+  LuFileSpreadsheet,
+  LuFileText,
+  LuLoader,
+} from "react-icons/lu";
 
 export interface DownloadDropdownProps {
   onDownloadExcel?: () => void;
@@ -35,24 +40,20 @@ export default function DownloadDropdown({
         type="button"
         disabled={disabled}
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none"
+        className="flex items-center gap-2 rounded-sm mb-1.5 bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none"
       >
-        <span>Unduh Data</span>
-        <svg
-          className={`ml-0.5 h-4 w-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-            clipRule="evenodd"
+        <span>{disabled ? "Mengunduh" : "Unduh Data"}</span>
+        {disabled ? (
+          <LuLoader className="animate-spin" />
+        ) : (
+          <LuChevronDown
+            className={`text-lg ${open ? "rotate-180" : ""} transition-transform duration-200`}
           />
-        </svg>
+        )}
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-50 mt-1.5 w-44 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
+        <div className="absolute left-0 top-full z-50 mt-1 w-44 overflow-hidden rounded-sm border border-gray-200 bg-white shadow-lg">
           <div className="px-3 py-2 text-[11px] font-semibold uppercase tracking-widest text-gray-400">
             Format Unduhan
           </div>

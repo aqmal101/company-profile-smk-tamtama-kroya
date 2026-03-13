@@ -25,6 +25,7 @@ import {
   transformFromApiFormat,
   transformRecentRegistrations,
 } from "@/utils/transformRegistrationData";
+import { downloadRegistrationExport } from "@/utils/downloadRegistrationExport";
 import DownloadDropdown from "@/components/Dropdown/DownloadDropdown";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -116,6 +117,7 @@ export default function AdminStatisticPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     const fetchMajorDistribution = async () => {
@@ -415,6 +417,44 @@ export default function AdminStatisticPage() {
     }
   };
 
+  const handleDownload = useCallback(
+    async (type: "pdf" | "xlsx") => {
+      setIsExporting(true);
+
+      try {
+        await downloadRegistrationExport({
+          type,
+          filename: "Data Pendaftar Sekolah",
+          filters: {
+            search: debouncedSearchTerm,
+            batchId: selectedBatchId,
+            academicYearId: selectedYearId,
+            authored: selectAuthored,
+          },
+        });
+      } catch (error) {
+        console.error(`Failed to export ${type}:`, error);
+        showAlert({
+          title: "Gagal",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Terjadi kesalahan saat mengunduh data.",
+          variant: "error",
+        });
+      } finally {
+        setIsExporting(false);
+      }
+    },
+    [
+      debouncedSearchTerm,
+      selectAuthored,
+      selectedBatchId,
+      selectedYearId,
+      showAlert,
+    ],
+  );
+
   const columns: Column<Student>[] = [
     {
       title: "No",
@@ -557,8 +597,9 @@ export default function AdminStatisticPage() {
             {/* Search Filter */}
             <div className="w-full flex flex-col justify-end sm:flex-row gap-3 mb-4">
               <DownloadDropdown
-                onDownloadExcel={() => {}}
-                onDownloadPdf={() => {}}
+                disabled={isExporting}
+                onDownloadExcel={() => handleDownload("xlsx")}
+                onDownloadPdf={() => handleDownload("pdf")}
               />
               <SelectInput
                 value={selectedYearId}

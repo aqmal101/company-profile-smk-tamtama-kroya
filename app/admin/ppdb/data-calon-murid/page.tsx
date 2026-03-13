@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { getAuthHeader } from "@/utils/auth";
 import { formatMajorLabel } from "@/utils/majorMetadata";
+import { downloadRegistrationExport } from "@/utils/downloadRegistrationExport";
 import { RegistrationData } from "@/utils/registrationTypes";
 import {
   transformFromApiFormat,
@@ -76,6 +77,7 @@ export default function AdminProspectiveStudentPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Debounce search term
   useEffect(() => {
@@ -446,6 +448,46 @@ export default function AdminProspectiveStudentPage() {
     }
   };
 
+  const handleDownload = useCallback(
+    async (type: "pdf" | "xlsx") => {
+      setIsExporting(true);
+
+      try {
+        await downloadRegistrationExport({
+          type,
+          filename: "Data Calon Murid",
+          filters: {
+            search: debouncedSearchTerm,
+            batchId: selectedBatchId,
+            academicYearId: selectedYearId,
+            authored: selectAuthored,
+            majorCode: selectedMajor,
+          },
+        });
+      } catch (error) {
+        console.error(`Failed to export ${type}:`, error);
+        showAlert({
+          title: "Gagal",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Terjadi kesalahan saat mengunduh data.",
+          variant: "error",
+        });
+      } finally {
+        setIsExporting(false);
+      }
+    },
+    [
+      debouncedSearchTerm,
+      selectAuthored,
+      selectedBatchId,
+      selectedMajor,
+      selectedYearId,
+      showAlert,
+    ],
+  );
+
   const columns: Column<Student>[] = [
     {
       title: "No",
@@ -572,8 +614,9 @@ export default function AdminProspectiveStudentPage() {
           <div className="p-2 max-sm:p-2 border-b border-gray-200">
             <div className="flex w-auto flex-wrap flex-col gap-4 lg:flex-row lg:items-center lg:justify-end mb-3">
               <DownloadDropdown
-                onDownloadExcel={() => {}}
-                onDownloadPdf={() => {}}
+                disabled={isExporting}
+                onDownloadExcel={() => handleDownload("xlsx")}
+                onDownloadPdf={() => handleDownload("pdf")}
               />
               <SelectInput
                 value={selectedYearId}
