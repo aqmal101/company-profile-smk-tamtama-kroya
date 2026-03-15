@@ -145,7 +145,10 @@ export default function LayoutWrapper({
   );
 
   const shouldRenderLandingBreadcrumb =
-    isLandingPage && pathname !== "/" && landingBreadcrumbItems.length > 0;
+    isLandingPage &&
+    !isRegistrationPage &&
+    pathname !== "/" &&
+    landingBreadcrumbItems.length > 0;
 
   if (isNoHeader) {
     return <>{children}</>;
@@ -178,7 +181,7 @@ export default function LayoutWrapper({
             className={`pt-28 min-h-screen bg-gray-50 transition-all duration-300 ${collapsed ? "pl-16" : "pl-62"}`}
           >
             {adminBreadcrumbItems.length > 0 ? (
-              <div className="px-4 pb-2 sm:px-6 lg:px-10">
+              <div className="px-6 pb-2">
                 <Breadcrumb
                   className="w-fit"
                   homeHref="/admin/dashboard"
@@ -191,16 +194,20 @@ export default function LayoutWrapper({
           </div>
         </AuthGuard>
       ) : (
-        <div className="relative">
+        <div className="relative border">
           {shouldRenderLandingBreadcrumb ? (
-            <div className="relative z-40 border-b border-gray-100 bg-white/95 backdrop-blur-sm md:pointer-events-none md:absolute md:inset-x-0 md:top-24 md:border-none md:bg-transparent md:backdrop-blur-none">
-              <div className="mx-auto w-full max-w-7xl px-4 py-3 sm:px-6 lg:px-10 md:py-0">
-                <Breadcrumb
-                  className="pointer-events-auto w-fit"
-                  items={landingBreadcrumbItems}
-                />
+            <>
+              {/* In-flow spacer so page content clears the absolute breadcrumb bar on mobile/sm */}
+              <div className="h-11 sm:h-12 md:hidden" aria-hidden="true" />
+              <div className="absolute inset-x-0 z-40 pointer-events-none top-16 sm:top-20 md:top-24 bg-white/95 backdrop-blur-sm border-b border-gray-100 md:border-none md:bg-transparent md:backdrop-blur-none">
+                <div className="w-full max-w-7xl py-3 px-4 sm:px-8 md:px-20">
+                  <Breadcrumb
+                    className="pointer-events-auto w-fit"
+                    items={landingBreadcrumbItems}
+                  />
+                </div>
               </div>
-            </div>
+            </>
           ) : null}
           {children}
         </div>

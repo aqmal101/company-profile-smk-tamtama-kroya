@@ -205,13 +205,13 @@ export const Header: React.FC = () => {
                 className={`w-fit px-3 h-fit py-3 md:text-sm ml-6 flex`}
               />
             )}
-            <TextButton
+            {/* <TextButton
               onClick={routeToRegistration}
               variant="primary"
               text="Daftar Sekarang"
               className="w-fit px-3 h-fit py-3 md:text-sm ml-6"
               width="fit"
-            />
+            /> */}
           </div>
         </div>
         {/* </div> */}
@@ -279,16 +279,16 @@ export const Header: React.FC = () => {
                 onClick={() => setIsVideoTutorialOpen(true)}
                 variant="outline"
                 text="Tutorial Pendaftaran"
-                className="w-fit px-3 h-fit py-3 md:text-sm ml-6"
+                className="w-fit px-3 h-fit py-3 md:text-sm"
                 width="full"
               />
-              <TextButton
+              {/* <TextButton
                 onClick={routeToRegistration}
                 variant="primary"
                 text="Daftar Sekarang"
                 className="min-w-fit w-fit px-3 h-fit py-3 md:text-sm ml-6"
                 width="full"
-              />
+              /> */}
             </div>
           </div>
         </div>

@@ -21,6 +21,7 @@ import { useAlert } from "@/components/ui/alert";
 import { useLeavePageConfirm } from "@/hooks/useLeavePageConfirm";
 import { useStepTabs } from "@/hooks/useStepTabs";
 import type { AlertVariant } from "@/components/ui/alert";
+import Breadcrumb from "@/components/Breadcrumb";
 
 const tabsData = [
   "Biodata Siswa",
@@ -483,16 +484,16 @@ export default function RegistrationPage() {
   return (
     <main className="min-h-screen bg-linear-to-b from-white to-gray-50 mt-10 max-sm:mt-16">
       <div className="w-full p-5 sm:border max-sm:p-5 md:p-10 lg:p-14 xl:p-20 flex flex-col items-center gap-6">
+        <div className="w-full border-b border-gray-200 pb-3">
+          <Breadcrumb
+            items={[
+              { label: "Pendaftaran", href: "/pendaftaran" },
+              { label: activeTab },
+            ]}
+          />
+        </div>
         {activeTab === "Biodata Siswa" && (
-          <div className="w-full flex flex-col mb-6 max-sm:mb-0">
-            {/* <div className="w-full flex flex-row justify-between mb-3">
-              <div
-                className="w-10 h-10 text-2xl drop-shadow bg-white rounded-md flex justify-center items-center cursor-pointer"
-                onClick={handleRouteToHome}
-              >
-                <GoArrowLeft />
-              </div>
-            </div> */}
+          <div className="w-full flex flex-col max-sm:my-4">
             <div className="w-full">
               <p className="text-primary text-2xl max-sm:text-xl mb-2">
                 Halo, calon murid <span className="font-bold">Tamtama!</span>

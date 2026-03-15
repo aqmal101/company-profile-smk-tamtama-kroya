@@ -257,7 +257,7 @@ export default function AlumnusPage() {
 
   return (
     <main className="min-h-screen w-full bg-linear-to-b from-[#fafafa] to-gray-50 px-4 sm:px-6 sm:py-12 md:px-10 lg:px-16 xl:px-24">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 mt-20 sm:pb-4 max-sm:mt-20 max-sm:px-8 justify-center items-center">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 mt-24 sm:pb-4 max-sm:mt-20 max-sm:px-8 justify-center items-center">
         <div className="w-full flex flex-wrap items-center justify-center max-w-2xl gap-4">
           <h1 className="text-4xl max-sm:text-2xl font-bold text-primary text-center">
             LULUSAN SMK TAMTAMA KROYA

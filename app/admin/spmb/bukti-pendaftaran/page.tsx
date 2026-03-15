@@ -655,7 +655,7 @@ export default function BuktiPendaftaranPage() {
       <div className="h-full">
         <TitleSection
           title="Bukti Pendaftaran"
-          subtitle="Halaman ini digunakan untuk mengedit dokumen PD yang akan dikirimkan ke calon murid baru sebagai bukti pendaftaran nya diterima oleh sekolah"
+          subtitle="Halaman ini digunakan untuk mengedit dokumen PDF yang akan dikirimkan ke calon murid baru sebagai bukti pendaftaran nya diterima oleh sekolah"
         />
         <div className="w-full h-fit bg-white rounded-md drop-shadow-sm p-3">
           {/* Tabs Navigation */}
