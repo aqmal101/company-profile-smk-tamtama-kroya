@@ -503,10 +503,6 @@ export default function RegistrationPage() {
                 📢 Pastikan semua data telah diisi dengan benar sebelum
                 mengirimkan formulir.
               </p>
-              {/* <p className="text-gray-700 text-lg max-sm:text-base">
-                Jika sudah yakin, silakan klik tombol
-                <span className="font-semibold"> Daftar Sekarang.</span>
-              </p> */}
             </div>
           </div>
         )}

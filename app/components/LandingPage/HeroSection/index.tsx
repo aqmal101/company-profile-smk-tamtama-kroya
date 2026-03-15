@@ -27,7 +27,7 @@ export const HeroSection: React.FC = () => {
             </ScrollAnimationWrapper>
             <ScrollAnimationWrapper>
               <h1 className="text-3xl max-sm:text-2xl text-left text-[#2D2D2D] font-semibold">
-                Portal Penerimaan Peserta Didik Baru (SPMB) SMK Tamtama Kroya{" "}
+                Sistem Penerimaan Murid Baru (SPMB) SMK Tamtama Kroya{" "}
                 {getAcademicYear()}
               </h1>
             </ScrollAnimationWrapper>
