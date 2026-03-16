@@ -52,18 +52,10 @@ const biodataSiswaSchema = z
       .refine((val) => !val || val.length <= 10, {
         message: "Nomor KIP maksimal 10 digit",
       }),
-    nomorWhatsapp: z.string().min(10, "Nomor WhatsApp minimal 10 digit"),
-  })
-  .superRefine((data, ctx) => {
-    if (data.adaKip) {
-      if (!data.nomorKip || String(data.nomorKip).trim() === "") {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["nomorKip"],
-          message: "Nomor KIP wajib diisi",
-        });
-      }
-    }
+    nomorWhatsapp: z
+      .string()
+      .min(1, "Nomor WhatsApp wajib diisi")
+      .min(10, "Nomor WhatsApp minimal 10 digit"),
   });
 
 type BiodataSiswaFormData = z.infer<typeof biodataSiswaSchema>;
@@ -556,7 +548,6 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                     <RadioInput
                       label="Apakah Memiliki KIP?"
                       name="adaKip"
-                      isMandatory
                       value={field.value ? "Ya" : "Tidak"}
                       onChange={(e) => {
                         field.onChange(e.target.value === "Ya");
@@ -584,7 +575,6 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                         {...field}
                         label="Nomor KIP"
                         placeholder="Masukkan Nomor KIP"
-                        isMandatory
                         limit={10}
                         error={form.formState.errors.nomorKip?.message}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -612,6 +602,7 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
                     {...field}
                     label="Nomor Whatsapp"
                     minLength={10}
+                    isMandatory
                     limit={15}
                     placeholder={
                       "Masukkan Nomor WhatsApp " +
