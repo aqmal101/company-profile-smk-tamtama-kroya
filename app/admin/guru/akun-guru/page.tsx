@@ -259,6 +259,7 @@ export default function AdminTeacherAccountPage() {
         <div className="w-full my-2 flex justify-center">
           <ProfileUser
             size={40}
+            isPreview={true}
             source={typeof value === "string" ? value : null}
           />
         </div>

@@ -21,6 +21,7 @@ import { getAuthHeader } from "@/utils/auth";
 import { transformAdonisValidationErrors } from "@/utils/adonisErrorTranslator";
 import SearchableMultiSelect from "@/components/InputForm/SearchableMultiSelect";
 import PhotoUpload from "@/components/Upload/PhotoUpload";
+import LoadingState from "@/components/ui/LoadingState";
 
 interface SchoolLesson {
   id: number;
@@ -199,15 +200,6 @@ export default function AdminEditTeacherAccountPage() {
   };
 
   const onSubmit = async (values: z.infer<typeof TeacherSchema>) => {
-    if (selectedLessons.length === 0) {
-      showAlert({
-        title: "Validasi",
-        description: "Pilih minimal satu mata pelajaran",
-        variant: "error",
-      });
-      return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -278,7 +270,7 @@ export default function AdminEditTeacherAccountPage() {
 
       showAlert({
         title: "Berhasil",
-        description: "Akun guru berhasil diupdate",
+        description: "Akun guru berhasil diperbarui",
         variant: "success",
       });
       router.push("/admin/guru/akun-guru");
@@ -296,15 +288,7 @@ export default function AdminEditTeacherAccountPage() {
   };
 
   if (isLoadingTeacher) {
-    return (
-      <div className="w-full min-h-[calc(100vh-4px)] bg-gray-100 p-4">
-        <div className="h-full">
-          <div className="flex justify-center items-center h-64">
-            <p className="text-gray-500">Memuat data guru...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingState message="Memuat data guru..." />;
   }
 
   return (
@@ -392,7 +376,7 @@ export default function AdminEditTeacherAccountPage() {
                   placeholder="Pilih Mata Pelajaran"
                   searchPlaceholder="Cari mata pelajaran..."
                   label="Mata Pelajaran"
-                  isMandatory={true}
+                  isMandatory={false} // Changed to make it non-mandatory
                   isLoading={isLoadingLessons}
                   disabled={isLoadingLessons || isLoading}
                 />

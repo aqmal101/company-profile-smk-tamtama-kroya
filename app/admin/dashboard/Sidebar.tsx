@@ -130,25 +130,30 @@ const sidebarItems = [
   },
 ];
 
+const getActiveGroup = (pathname: string) => {
+  return sidebarItems.find((section) =>
+    section.items.some((item) => pathname.startsWith(item.href)),
+  )?.group;
+};
+
+const isActivePath = (pathname: string, href: string) => {
+  return pathname === href || pathname.startsWith(`${href}/`);
+};
+
+const getInitialExpandedGroups = (pathname: string) => {
+  const activeGroup = getActiveGroup(pathname);
+  return new Set(activeGroup ? ["dashboard", activeGroup] : ["dashboard"]);
+};
+
 export default function Sidebar({ collapsed }: { collapsed: boolean }) {
   const pathname = usePathname();
 
-  // Compute initial expanded groups based on current pathname
-  const getInitialExpandedGroups = () => {
-    const activeGroup = sidebarItems.find((section) =>
-      section.items.some((item) => item.href === pathname),
-    )?.group;
-    return new Set(activeGroup ? ["dashboard", activeGroup] : ["dashboard"]);
-  };
-
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
-    getInitialExpandedGroups,
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() =>
+    getInitialExpandedGroups(pathname),
   );
 
   useEffect(() => {
-    const activeGroup = sidebarItems.find((section) =>
-      section.items.some((item) => item.href === pathname),
-    )?.group;
+    const activeGroup = getActiveGroup(pathname);
 
     if (activeGroup && !expandedGroups.has(activeGroup) && !collapsed) {
       setExpandedGroups(new Set([...expandedGroups, activeGroup]));
@@ -158,9 +163,7 @@ export default function Sidebar({ collapsed }: { collapsed: boolean }) {
 
   useEffect(() => {
     if (!collapsed) {
-      const activeGroup = sidebarItems.find((section) =>
-        section.items.some((item) => item.href === pathname),
-      )?.group;
+      const activeGroup = getActiveGroup(pathname);
 
       if (activeGroup && !expandedGroups.has(activeGroup)) {
         setExpandedGroups(new Set([...expandedGroups, activeGroup]));
@@ -185,7 +188,7 @@ export default function Sidebar({ collapsed }: { collapsed: boolean }) {
     <aside
       className={`bg-white h-[calc(100vh-4rem)] my-10 py-10 transition-all duration-300 z-50 overflow-y-auto overflow-x-hidden ${collapsed ? "w-16" : "w-62"} fixed left-0 top-0`}
     >
-      <nav className="mt-8 flex flex-col gap-2 h-full">
+      <nav className="mt-8 flex flex-col gap-2 h-full relative">
         {sidebarItems.map((section) => (
           <div key={section.group} className="mb-4 px-3">
             {!collapsed && (
@@ -207,7 +210,7 @@ export default function Sidebar({ collapsed }: { collapsed: boolean }) {
                   <a
                     key={item.label}
                     href={item.href}
-                    className={`flex items-center gap-3 py-2 px-4 rounded ${pathname === item.href ? "bg-primary hover:bg-primary/70 text-white" : ""} hover:bg-primary text-gray-800 font-medium transition-all ${collapsed ? "justify-center text-xl px-1" : "text-base"}`}
+                    className={`flex items-center gap-3 py-2 px-4 rounded ${isActivePath(pathname, item.href) ? "bg-primary hover:bg-primary/70 text-white sticky top-0 z-10" : ""} hover:bg-primary text-gray-800 font-medium transition-all ${collapsed ? "justify-center text-xl px-1" : "text-base"}`}
                   >
                     {collapsed ? (
                       <Tooltip>

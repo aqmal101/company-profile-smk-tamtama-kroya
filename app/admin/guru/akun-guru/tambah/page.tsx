@@ -21,6 +21,7 @@ import { getAuthHeader } from "@/utils/auth";
 import { transformAdonisValidationErrors } from "@/utils/adonisErrorTranslator";
 import SearchableMultiSelect from "@/components/InputForm/SearchableMultiSelect";
 import PhotoUpload from "@/components/Upload/PhotoUpload";
+import LoadingState from "@/components/ui/LoadingState";
 
 interface SchoolLesson {
   id: number;
@@ -38,6 +39,7 @@ export default function AdminAddTeacherAccountPage() {
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingLessons, setIsLoadingLessons] = useState(true);
+  const [isLoadingTeacher, setIsLoadingTeacher] = useState(true);
 
   const TeacherSchema = z.object({
     fullName: z.string().min(1, "Nama Lengkap harus diisi"),
@@ -133,15 +135,6 @@ export default function AdminAddTeacherAccountPage() {
   };
 
   const onSubmit = async (values: z.infer<typeof TeacherSchema>) => {
-    if (selectedLessons.length === 0) {
-      showAlert({
-        title: "Validasi",
-        description: "Pilih minimal satu mata pelajaran",
-        variant: "error",
-      });
-      return;
-    }
-
     if (!photoFile) {
       showAlert({
         title: "Validasi",
@@ -312,7 +305,7 @@ export default function AdminAddTeacherAccountPage() {
                   placeholder="Pilih Mata Pelajaran"
                   searchPlaceholder="Cari mata pelajaran..."
                   label="Mata Pelajaran"
-                  isMandatory={true}
+                  isMandatory={false} // Changed to make it non-mandatory
                   isLoading={isLoadingLessons}
                   disabled={isLoadingLessons || isLoading}
                 />
@@ -353,4 +346,8 @@ export default function AdminAddTeacherAccountPage() {
       </div>
     </div>
   );
+
+  if (isLoadingTeacher) {
+    return <LoadingState message="Memuat data guru..." />;
+  }
 }
