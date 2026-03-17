@@ -78,9 +78,9 @@ export default function KontakMediaPage() {
   const [frontFile, setFrontFile] = useState<File | null>(null);
   const [backFile, setBackFile] = useState<File | null>(null);
 
-  const MAX_WHATSAPP = 5;
-  const MAX_INSTAGRAM = 5;
-  const MAX_SOCIAL_PLATFORM = 5;
+  const MAX_WHATSAPP = 20;
+  const MAX_INSTAGRAM = 20;
+  const MAX_SOCIAL_PLATFORM = 20;
   const MAX_BROCHURE_MB = 10;
   const MAX_BROCHURE_BYTES = MAX_BROCHURE_MB * 1024 * 1024;
 
