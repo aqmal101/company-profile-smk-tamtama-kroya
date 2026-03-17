@@ -30,7 +30,6 @@ import { useCallback, useEffect, useState } from "react";
 import { IoMdRefresh, IoMdAdd } from "react-icons/io";
 import { LuEye, LuPen, LuTrash2, LuX } from "react-icons/lu";
 import { BsArrowLeft } from "react-icons/bs";
-import { debounce } from "lodash";
 import { InputText } from "@/components/InputForm/TextInput";
 
 // Tipe data untuk tab sekolah
@@ -59,6 +58,24 @@ export default function AdminProspectiveStudentPage() {
   // State untuk konfirmasi hapus tab
   const [deleteTabModalOpen, setDeleteTabModalOpen] = useState(false);
   const [tabToDelete, setTabToDelete] = useState<SchoolTab | null>(null);
+  // State untuk konfirmasi hapus semua tab
+  const [deleteAllTabsModalOpen, setDeleteAllTabsModalOpen] = useState(false);
+  // Fungsi untuk hapus semua tab
+  const handleDeleteAllTabs = () => {
+    setDeleteAllTabsModalOpen(true);
+  };
+
+  const confirmDeleteAllTabs = () => {
+    setSchoolTabs([]);
+    setActiveTab("");
+    setSelectedSchoolOrigin("");
+    setDeleteAllTabsModalOpen(false);
+    showAlert({
+      title: "Berhasil",
+      description: "Semua tab sekolah berhasil dihapus",
+      variant: "success",
+    });
+  };
 
   // State untuk data siswa
   const [students, setStudents] = useState<Student[]>([]);
@@ -547,6 +564,7 @@ export default function AdminProspectiveStudentPage() {
             academicYearId: selectedYearId,
             authored: selectAuthored,
             majorCode: selectedMajor,
+            schoolOrigin: selectedSchoolOrigin,
           },
         });
 
@@ -743,16 +761,53 @@ export default function AdminProspectiveStudentPage() {
               <TooltipTrigger>
                 <TextButton
                   onClick={() => setIsAddSchoolModalOpen(true)}
-                  // text="Tambah Sekolah"
                   className="text-xs!"
                   icon={<IoMdAdd className="text-lg" />}
                 />
               </TooltipTrigger>
-              <TooltipContent side="right" className="text-xs ml-4">
-                <p>Tambah Sekolah</p>
+              <TooltipContent side="top" className="text-xs">
+                <p>Tambah Tab Sekolah</p>
               </TooltipContent>
             </Tooltip>
+            {schoolTabs.length > 0 && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <TextButton
+                    variant="outline-danger"
+                    className="text-xs! ml-2"
+                    icon={<LuTrash2 className="text-lg" />}
+                    onClick={handleDeleteAllTabs}
+                  />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">
+                  <p>Hapus Semua Tab</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
+          {/* Modal Hapus Semua Tab */}
+          <BaseModal
+            isOpen={deleteAllTabsModalOpen}
+            onClose={() => setDeleteAllTabsModalOpen(false)}
+            title="Konfirmasi Hapus Semua Tab"
+            footer={
+              <div className="flex justify-end gap-2">
+                <TextButton
+                  variant="outline"
+                  text="Batal"
+                  onClick={() => setDeleteAllTabsModalOpen(false)}
+                />
+                <TextButton
+                  text="Hapus Semua"
+                  variant="danger"
+                  onClick={confirmDeleteAllTabs}
+                />
+              </div>
+            }
+          >
+            <p>Anda yakin ingin menghapus semua tab sekolah?</p>
+            <p>Data tidak akan hilang, hanya tab yang dihapus.</p>
+          </BaseModal>
         </div>
 
         {/* Konten Utama */}
@@ -760,7 +815,8 @@ export default function AdminProspectiveStudentPage() {
           <div className="p-2 max-sm:p-2">
             <div className="flex w-auto flex-wrap flex-col gap-4 lg:flex-row lg:items-center lg:justify-end mb-3">
               <DownloadDropdown
-                disabled={isExporting || !selectedSchoolOrigin}
+                disabled={!selectedSchoolOrigin}
+                loading={isExporting}
                 onDownloadExcel={() => handleDownload("xlsx")}
                 onDownloadPdf={() => handleDownload("pdf")}
               />

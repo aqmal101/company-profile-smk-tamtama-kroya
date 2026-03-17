@@ -8,6 +8,7 @@ export type RegistrationExportFilters = {
   academicYearId?: string | number | "";
   authored?: "" | "true" | "false";
   majorCode?: string | number | "";
+  schoolOrigin?: string | number | "";
 };
 
 const EXPORT_EXTENSION: Record<RegistrationExportType, string> = {
@@ -97,6 +98,7 @@ export async function downloadRegistrationExport({
   appendFilter(params, "academic_year_id", filters?.academicYearId);
   appendFilter(params, "authored", filters?.authored);
   appendFilter(params, "major_code", filters?.majorCode);
+  appendFilter(params, "school_origin", filters?.schoolOrigin);
 
   const queryString = params.toString();
   const response = await fetch(

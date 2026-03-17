@@ -12,6 +12,7 @@ export interface DownloadDropdownProps {
   onDownloadExcel?: () => void;
   onDownloadPdf?: () => void;
   disabled?: boolean;
+  loading?: boolean;
   className?: string;
 }
 
@@ -19,6 +20,7 @@ export default function DownloadDropdown({
   onDownloadExcel,
   onDownloadPdf,
   disabled = false,
+  loading = false,
   className = "",
 }: DownloadDropdownProps) {
   const [open, setOpen] = useState(false);
@@ -43,7 +45,7 @@ export default function DownloadDropdown({
         className="flex items-center gap-2 rounded-sm mb-1.5 bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none"
       >
         <span>{disabled ? "Mengunduh" : "Unduh Data"}</span>
-        {disabled ? (
+        {loading ? (
           <LuLoader className="animate-spin" />
         ) : (
           <LuChevronDown
