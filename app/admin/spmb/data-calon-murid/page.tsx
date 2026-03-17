@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { IoMdRefresh } from "react-icons/io";
 import { LuEye, LuPen, LuTrash2 } from "react-icons/lu";
+import { Button } from "@/components/ui/button";
 
 export default function AdminProspectiveStudentPage() {
   const { showAlert } = useAlert();
@@ -607,6 +608,10 @@ export default function AdminProspectiveStudentPage() {
     },
   ];
 
+  const routerToDataPerSekolah = () => {
+    router.push("/admin/spmb/data-calon-murid/data-per-sekolah");
+  };
+
   return (
     <div className="w-full min-h-[calc(100vh-4px)] bg-gray-100 p-4">
       <div className="h-full">
@@ -617,10 +622,11 @@ export default function AdminProspectiveStudentPage() {
         <div className="w-full h-fit bg-white rounded-md drop-shadow-sm">
           <div className="p-2 max-sm:p-2 border-b border-gray-200">
             <div className="flex w-auto flex-wrap flex-col gap-4 lg:flex-row lg:items-center lg:justify-end mb-3">
-              <DownloadDropdown
-                disabled={isExporting}
-                onDownloadExcel={() => handleDownload("xlsx")}
-                onDownloadPdf={() => handleDownload("pdf")}
+              <TextButton
+                variant="primary"
+                onClick={routerToDataPerSekolah}
+                className="text-sm! py-1.5! px-2! mb-1.5!"
+                text="Data per Sekolah"
               />
               <SelectInput
                 value={selectedYearId}

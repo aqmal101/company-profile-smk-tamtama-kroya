@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
     const major_code = searchParams.get("major_code") || "";
     const academic_year_id = searchParams.get("academic_year_id") || "";
     const teacher_id = searchParams.get("teacher_id") || "";
+    const school_origin = searchParams.get("school_origin") || "";
 
     const queryParams = new URLSearchParams({ page, limit });
     if (search) {
@@ -48,6 +49,10 @@ export async function GET(request: NextRequest) {
 
     if (teacher_id !== "") {
       queryParams.append("teacher_id", teacher_id);
+    }
+
+    if (school_origin !== "") {
+      queryParams.append("school_origin", school_origin);
     }
 
     const backendResponse = await fetch(
