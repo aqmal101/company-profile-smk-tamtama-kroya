@@ -47,7 +47,11 @@ const fieldOrder: Record<string, string[]> = {
   biodataWali: ["namaWali", "noTelponWali", "alamatWali"],
 };
 
-const formatValue = (key: string, value: unknown): string => {
+const formatValue = (
+  key: string,
+  value: unknown,
+  row?: Record<string, unknown>,
+): string => {
   if (value === null || value === undefined || value === "") return "-";
   if (key === "adaKip") return value ? "Ya" : "Tidak";
   if (key === "kondisiAyah" || key === "kondisiIbu") {
@@ -68,21 +72,21 @@ const formatValue = (key: string, value: unknown): string => {
             : String(value);
   }
   if (key === "agama") {
-    return value === "islam"
-      ? "Islam"
-      : value === "christian"
-        ? "Kristen"
-        : value === "catholic"
-          ? "Katolik"
-          : value === "hindu"
-            ? "Hindu"
-            : value === "buddhist"
-              ? "Buddha"
-              : value === "confucianism"
-                ? "Konghucu"
-                : String(value);
+    if (value === "islam") return "Islam";
+    if (value === "christian") return "Kristen";
+    if (value === "catholic") return "Katolik";
+    if (value === "hindu") return "Hindu";
+    if (value === "buddhist") return "Buddha";
+    if (value === "confucianism") return "Konghucu";
+    if (value === "other") {
+      // Use agamaLainnya or religionOther from row
+      if (row && (row.agamaLainnya || row.religionOther)) {
+        return String(row.agamaLainnya || row.religionOther);
+      }
+      return "-";
+    }
+    return String(value);
   }
-
   if (dateKeys.includes(key) && typeof value === "string") {
     const date = new Date(value);
     return date.toLocaleDateString("id-ID", {
@@ -110,6 +114,15 @@ const DataSection = ({
   let entries = Object.entries(data as Record<string, unknown>);
   if (entries.length === 0) return null;
 
+  // For biodataSiswa, only show one agama field, and if agama is 'other', use agamaLainnya/religionOther as value
+  if (title === "Biodata Siswa") {
+    const row = data as Record<string, unknown>;
+    // Remove agamaLainnya/religionOther from entries, only show 'agama' label
+    entries = entries.filter(
+      ([key]) => key !== "agamaLainnya" && key !== "religionOther",
+    );
+  }
+
   // Sort entries berdasarkan fieldOrder jika ada
   if (sectionKey && fieldOrder[sectionKey]) {
     const order = fieldOrder[sectionKey];
@@ -129,14 +142,29 @@ const DataSection = ({
       <div
         className={`grid ${columns === 2 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"} gap-x-6 gap-y-4 mt-4`}
       >
-        {entries.map(([key, value]) => (
-          <div key={key} className=" border-gray-200 pb-3">
-            <p className="text-xs text-primary font-semibold mb-1">
-              {labelMap[key] || key}
-            </p>
-            <p className="text-sm text-gray-800">{formatValue(key, value)}</p>
-          </div>
-        ))}
+        {entries.map(([key, value]) => {
+          // For agama, pass the full row for custom display
+          if (key === "agama" && title === "Biodata Siswa") {
+            return (
+              <div key={key} className=" border-gray-200 pb-3">
+                <p className="text-xs text-primary font-semibold mb-1">
+                  {labelMap[key] || key}
+                </p>
+                <p className="text-sm text-gray-800">
+                  {formatValue(key, value, data as Record<string, unknown>)}
+                </p>
+              </div>
+            );
+          }
+          return (
+            <div key={key} className=" border-gray-200 pb-3">
+              <p className="text-xs text-primary font-semibold mb-1">
+                {labelMap[key] || key}
+              </p>
+              <p className="text-sm text-gray-800">{formatValue(key, value)}</p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

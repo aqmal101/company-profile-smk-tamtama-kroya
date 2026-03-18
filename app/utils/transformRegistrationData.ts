@@ -9,6 +9,7 @@ interface RegistrationPayload {
     dateOfBirth: string;
     gender: number;
     religion: string;
+    religionOther?: string;
     schoolOriginNpsn: string;
     address: string;
     phoneNumber: string;
@@ -43,6 +44,7 @@ interface ApiRegistrationResponse {
     dateOfBirth: string;
     gender: string;
     religion: string;
+    religionOther?: string;
     schoolOriginName: string | null;
     schoolOriginNpsn: string | null;
     address: string;
@@ -93,6 +95,7 @@ export const transformToApiFormat = (
       dateOfBirth: biodataSiswa?.tanggalLahir || "",
       gender: parseInt(biodataSiswa?.jenisKelamin || "1", 10), // Parse string to number
       religion: biodataSiswa?.agama || "",
+      religionOther:  biodataSiswa?.agamaLainnya || "",
       schoolOriginNpsn: biodataSiswa?.asalSekolah || "",
       address: biodataSiswa?.alamat || "",
       phoneNumber: biodataSiswa?.nomorWhatsapp || "",
@@ -131,6 +134,7 @@ export const transformFromApiFormat = (
       alamat: studentDetail.address || "",
       jenisKelamin: studentDetail.gender === "1" ? "Laki-laki" : "Perempuan",
       agama: studentDetail.religion,
+      agamaLainnya: studentDetail.religionOther || "",
       adaKip: studentDetail.isKipRecipient === 1,
       nomorKip: studentDetail.kipNumber || "",
       nomorWhatsapp: studentDetail.phoneNumber || "",
@@ -212,6 +216,7 @@ export function transformRecentRegistrations(items: unknown): Student[] {
       createdAt:creactedAt,
       // provide religion which Student expects
       religion: String(sd["religion"] ?? ""),
+      religionOther: String(sd["religionOther"] ?? ""),
       // provide author shape (kept simple and derived from the author object)
       authorName: author ? (author["fullName"] ? String(author["fullName"]) : "-") : "-",
       author: author ?? null,

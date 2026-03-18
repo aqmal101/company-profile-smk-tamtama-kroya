@@ -8,6 +8,7 @@ interface StudentDetail {
   dateOfBirth: string;
   gender: number;
   religion: string;
+  religionOther?: string;
   schoolOriginNpsn: string;
   address: string;
   phoneNumber: string;

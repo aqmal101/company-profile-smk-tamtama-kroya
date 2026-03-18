@@ -101,6 +101,7 @@ export const translateFieldName = (fieldName: string): string => {
     username: "Username",
     password: "Password",
     schoolLessonIds: "Mata Pelajaran",
+    schoolLessons: "Mata Pelajaran",
     photoUrl: "Foto Profil",
 
     // Student fields

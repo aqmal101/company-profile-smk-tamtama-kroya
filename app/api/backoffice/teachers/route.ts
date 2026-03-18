@@ -88,9 +88,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate required fields
-    if (!body.fullName || !body.username || !body.password || !Array.isArray(body.schoolLessonIds)) {
+    if (!body.fullName || !body.username || !body.password || !Array.isArray(body.schoolLessons)) {
       return NextResponse.json(
-        { error: "Missing required fields: fullName, username, password, schoolLessonIds" },
+        { error: "Missing required fields: fullName, username, password, schoolLessons" },
         { status: 400 }
       );
     }
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         fullName: body.fullName,
         username: body.username,
         password: body.password,
-        schoolLessonIds: body.schoolLessonIds,
+        schoolLessons: body.schoolLessons,
         photoUrl: body.photoUrl || null,
       }),
     });

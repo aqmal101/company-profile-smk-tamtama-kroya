@@ -45,6 +45,7 @@ const biodataSiswaSchema = z
     alamat: z.string().min(1, "Alamat wajib diisi"),
     jenisKelamin: z.string().min(1, "Jenis Kelamin wajib diisi"),
     agama: z.string().min(1, "Agama wajib diisi"),
+    agamaLainnya: z.string().optional(),
     adaKip: z.boolean(),
     nomorKip: z
       .string()
@@ -56,6 +57,18 @@ const biodataSiswaSchema = z
       .string()
       .min(1, "Nomor WhatsApp wajib diisi")
       .min(10, "Nomor WhatsApp minimal 10 digit"),
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.agama === "other" &&
+      (!data.agamaLainnya || data.agamaLainnya.trim() === "")
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["agamaLainnya"],
+        message: "Agama Lainnya wajib diisi",
+      });
+    }
   });
 
 type BiodataSiswaFormData = z.infer<typeof biodataSiswaSchema>;
@@ -96,8 +109,9 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
       tanggalLahir: "",
       asalSekolah: "",
       alamat: "",
-      jenisKelamin: "", // Changed to empty string
+      jenisKelamin: "",
       agama: "",
+      agamaLainnya: "",
       adaKip: false,
       nomorKip: "",
       nomorWhatsapp: "",
@@ -509,34 +523,59 @@ export const BiodataSiswa: React.FC<BiodataSiswaProps> = ({
               </FormItem>
             )}
           />
+          <div className="flex flex-col gap-3 max-sm:gap-4">
+            <FormField
+              control={form.control}
+              name="agama"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <SelectInput
+                      label="Agama"
+                      {...field}
+                      options={[
+                        { value: "islam", label: "Islam" },
+                        { value: "christian", label: "Kristen" },
+                        { value: "catholic", label: "Katolik" },
+                        { value: "hindu", label: "Hindu" },
+                        { value: "buddhist", label: "Buddha" },
+                        { value: "confucianism", label: "Konghucu" },
+                        { value: "other", label: "Agama Lainnya" },
+                      ]}
+                      placeholder={
+                        "Pilih Agama " +
+                        (isTeacherMode ? "Calon Murid" : "Anda")
+                      }
+                      isMandatory
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="agama"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <SelectInput
-                    label="Agama"
-                    {...field}
-                    options={[
-                      { value: "islam", label: "Islam" },
-                      { value: "christian", label: "Kristen" },
-                      { value: "catholic", label: "Katolik" },
-                      { value: "hindu", label: "Hindu" },
-                      { value: "buddhist", label: "Buddha" },
-                      { value: "confucianism", label: "Konghucu" },
-                    ]}
-                    placeholder={
-                      "Pilih Agama " + (isTeacherMode ? "Calon Murid" : "Anda")
-                    }
-                    isMandatory
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            {/* Religion Other Field (conditional) */}
+            {form.watch("agama") === "other" && (
+              <FormField
+                control={form.control}
+                name="agamaLainnya"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <FormInput
+                        {...field}
+                        label="Agama Lainnya"
+                        placeholder="Masukkan Agama Lainnya"
+                        isMandatory
+                        error={form.formState.errors.agamaLainnya?.message}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             )}
-          />
+          </div>
 
           <div className="flex flex-col max-sm:gap-4">
             <FormField

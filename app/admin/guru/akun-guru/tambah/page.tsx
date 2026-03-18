@@ -169,7 +169,7 @@ export default function AdminAddTeacherAccountPage() {
           fullName: values.fullName,
           username: values.username,
           password: values.password,
-          schoolLessonIds: selectedLessons,
+          schoolLessons: selectedLessons,
           photoUrl: photoUrl,
         }),
       });

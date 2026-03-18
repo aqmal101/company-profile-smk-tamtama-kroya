@@ -44,7 +44,7 @@ interface TeacherData {
 interface TeacherUpdatePayload {
   fullName: string;
   username: string;
-  schoolLessonIds: number[];
+  schoolLessons: number[];
   password?: string;
   photoUrl?: string;
 }
@@ -218,7 +218,7 @@ export default function AdminEditTeacherAccountPage() {
       const updatePayload: TeacherUpdatePayload = {
         fullName: values.fullName,
         username: values.username,
-        schoolLessonIds: selectedLessons,
+        schoolLessons: selectedLessons,
       };
 
       // Only include password if provided
