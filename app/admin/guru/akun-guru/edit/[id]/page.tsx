@@ -44,7 +44,7 @@ interface TeacherData {
 interface TeacherUpdatePayload {
   fullName: string;
   username: string;
-  schoolLessons: number[];
+  schoolLessons: (number | string)[];
   password?: string;
   photoUrl?: string;
 }
@@ -56,7 +56,9 @@ export default function AdminEditTeacherAccountPage() {
   const teacherId = params.id as string;
 
   const [schoolLessons, setSchoolLessons] = useState<SchoolLesson[]>([]);
-  const [selectedLessons, setSelectedLessons] = useState<number[]>([]);
+  const [selectedLessons, setSelectedLessons] = useState<(number | string)[]>(
+    [],
+  );
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -370,15 +372,14 @@ export default function AdminEditTeacherAccountPage() {
                     label: `${lesson.name} ${lesson.abbreviation ? `(${lesson.abbreviation})` : ""}`,
                   }))}
                   selectedValues={selectedLessons}
-                  onSelectionChange={(values) =>
-                    setSelectedLessons(values.map((v) => Number(v)))
-                  }
+                  onSelectionChange={(values) => setSelectedLessons(values)}
                   placeholder="Pilih Mata Pelajaran"
                   searchPlaceholder="Cari mata pelajaran..."
                   label="Mata Pelajaran"
-                  isMandatory={false} // Changed to make it non-mandatory
+                  isMandatory={false}
                   isLoading={isLoadingLessons}
                   disabled={isLoadingLessons || isLoading}
+                  allowCustomValues={true}
                 />
 
                 {/* Photo Upload */}

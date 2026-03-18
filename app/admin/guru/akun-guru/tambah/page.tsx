@@ -21,7 +21,6 @@ import { getAuthHeader } from "@/utils/auth";
 import { transformAdonisValidationErrors } from "@/utils/adonisErrorTranslator";
 import SearchableMultiSelect from "@/components/InputForm/SearchableMultiSelect";
 import PhotoUpload from "@/components/Upload/PhotoUpload";
-import LoadingState from "@/components/ui/LoadingState";
 
 interface SchoolLesson {
   id: number;
@@ -34,12 +33,13 @@ export default function AdminAddTeacherAccountPage() {
   const { showAlert } = useAlert();
 
   const [schoolLessons, setSchoolLessons] = useState<SchoolLesson[]>([]);
-  const [selectedLessons, setSelectedLessons] = useState<number[]>([]);
+  const [selectedLessons, setSelectedLessons] = useState<(number | string)[]>(
+    [],
+  );
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingLessons, setIsLoadingLessons] = useState(true);
-  const [isLoadingTeacher, setIsLoadingTeacher] = useState(true);
 
   const TeacherSchema = z.object({
     fullName: z.string().min(1, "Nama Lengkap harus diisi"),
@@ -300,15 +300,14 @@ export default function AdminAddTeacherAccountPage() {
                     label: `${lesson.name} ${lesson.abbreviation ? `(${lesson.abbreviation})` : ""}`,
                   }))}
                   selectedValues={selectedLessons}
-                  onSelectionChange={(values) =>
-                    setSelectedLessons(values.map((v) => Number(v)))
-                  }
+                  onSelectionChange={(values) => setSelectedLessons(values)}
                   placeholder="Pilih Mata Pelajaran"
                   searchPlaceholder="Cari mata pelajaran..."
                   label="Mata Pelajaran"
-                  isMandatory={false} // Changed to make it non-mandatory
+                  isMandatory={false}
                   isLoading={isLoadingLessons}
                   disabled={isLoadingLessons || isLoading}
+                  allowCustomValues={true}
                 />
 
                 {/* Photo Upload */}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { LuX, LuChevronDown } from "react-icons/lu";
 
 export interface SelectOption {
@@ -23,6 +23,9 @@ export interface SearchableMultiSelectProps {
   className?: string;
   badgeClassName?: string;
   maxSelections?: number;
+  allowCustomValues?: boolean; // Allow adding custom values
+  customValuePrefix?: string; // Prefix for custom values (optional)
+  onCreateCustomValue?: (value: string) => void; // Callback when custom value is created
 }
 
 export const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
@@ -39,15 +42,36 @@ export const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
   className = "",
   badgeClassName = "",
   maxSelections,
+  allowCustomValues = false,
+  customValuePrefix = "",
+  onCreateCustomValue,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const selectedOptions = useMemo(
-    () => options.filter((opt) => selectedValues.includes(opt.value)),
-    [options, selectedValues],
-  );
+  // Get selected options with their labels
+  const selectedOptions = useMemo(() => {
+    const selected: SelectOption[] = [];
 
+    selectedValues.forEach((value) => {
+      // Check if value exists in options
+      const existingOption = options.find((opt) => opt.value === value);
+      if (existingOption) {
+        selected.push(existingOption);
+      } else if (allowCustomValues && typeof value === "string") {
+        // For custom values (not in options), create a temporary option
+        selected.push({
+          value: value,
+          label: value,
+        });
+      }
+    });
+
+    return selected;
+  }, [options, selectedValues, allowCustomValues]);
+
+  // Filter options based on search and selected values
   const filteredOptions = useMemo(
     () =>
       options.filter(
@@ -57,6 +81,18 @@ export const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
       ),
     [options, selectedValues, searchTerm],
   );
+
+  // Check if search term matches any existing option
+  const isExactMatch = useMemo(() => {
+    return options.some(
+      (opt) => opt.label.toLowerCase() === searchTerm.trim().toLowerCase(),
+    );
+  }, [options, searchTerm]);
+
+  // Check if search term is already selected
+  const isAlreadySelected = useMemo(() => {
+    return selectedValues.includes(searchTerm.trim());
+  }, [selectedValues, searchTerm]);
 
   const handleSelect = (value: number | string) => {
     const isSelected = selectedValues.includes(value);
@@ -73,6 +109,59 @@ export const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
     }
 
     setSearchTerm("");
+    // Keep focus on input after selection
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  };
+
+  // Handle Enter key for custom value
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      const trimmedSearch = searchTerm.trim();
+
+      if (trimmedSearch === "") return;
+
+      // Check if we can add more items
+      if (maxSelections && selectedValues.length >= maxSelections) {
+        return;
+      }
+
+      // If exact match exists in options, select that option
+      const exactMatch = options.find(
+        (opt) => opt.label.toLowerCase() === trimmedSearch.toLowerCase(),
+      );
+
+      if (exactMatch) {
+        e.preventDefault();
+        handleSelect(exactMatch.value);
+        return;
+      }
+
+      // If custom values are allowed and no exact match, add as custom value
+      if (allowCustomValues && !isAlreadySelected) {
+        e.preventDefault();
+
+        // Format custom value with prefix if provided
+        const customValue = customValuePrefix
+          ? `${customValuePrefix}${trimmedSearch}`
+          : trimmedSearch;
+
+        // Call callback if provided
+        if (onCreateCustomValue) {
+          onCreateCustomValue(customValue);
+        }
+
+        onSelectionChange([...selectedValues, customValue]);
+        setSearchTerm("");
+        setIsOpen(false);
+
+        // Keep focus on input after adding
+        setTimeout(() => {
+          inputRef.current?.focus();
+        }, 0);
+      }
+    }
   };
 
   const handleRemoveBadge = (value: number | string) => {
@@ -80,6 +169,15 @@ export const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
   };
 
   const canAddMore = !maxSelections || selectedValues.length < maxSelections;
+
+  // Focus input when dropdown opens
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen]);
 
   return (
     <div className={`form-item ${className}`}>
@@ -97,17 +195,21 @@ export const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
             {selectedOptions.map((opt) => (
               <div
                 key={opt.value}
-                className={`inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium ${badgeClassName}`}
+                className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+                  options.some((o) => o.value === opt.value)
+                    ? "bg-blue-100 text-blue-800" // Existing option
+                    : "bg-green-100 text-green-800" // Custom value
+                } ${badgeClassName}`}
               >
                 <span>{opt.label}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveBadge(opt.value)}
-                  className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                  className="hover:bg-opacity-20 hover:bg-black rounded-full p-0.5 transition-colors"
                   aria-label={`Remove ${opt.label}`}
                   disabled={disabled}
                 >
-                  <LuX size={16} className="text-danger" />
+                  <LuX size={16} className="text-current" />
                 </button>
               </div>
             ))}
@@ -125,6 +227,7 @@ export const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
             `}
           >
             <input
+              ref={inputRef}
               type="text"
               placeholder={
                 selectedOptions.length === 0 ? placeholder : searchPlaceholder
@@ -134,6 +237,7 @@ export const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
               onFocus={() => setIsOpen(true)}
               disabled={disabled || isLoading}
               className="flex-1 bg-transparent outline-none text-sm placeholder-gray-500"
+              onKeyDown={handleInputKeyDown}
             />
             <LuChevronDown
               size={20}
@@ -142,35 +246,78 @@ export const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
           </div>
 
           {/* Dropdown Options */}
-          {isOpen && (
+          {isOpen && !disabled && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
               {isLoading ? (
                 <div className="p-3 text-center text-gray-500 text-sm">
                   Memuat...
                 </div>
-              ) : filteredOptions.length === 0 ? (
-                <div className="p-3 text-center text-gray-500 text-sm">
-                  {selectedOptions.length === 0 && options.length === 0
-                    ? "Tidak ada pilihan"
-                    : "Tidak ada hasil"}
-                </div>
               ) : (
                 <div>
-                  {filteredOptions.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => handleSelect(opt.value)}
-                      disabled={
-                        opt.disabled || (disabled && !canAddMore && !isOpen)
-                      }
-                      className={`w-full px-3 py-2 text-left text-sm transition-colors
-                        ${opt.disabled ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "hover:bg-blue-50"}
-                      `}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                  {/* Existing Options */}
+                  {filteredOptions.length > 0 && (
+                    <>
+                      {filteredOptions.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => handleSelect(opt.value)}
+                          disabled={opt.disabled || !canAddMore}
+                          className={`w-full px-3 py-2 text-left text-sm transition-colors
+                            ${opt.disabled ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "hover:bg-blue-50"}
+                          `}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </>
+                  )}
+
+                  {/* Custom value option */}
+                  {allowCustomValues &&
+                    searchTerm.trim() !== "" &&
+                    !isExactMatch &&
+                    !isAlreadySelected &&
+                    canAddMore && (
+                      <button
+                        type="button"
+                        className="w-full px-3 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 border-t border-gray-100"
+                        onClick={() => {
+                          const customValue = customValuePrefix
+                            ? `${customValuePrefix}${searchTerm.trim()}`
+                            : searchTerm.trim();
+
+                          if (onCreateCustomValue) {
+                            onCreateCustomValue(customValue);
+                          }
+
+                          onSelectionChange([...selectedValues, customValue]);
+                          setSearchTerm("");
+                          setIsOpen(false);
+
+                          setTimeout(() => {
+                            inputRef.current?.focus();
+                          }, 0);
+                        }}
+                      >
+                        + Tambahkan "{searchTerm.trim()}" sebagai nilai baru
+                      </button>
+                    )}
+
+                  {/* No results message */}
+                  {filteredOptions.length === 0 &&
+                    (!allowCustomValues ||
+                      searchTerm.trim() === "" ||
+                      isExactMatch ||
+                      !canAddMore) && (
+                      <div className="p-3 text-center text-gray-500 text-sm">
+                        {!canAddMore
+                          ? `Maksimal ${maxSelections} item dipilih`
+                          : searchTerm.trim() === ""
+                            ? "Ketik untuk mencari"
+                            : "Tidak ada hasil"}
+                      </div>
+                    )}
                 </div>
               )}
             </div>
@@ -189,6 +336,7 @@ export const SearchableMultiSelect: React.FC<SearchableMultiSelectProps> = ({
         {maxSelections && (
           <p className="text-xs text-gray-500 mt-1">
             {selectedValues.length}/{maxSelections} item dipilih
+            {allowCustomValues && " (bisa menambahkan nilai baru)"}
           </p>
         )}
       </div>
